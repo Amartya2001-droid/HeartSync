@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct HeartSyncApp: App {
+    @StateObject private var store = HeartSyncStore()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(store)
         }
     }
 }
