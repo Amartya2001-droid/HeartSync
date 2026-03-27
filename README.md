@@ -24,10 +24,11 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 
 ## Demo flow
 
-1. Open the Home tab and introduce the weekly pulse, streak, and support focus.
-2. Open Check-In and show how quickly a couple can log energy, connection, and one intention.
-3. Save a new entry, then move back to Home or Moments to show the update reflected in history.
-4. Use the Profile tab to switch presets if you want a different presentation scenario.
+1. Let the onboarding sheet introduce the app on first launch, or replay it from Profile.
+2. Open the Home tab and introduce the weekly pulse, streak, and support focus.
+3. Open Check-In and show how quickly a couple can log energy, connection, and one intention.
+4. Save a new entry, then move back to Home or Moments to show the update reflected in history.
+5. Use the Profile tab to switch presets if you want a different presentation scenario.
 
 ## Best next improvements
 

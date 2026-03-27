@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var store: HeartSyncStore
+    @AppStorage("heartsync.shouldShowOnboarding") private var shouldShowOnboarding = true
     @State private var partnerName = ""
     @State private var milestone = ""
     @State private var supportFocus = ""
@@ -60,6 +61,11 @@ struct SettingsView: View {
                         saveMessage = "Sample data restored."
                     }
                     .foregroundStyle(.red)
+
+                    Button("Replay onboarding") {
+                        shouldShowOnboarding = true
+                        saveMessage = "Onboarding will open again."
+                    }
                 }
 
                 Section("MVP scope") {
@@ -67,6 +73,7 @@ struct SettingsView: View {
                     Label("Dashboard with pulse, streak, and recent moments", systemImage: "checkmark.circle.fill")
                     Label("Simple profile tuning for demo customization", systemImage: "checkmark.circle.fill")
                     Label("Preset switching for different presentation scenarios", systemImage: "checkmark.circle.fill")
+                    Label("Lightweight first-run onboarding", systemImage: "checkmark.circle.fill")
                 }
 
                 Section("Not in this week’s build") {
