@@ -68,12 +68,27 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Share weekly summary") {
+                    Text(store.weeklyStory)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    ShareLink(
+                        item: store.weeklySummaryText,
+                        subject: Text(store.weeklySummaryTitle),
+                        message: Text("Shared from HeartSync")
+                    ) {
+                        Label("Share current summary", systemImage: "square.and.arrow.up")
+                    }
+                }
+
                 Section("MVP scope") {
                     Label("Daily check-in with local persistence", systemImage: "checkmark.circle.fill")
                     Label("Dashboard with pulse, streak, and recent moments", systemImage: "checkmark.circle.fill")
                     Label("Simple profile tuning for demo customization", systemImage: "checkmark.circle.fill")
                     Label("Preset switching for different presentation scenarios", systemImage: "checkmark.circle.fill")
                     Label("Lightweight first-run onboarding", systemImage: "checkmark.circle.fill")
+                    Label("Shareable weekly summary text", systemImage: "checkmark.circle.fill")
                 }
 
                 Section("Not in this week’s build") {

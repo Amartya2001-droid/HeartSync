@@ -29,10 +29,11 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 3. Open Check-In and show how quickly a couple can log energy, connection, and one intention.
 4. Save a new entry, then move back to Home or Moments to show the update reflected in history.
 5. Use the Profile tab to switch presets if you want a different presentation scenario.
+6. Share the weekly summary from Profile to export a concise relationship snapshot.
 
 ## Best next improvements
 
 - Replace placeholder app icon assets with final brand artwork
-- Add a lightweight onboarding screen for first launch
+- Add screenshots and a short demo script for handoff
 - Add tests around store persistence and streak calculation
 - Polish copy and spacing after device-level review in Xcode

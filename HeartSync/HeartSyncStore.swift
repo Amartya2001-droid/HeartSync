@@ -151,6 +151,36 @@ final class HeartSyncStore: ObservableObject {
         history.first?.date
     }
 
+    var weeklySummaryTitle: String {
+        "HeartSync weekly summary"
+    }
+
+    var weeklySummaryText: String {
+        let latestMoment = history.first?.note.isEmpty == false ? history.first?.note ?? "No recent moment captured." : "No recent moment captured."
+
+        return """
+        \(weeklySummaryTitle)
+
+        Partner: \(partner.name)
+        Milestone: \(partner.milestone)
+        Support focus: \(partner.supportFocus)
+
+        Relationship pulse: \(snapshot.relationshipPulse)/5
+        Average energy: \(snapshot.weeklyAverageEnergy)/5
+        Average connection: \(snapshot.weeklyAverageConnection)/5
+        Check-in streak: \(snapshot.streakDays) day(s)
+
+        Weekly story:
+        \(weeklyStory)
+
+        Recommended next step:
+        \(recommendedAction)
+
+        Latest moment:
+        \(latestMoment)
+        """
+    }
+
     func saveDraft() {
         defaults.set(todayEnergy, forKey: StorageKeys.draftEnergy)
         defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
