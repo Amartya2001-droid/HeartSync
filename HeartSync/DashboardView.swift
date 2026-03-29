@@ -42,6 +42,7 @@ struct DashboardView: View {
 
                     focusCard
                     insightCard
+                    summaryCard
                     recentMoments
                 }
                 .padding(.horizontal, 20)
@@ -135,6 +136,39 @@ struct DashboardView: View {
             Label(store.recommendedAction, systemImage: "bolt.badge.clock")
                 .font(.subheadline)
                 .foregroundStyle(HeartSyncTheme.ink)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Take this week with you")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+
+            Text(store.weeklyStory)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .lineLimit(4)
+
+            ShareLink(
+                item: store.weeklySummaryText,
+                subject: Text(store.weeklySummaryTitle),
+                message: Text("Shared from HeartSync")
+            ) {
+                Label("Share weekly summary", systemImage: "square.and.arrow.up")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(HeartSyncTheme.ink, in: Capsule())
+            }
         }
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
