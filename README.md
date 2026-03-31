@@ -22,6 +22,11 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 
 In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` inside the workspace.
 
+## Demo materials
+
+- See [DEMO_SCRIPT.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/DEMO_SCRIPT.md) for a short presenter flow.
+- See [PRESENTER_CHECKLIST.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/PRESENTER_CHECKLIST.md) for a quick run-through before showing the app.
+
 ## Demo flow
 
 1. Let the onboarding sheet introduce the app on first launch, or replay it from Profile.
