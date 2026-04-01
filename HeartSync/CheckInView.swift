@@ -67,10 +67,22 @@ struct CheckInView: View {
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 
+            suggestionRow(
+                title: "Quick reflection prompts",
+                suggestions: store.notePromptSuggestions,
+                action: store.applyNoteSuggestion
+            )
+
             TextField("Today’s intention", text: $store.todayIntention, axis: .vertical)
                 .textFieldStyle(.plain)
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+            suggestionRow(
+                title: "Quick intention ideas",
+                suggestions: store.intentionSuggestions,
+                action: store.applyIntentionSuggestion
+            )
         }
         .padding(20)
         .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -78,6 +90,39 @@ struct CheckInView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+    }
+
+    private func suggestionRow(
+        title: String,
+        suggestions: [PromptSuggestion],
+        action: @escaping (PromptSuggestion) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(suggestions) { suggestion in
+                        Button {
+                            action(suggestion)
+                            showSavedState = false
+                        } label: {
+                            Text(suggestion.text)
+                                .font(.caption)
+                                .multilineTextAlignment(.leading)
+                                .foregroundStyle(HeartSyncTheme.ink)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                                .background(Color.white.opacity(0.92), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+        }
     }
 
     private func sliderCard(title: String, subtitle: String, value: Binding<Double>, accent: Color) -> some View {

@@ -6,6 +6,7 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 
 - A polished dashboard that shows relationship pulse, streak, and recent reflections
 - A daily check-in flow for energy, connection, notes, and intention
+- Quick prompt suggestions to make check-ins easier during demos and first use
 - A moments view for recent history
 - Local persistence for demo-ready state without requiring a backend
 - Basic profile customization for presenting the app with different names and milestones

@@ -48,6 +48,11 @@ struct DemoPreset: Identifiable, Hashable {
     let supportFocus: String
 }
 
+struct PromptSuggestion: Identifiable, Hashable {
+    let id: String
+    let text: String
+}
+
 @MainActor
 final class HeartSyncStore: ObservableObject {
     @Published var partner: PartnerProfile
@@ -179,6 +184,32 @@ final class HeartSyncStore: ObservableObject {
         Latest moment:
         \(latestMoment)
         """
+    }
+
+    var notePromptSuggestions: [PromptSuggestion] {
+        [
+            PromptSuggestion(id: "repair", text: "We handled stress better once we said what we needed."),
+            PromptSuggestion(id: "ritual", text: "A small ritual helped us feel more like a team tonight."),
+            PromptSuggestion(id: "drift", text: "We felt a little off today and need a calmer reset tomorrow.")
+        ]
+    }
+
+    var intentionSuggestions: [PromptSuggestion] {
+        [
+            PromptSuggestion(id: "walk", text: "Take a 10-minute walk together after work."),
+            PromptSuggestion(id: "phones", text: "Protect 20 phone-free minutes tonight."),
+            PromptSuggestion(id: "checkin", text: "Ask one better question before the day ends.")
+        ]
+    }
+
+    func applyNoteSuggestion(_ suggestion: PromptSuggestion) {
+        todayNote = suggestion.text
+        saveDraft()
+    }
+
+    func applyIntentionSuggestion(_ suggestion: PromptSuggestion) {
+        todayIntention = suggestion.text
+        saveDraft()
     }
 
     func saveDraft() {
