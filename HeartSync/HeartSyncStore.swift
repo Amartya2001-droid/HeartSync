@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 struct PartnerProfile: Codable {
     var name: String
@@ -212,6 +213,10 @@ final class HeartSyncStore: ObservableObject {
         saveDraft()
     }
 
+    func copyWeeklySummaryToClipboard() {
+        UIPasteboard.general.string = weeklySummaryText
+    }
+
     func saveDraft() {
         defaults.set(todayEnergy, forKey: StorageKeys.draftEnergy)
         defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
@@ -236,6 +241,12 @@ final class HeartSyncStore: ObservableObject {
         todayNote = ""
         todayIntention = "Protect 20 minutes for a no-phone check-in tonight."
         saveDraft()
+    }
+
+    func deleteCheckIns(at offsets: IndexSet, from entries: [DailyCheckIn]) {
+        let idsToDelete = offsets.map { entries[$0].id }
+        history.removeAll { idsToDelete.contains($0.id) }
+        persistHistory()
     }
 
     func updatePartner(name: String, milestone: String, supportFocus: String) {

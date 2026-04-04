@@ -80,6 +80,13 @@ struct SettingsView: View {
                     ) {
                         Label("Share current summary", systemImage: "square.and.arrow.up")
                     }
+
+                    Button {
+                        store.copyWeeklySummaryToClipboard()
+                        saveMessage = "Weekly summary copied."
+                    } label: {
+                        Label("Copy summary text", systemImage: "doc.on.doc")
+                    }
                 }
 
                 Section("MVP scope") {

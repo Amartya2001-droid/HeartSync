@@ -40,34 +40,49 @@ struct JournalView: View {
                 }
 
                 Section(selectedFilter.sectionTitle) {
-                    ForEach(filteredHistory) { item in
+                    if filteredHistory.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Text(item.date, format: .dateTime.weekday(.wide).month().day())
-                                    .font(.headline)
-                                Spacer()
-                                Text("\(item.connection)/5 connected")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(connectionTint(for: item))
-                            }
-
-                            Text(item.note.isEmpty ? "No note was captured for this day." : item.note)
-                                .font(.body)
-
-                            Label("Intention: \(item.intention)", systemImage: "sparkles")
+                            Text(emptyStateTitle)
+                                .font(.headline)
+                            Text(emptyStateMessage)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
-
-                            Label("Energy \(item.energy)/5", systemImage: "bolt.heart")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
                         }
-                        .padding(.vertical, 8)
-                        .listRowBackground(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .fill(Color.white.opacity(0.88))
-                                .padding(.vertical, 4)
-                        )
+                        .padding(.vertical, 10)
+                        .listRowBackground(Color.white.opacity(0.72))
+                    } else {
+                        ForEach(filteredHistory) { item in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text(item.date, format: .dateTime.weekday(.wide).month().day())
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("\(item.connection)/5 connected")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(connectionTint(for: item))
+                                }
+
+                                Text(item.note.isEmpty ? "No note was captured for this day." : item.note)
+                                    .font(.body)
+
+                                Label("Intention: \(item.intention)", systemImage: "sparkles")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+
+                                Label("Energy \(item.energy)/5", systemImage: "bolt.heart")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 8)
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .fill(Color.white.opacity(0.88))
+                                    .padding(.vertical, 4)
+                            )
+                        }
+                        .onDelete { offsets in
+                            store.deleteCheckIns(at: offsets, from: filteredHistory)
+                        }
                     }
                 }
             }
@@ -108,6 +123,28 @@ struct JournalView: View {
 
     private func connectionTint(for item: DailyCheckIn) -> Color {
         item.connection >= 4 ? HeartSyncTheme.sage : HeartSyncTheme.blush
+    }
+
+    private var emptyStateTitle: String {
+        switch selectedFilter {
+        case .all:
+            return "No moments yet"
+        case .strong:
+            return "No strong days captured yet"
+        case .care:
+            return "No lower-energy or lower-connection days right now"
+        }
+    }
+
+    private var emptyStateMessage: String {
+        switch selectedFilter {
+        case .all:
+            return "Complete a check-in and it will show up here as part of your shared story."
+        case .strong:
+            return "Once a higher-connection day is logged, this filter will make those bright spots easy to revisit."
+        case .care:
+            return "This filter is for moments that may need a little more repair, honesty, or support."
+        }
     }
 
     private func recapCard(title: String, value: String, symbol: String, tint: Color) -> some View {
