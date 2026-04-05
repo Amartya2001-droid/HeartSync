@@ -41,6 +41,7 @@ struct DashboardView: View {
                     }
 
                     focusCard
+                    todayStatusCard
                     insightCard
                     summaryCard
                     recentMoments
@@ -136,6 +137,35 @@ struct DashboardView: View {
             Label(store.recommendedAction, systemImage: "bolt.badge.clock")
                 .font(.subheadline)
                 .foregroundStyle(HeartSyncTheme.ink)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private var todayStatusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text(store.todayStatusTitle)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Spacer()
+                Label(
+                    store.hasCompletedTodayCheckIn ? "Done" : "Pending",
+                    systemImage: store.hasCompletedTodayCheckIn ? "checkmark.circle.fill" : "clock.fill"
+                )
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(store.hasCompletedTodayCheckIn ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+            }
+
+            Text(store.todayStatusMessage)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .lineLimit(4)
         }
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)

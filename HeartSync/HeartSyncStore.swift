@@ -157,6 +157,33 @@ final class HeartSyncStore: ObservableObject {
         history.first?.date
     }
 
+    var todayCheckIn: DailyCheckIn? {
+        let today = Calendar.current.startOfDay(for: .now)
+        return history.first {
+            Calendar.current.isDate(Calendar.current.startOfDay(for: $0.date), inSameDayAs: today)
+        }
+    }
+
+    var hasCompletedTodayCheckIn: Bool {
+        todayCheckIn != nil
+    }
+
+    var todayStatusTitle: String {
+        hasCompletedTodayCheckIn ? "Today's check-in is in" : "Today's check-in is still open"
+    }
+
+    var todayStatusMessage: String {
+        guard let todayCheckIn else {
+            return "A 60-second reflection is enough to keep the relationship pulse current."
+        }
+
+        if todayCheckIn.note.isEmpty {
+            return "You logged today's emotional state. Add a note later if more context comes up."
+        }
+
+        return todayCheckIn.note
+    }
+
     var weeklySummaryTitle: String {
         "HeartSync weekly summary"
     }

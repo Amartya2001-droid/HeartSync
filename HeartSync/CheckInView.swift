@@ -30,13 +30,17 @@ struct CheckInView: View {
                         accent: HeartSyncTheme.blush
                     )
 
+                    if let todayCheckIn = store.todayCheckIn {
+                        existingCheckInCard(todayCheckIn)
+                    }
+
                     reflectionCard
 
                     Button {
                         store.submitCheckIn()
                         showSavedState = true
                     } label: {
-                        Text(showSavedState ? "Saved for today" : "Save today’s check-in")
+                        Text(buttonTitle)
                             .font(.headline)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -54,6 +58,35 @@ struct CheckInView: View {
                 showSavedState = false
             }
         }
+    }
+
+    private var buttonTitle: String {
+        if showSavedState {
+            return "Saved for today"
+        }
+
+        return store.hasCompletedTodayCheckIn ? "Update today’s check-in" : "Save today’s check-in"
+    }
+
+    private func existingCheckInCard(_ checkIn: DailyCheckIn) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Already checked in today")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+
+            Text("You can adjust the sliders or replace the note and intention below. Saving again will update today’s entry.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 14) {
+                Label("Energy \(checkIn.energy)/5", systemImage: "bolt.heart.fill")
+                Label("Connection \(checkIn.connection)/5", systemImage: "heart.fill")
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(HeartSyncTheme.blush)
+        }
+        .padding(20)
+        .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var reflectionCard: some View {
