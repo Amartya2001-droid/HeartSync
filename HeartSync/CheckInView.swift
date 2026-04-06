@@ -84,6 +84,21 @@ struct CheckInView: View {
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(HeartSyncTheme.blush)
+
+            HStack(spacing: 10) {
+                Button("Use saved values") {
+                    store.loadTodayCheckInIntoDraft()
+                    showSavedState = false
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(HeartSyncTheme.blush)
+
+                Button("Start fresh") {
+                    store.clearDraft()
+                    showSavedState = false
+                }
+                .buttonStyle(.bordered)
+            }
         }
         .padding(20)
         .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -116,6 +131,10 @@ struct CheckInView: View {
                 suggestions: store.intentionSuggestions,
                 action: store.applyIntentionSuggestion
             )
+
+            Label("Drafts save automatically while you type.", systemImage: "checkmark.shield")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
         .padding(20)
         .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))

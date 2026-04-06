@@ -244,6 +244,23 @@ final class HeartSyncStore: ObservableObject {
         UIPasteboard.general.string = weeklySummaryText
     }
 
+    func loadTodayCheckInIntoDraft() {
+        guard let todayCheckIn else { return }
+        todayEnergy = Double(todayCheckIn.energy)
+        todayConnection = Double(todayCheckIn.connection)
+        todayNote = todayCheckIn.note
+        todayIntention = todayCheckIn.intention
+        saveDraft()
+    }
+
+    func clearDraft() {
+        todayEnergy = 3
+        todayConnection = 3
+        todayNote = ""
+        todayIntention = ""
+        saveDraft()
+    }
+
     func saveDraft() {
         defaults.set(todayEnergy, forKey: StorageKeys.draftEnergy)
         defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
