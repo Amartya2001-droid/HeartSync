@@ -110,6 +110,10 @@ struct CheckInView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(HeartSyncTheme.ink)
 
+            if isDraftMostlyEmpty {
+                starterCard
+            }
+
             TextField("One sentence about the day, tension, or a bright moment", text: $store.todayNote, axis: .vertical)
                 .textFieldStyle(.plain)
                 .padding(16)
@@ -142,6 +146,45 @@ struct CheckInView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+    }
+
+    private var isDraftMostlyEmpty: Bool {
+        store.todayNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        store.todayIntention.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var starterCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Need a quick starting point?")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+
+            Text("Use one tap to prefill a reflection and intention, then edit it so it sounds like you.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                Button("Add reflection") {
+                    if let suggestion = store.notePromptSuggestions.first {
+                        store.applyNoteSuggestion(suggestion)
+                    }
+                    showSavedState = false
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(HeartSyncTheme.blush)
+
+                Button("Add intention") {
+                    if let suggestion = store.intentionSuggestions.first {
+                        store.applyIntentionSuggestion(suggestion)
+                    }
+                    showSavedState = false
+                }
+                .buttonStyle(.bordered)
+            }
+            .font(.caption.weight(.semibold))
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     private func suggestionRow(
