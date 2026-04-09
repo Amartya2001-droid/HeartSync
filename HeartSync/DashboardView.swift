@@ -234,6 +234,19 @@ struct DashboardView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(4)
 
+            VStack(alignment: .leading, spacing: 10) {
+                summaryHighlight(
+                    title: "What helped",
+                    detail: store.strongestMomentSummary,
+                    tint: HeartSyncTheme.sage
+                )
+                summaryHighlight(
+                    title: "Needs care",
+                    detail: store.needsCareSummary,
+                    tint: HeartSyncTheme.coral
+                )
+            }
+
             ShareLink(
                 item: store.weeklySummaryText,
                 subject: Text(store.weeklySummaryTitle),
@@ -314,6 +327,21 @@ struct DashboardView: View {
             .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .buttonStyle(.plain)
+    }
+
+    private func summaryHighlight(title: String, detail: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(tint)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(HeartSyncTheme.ink)
+                .lineLimit(2)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 

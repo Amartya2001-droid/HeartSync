@@ -209,6 +209,26 @@ final class HeartSyncStore: ObservableObject {
         "HeartSync weekly summary"
     }
 
+    var strongestMomentSummary: String {
+        guard let strongest = history.max(by: compareMomentsForStrength) else {
+            return "No standout moment captured yet."
+        }
+
+        return strongest.note.isEmpty
+            ? "A higher-connection day was logged without a note."
+            : strongest.note
+    }
+
+    var needsCareSummary: String {
+        guard let lowest = history.min(by: compareMomentsForStrength) else {
+            return "No lower-connection moment captured yet."
+        }
+
+        return lowest.note.isEmpty
+            ? "A lower-connection day was logged without a note."
+            : lowest.note
+    }
+
     var weeklySummaryText: String {
         let latestMoment = history.first?.note.isEmpty == false ? history.first?.note ?? "No recent moment captured." : "No recent moment captured."
 
@@ -232,6 +252,12 @@ final class HeartSyncStore: ObservableObject {
 
         Latest moment:
         \(latestMoment)
+
+        What helped most:
+        \(strongestMomentSummary)
+
+        What may need care:
+        \(needsCareSummary)
         """
     }
 
@@ -406,4 +432,12 @@ final class HeartSyncStore: ObservableObject {
             supportFocus: "Creating more emotionally meaningful check-ins across time zones"
         )
     ]
+
+    private func compareMomentsForStrength(lhs: DailyCheckIn, rhs: DailyCheckIn) -> Bool {
+        if lhs.connection == rhs.connection {
+            return lhs.energy < rhs.energy
+        }
+
+        return lhs.connection < rhs.connection
+    }
 }
