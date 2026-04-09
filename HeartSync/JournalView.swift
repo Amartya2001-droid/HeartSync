@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 struct JournalView: View {
@@ -37,6 +38,27 @@ struct JournalView: View {
                         symbol: "bolt.horizontal.circle",
                         tint: HeartSyncTheme.coral
                     )
+                }
+
+                Section("Week at a glance") {
+                    HStack(spacing: 12) {
+                        summaryPill(
+                            title: "Entries",
+                            value: "\(filteredHistory.count)",
+                            tint: HeartSyncTheme.blush
+                        )
+                        summaryPill(
+                            title: "Avg energy",
+                            value: averageEnergyLabel,
+                            tint: HeartSyncTheme.sage
+                        )
+                        summaryPill(
+                            title: "Avg connection",
+                            value: averageConnectionLabel,
+                            tint: HeartSyncTheme.coral
+                        )
+                    }
+                    .padding(.vertical, 6)
                 }
 
                 Section(selectedFilter.sectionTitle) {
@@ -163,6 +185,33 @@ struct JournalView: View {
             }
         }
         .padding(.vertical, 6)
+    }
+
+    private var averageEnergyLabel: String {
+        averageLabel(for: filteredHistory.map(\.energy))
+    }
+
+    private var averageConnectionLabel: String {
+        averageLabel(for: filteredHistory.map(\.connection))
+    }
+
+    private func averageLabel(for values: [Int]) -> String {
+        guard !values.isEmpty else { return "--" }
+        let average = Double(values.reduce(0, +)) / Double(values.count)
+        return String(format: "%.1f/5", average)
+    }
+
+    private func summaryPill(title: String, value: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 
