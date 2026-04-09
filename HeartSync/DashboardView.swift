@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var store: HeartSyncStore
+    @Binding var selectedTab: HeartSyncTab
 
     var body: some View {
         NavigationStack {
@@ -41,6 +42,7 @@ struct DashboardView: View {
                     }
 
                     focusCard
+                    quickActionsCard
                     todayStatusCard
                     insightCard
                     summaryCard
@@ -176,6 +178,51 @@ struct DashboardView: View {
         )
     }
 
+    private var quickActionsCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Jump back in")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+
+            Text("Use Home as the launch point for your next check-in, recap, or profile tweak.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                quickActionButton(
+                    title: "Check-In",
+                    symbol: "slider.horizontal.3",
+                    tint: HeartSyncTheme.coral
+                ) {
+                    selectedTab = .checkIn
+                }
+
+                quickActionButton(
+                    title: "Moments",
+                    symbol: "book.closed",
+                    tint: HeartSyncTheme.sage
+                ) {
+                    selectedTab = .moments
+                }
+
+                quickActionButton(
+                    title: "Profile",
+                    symbol: "person.crop.circle",
+                    tint: HeartSyncTheme.blush
+                ) {
+                    selectedTab = .profile
+                }
+            }
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+        )
+    }
+
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Take this week with you")
@@ -252,11 +299,27 @@ struct DashboardView: View {
         .padding(.vertical, 12)
         .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
+
+    private func quickActionButton(title: String, symbol: String, tint: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                Image(systemName: symbol)
+                    .font(.headline)
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(tint)
+            .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
+            .padding(.horizontal, 14)
+            .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView()
+        DashboardView(selectedTab: .constant(.home))
             .environmentObject(HeartSyncStore())
     }
 }

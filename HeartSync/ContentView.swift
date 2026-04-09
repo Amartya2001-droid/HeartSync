@@ -1,27 +1,39 @@
 import SwiftUI
 
+enum HeartSyncTab: Hashable {
+    case home
+    case checkIn
+    case moments
+    case profile
+}
+
 struct ContentView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @AppStorage("heartsync.shouldShowOnboarding") private var shouldShowOnboarding = true
+    @State private var selectedTab: HeartSyncTab = .home
 
     var body: some View {
-        TabView {
-            DashboardView()
+        TabView(selection: $selectedTab) {
+            DashboardView(selectedTab: $selectedTab)
+                .tag(HeartSyncTab.home)
                 .tabItem {
                     Label("Home", systemImage: "heart.text.square")
                 }
 
             CheckInView()
+                .tag(HeartSyncTab.checkIn)
                 .tabItem {
                     Label("Check-In", systemImage: "slider.horizontal.3")
                 }
 
             JournalView()
+                .tag(HeartSyncTab.moments)
                 .tabItem {
                     Label("Moments", systemImage: "book.closed")
                 }
 
             SettingsView()
+                .tag(HeartSyncTab.profile)
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle")
                 }
