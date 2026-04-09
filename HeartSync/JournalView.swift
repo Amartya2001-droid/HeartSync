@@ -54,7 +54,7 @@ struct JournalView: View {
                         ForEach(filteredHistory) { item in
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
-                                    Text(item.date, format: .dateTime.weekday(.wide).month().day())
+                                    Text(store.dateContextLabel(for: item.date))
                                         .font(.headline)
                                     Spacer()
                                     Text("\(item.connection)/5 connected")

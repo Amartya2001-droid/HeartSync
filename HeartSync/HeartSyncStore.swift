@@ -157,6 +157,27 @@ final class HeartSyncStore: ObservableObject {
         history.first?.date
     }
 
+    func relativeDayLabel(for date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "Today"
+        }
+
+        if calendar.isDateInYesterday(date) {
+            return "Yesterday"
+        }
+
+        return date.formatted(.dateTime.weekday(.wide))
+    }
+
+    func calendarDateLabel(for date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day())
+    }
+
+    func dateContextLabel(for date: Date) -> String {
+        "\(relativeDayLabel(for: date)) • \(calendarDateLabel(for: date))"
+    }
+
     var todayCheckIn: DailyCheckIn? {
         let today = Calendar.current.startOfDay(for: .now)
         return history.first {

@@ -217,7 +217,7 @@ struct DashboardView: View {
 
             ForEach(store.recentMoments) { item in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(item.date, format: .dateTime.weekday(.abbreviated).month().day())
+                    Text(store.dateContextLabel(for: item.date))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(HeartSyncTheme.blush)
                     Text(item.note.isEmpty ? "No note captured for this day." : item.note)
@@ -236,7 +236,7 @@ struct DashboardView: View {
 
     private var latestDateLabel: String {
         guard let latest = store.latestCheckInDate else { return "None" }
-        return latest.formatted(.dateTime.month(.abbreviated).day())
+        return store.dateContextLabel(for: latest)
     }
 
     private func statPill(title: String, value: String) -> some View {
