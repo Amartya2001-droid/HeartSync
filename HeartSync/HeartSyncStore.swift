@@ -153,6 +153,42 @@ final class HeartSyncStore: ObservableObject {
         return "You are in a rebuilding zone. Keep the streak alive and optimize for honesty over perfectly positive check-ins."
     }
 
+    var connectionTrendTitle: String {
+        switch connectionTrendDelta {
+        case 1...:
+            return "Connection is rising"
+        case ..<0:
+            return "Connection needs care"
+        default:
+            return "Connection is steady"
+        }
+    }
+
+    var connectionTrendMessage: String {
+        guard history.count >= 4 else {
+            return "Keep logging a few more check-ins and HeartSync will start comparing patterns over time."
+        }
+
+        switch connectionTrendDelta {
+        case 1...:
+            return "Recent check-ins are trending stronger than the previous stretch. Capture what helped so it can become repeatable."
+        case ..<0:
+            return "Recent check-ins are softer than the previous stretch. Use today’s intention to lower the emotional load."
+        default:
+            return "The pattern is stable right now. A small consistent ritual is the best next move."
+        }
+    }
+
+    private var connectionTrendDelta: Int {
+        let recent = Array(history.prefix(3))
+        let previous = Array(history.dropFirst(3).prefix(3))
+        guard !recent.isEmpty, !previous.isEmpty else { return 0 }
+
+        let recentAverage = recent.map(\.connection).reduce(0, +) / recent.count
+        let previousAverage = previous.map(\.connection).reduce(0, +) / previous.count
+        return recentAverage - previousAverage
+    }
+
     var latestCheckInDate: Date? {
         history.first?.date
     }

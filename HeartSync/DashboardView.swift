@@ -41,6 +41,7 @@ struct DashboardView: View {
                         )
                     }
 
+                    trendCard
                     focusCard
                     quickActionsCard
                     todayStatusCard
@@ -113,6 +114,32 @@ struct DashboardView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(HeartSyncTheme.ink, in: Capsule())
+            }
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private var trendCard: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.sage)
+                .frame(width: 44, height: 44)
+                .background(Color.white.opacity(0.76), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(store.connectionTrendTitle)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Text(store.connectionTrendMessage)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(22)
