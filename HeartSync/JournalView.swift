@@ -4,6 +4,7 @@ import SwiftUI
 struct JournalView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @State private var selectedFilter: JournalFilter = .all
+    @State private var searchText = ""
 
     var body: some View {
         NavigationStack {
@@ -111,17 +112,28 @@ struct JournalView: View {
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Moments")
+            .searchable(text: $searchText, prompt: "Search notes or intentions")
         }
     }
 
     private var filteredHistory: [DailyCheckIn] {
+        let entries: [DailyCheckIn]
         switch selectedFilter {
         case .all:
-            return store.history
+            entries = store.history
         case .strong:
-            return store.history.filter { $0.connection >= 4 }
+            entries = store.history.filter { $0.connection >= 4 }
         case .care:
-            return store.history.filter { $0.connection <= 3 || $0.energy <= 3 }
+            entries = store.history.filter { $0.connection <= 3 || $0.energy <= 3 }
+        }
+
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return entries }
+
+        return entries.filter { entry in
+            entry.note.localizedCaseInsensitiveContains(query) ||
+            entry.intention.localizedCaseInsensitiveContains(query) ||
+            store.dateContextLabel(for: entry.date).localizedCaseInsensitiveContains(query)
         }
     }
 
@@ -148,6 +160,10 @@ struct JournalView: View {
     }
 
     private var emptyStateTitle: String {
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "No matching moments"
+        }
+
         switch selectedFilter {
         case .all:
             return "No moments yet"
@@ -159,6 +175,10 @@ struct JournalView: View {
     }
 
     private var emptyStateMessage: String {
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Try a different word from a note, intention, or date label."
+        }
+
         switch selectedFilter {
         case .all:
             return "Complete a check-in and it will show up here as part of your shared story."
