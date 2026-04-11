@@ -241,6 +241,38 @@ final class HeartSyncStore: ObservableObject {
         return todayCheckIn.note
     }
 
+    var draftCoachingTitle: String {
+        let energy = Int(todayEnergy.rounded())
+        let connection = Int(todayConnection.rounded())
+
+        switch (energy, connection) {
+        case let (energy, _) where energy <= 2:
+            return "Keep this one gentle"
+        case let (_, connection) where connection <= 2:
+            return "Name the distance early"
+        case (4...5, 4...5):
+            return "Turn momentum into a ritual"
+        default:
+            return "Choose one small next step"
+        }
+    }
+
+    var draftCoachingMessage: String {
+        let energy = Int(todayEnergy.rounded())
+        let connection = Int(todayConnection.rounded())
+
+        switch (energy, connection) {
+        case let (energy, _) where energy <= 2:
+            return "Low energy days are not the time for a perfect conversation. Aim for one clear ask and one kind check-in."
+        case let (_, connection) where connection <= 2:
+            return "Connection feels lower today, so make the intention concrete: when, where, and what support would help."
+        case (4...5, 4...5):
+            return "This is a good day to notice what worked and protect it as a repeatable rhythm."
+        default:
+            return "Use the note to capture what is true, then set an intention that feels doable tonight."
+        }
+    }
+
     var weeklySummaryTitle: String {
         "HeartSync weekly summary"
     }

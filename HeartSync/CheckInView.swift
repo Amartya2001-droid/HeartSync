@@ -30,6 +30,8 @@ struct CheckInView: View {
                         accent: HeartSyncTheme.blush
                     )
 
+                    coachingCard
+
                     if let todayCheckIn = store.todayCheckIn {
                         existingCheckInCard(todayCheckIn)
                     }
@@ -102,6 +104,27 @@ struct CheckInView: View {
         }
         .padding(20)
         .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var coachingCard: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: "lightbulb.max.fill")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.coral)
+                .frame(width: 42, height: 42)
+                .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(store.draftCoachingTitle)
+                    .font(.headline)
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Text(store.draftCoachingMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(18)
+        .background(Color.white.opacity(0.66), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var reflectionCard: some View {
