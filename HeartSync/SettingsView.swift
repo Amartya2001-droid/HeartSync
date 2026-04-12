@@ -89,6 +89,23 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Demo readiness") {
+                    ForEach(store.demoReadinessItems) { item in
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: item.isReady ? "checkmark.circle.fill" : "clock.badge.exclamationmark")
+                                .foregroundStyle(item.isReady ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(item.detail)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+
                 Section("MVP scope") {
                     Label("Daily check-in with local persistence", systemImage: "checkmark.circle.fill")
                     Label("Dashboard with pulse, streak, and recent moments", systemImage: "checkmark.circle.fill")

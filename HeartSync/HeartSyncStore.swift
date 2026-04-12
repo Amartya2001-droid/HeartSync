@@ -54,6 +54,13 @@ struct PromptSuggestion: Identifiable, Hashable {
     let text: String
 }
 
+struct DemoReadinessItem: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let detail: String
+    let isReady: Bool
+}
+
 @MainActor
 final class HeartSyncStore: ObservableObject {
     @Published var partner: PartnerProfile
@@ -327,6 +334,35 @@ final class HeartSyncStore: ObservableObject {
         What may need care:
         \(needsCareSummary)
         """
+    }
+
+    var demoReadinessItems: [DemoReadinessItem] {
+        [
+            DemoReadinessItem(
+                id: "profile",
+                title: "Profile is personalized",
+                detail: "Partner name, milestone, and support focus are ready for the story.",
+                isReady: !partner.name.isEmpty && !partner.milestone.isEmpty && !partner.supportFocus.isEmpty
+            ),
+            DemoReadinessItem(
+                id: "history",
+                title: "Moments have sample history",
+                detail: "The dashboard and Moments tab have enough data to show patterns.",
+                isReady: history.count >= 3
+            ),
+            DemoReadinessItem(
+                id: "today",
+                title: "Today has a check-in",
+                detail: "A current entry makes the Home and Check-In states feel live.",
+                isReady: hasCompletedTodayCheckIn
+            ),
+            DemoReadinessItem(
+                id: "summary",
+                title: "Weekly summary is shareable",
+                detail: "The presenter can share or copy a concise relationship snapshot.",
+                isReady: !weeklySummaryText.isEmpty
+            )
+        ]
     }
 
     var notePromptSuggestions: [PromptSuggestion] {
