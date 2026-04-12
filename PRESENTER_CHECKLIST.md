@@ -3,7 +3,8 @@
 ## Before presenting
 
 - Open the app once and confirm it lands on the expected sample state.
-- If needed, go to Profile and tap `Reset sample data`.
+- Go to Profile and scan `Demo readiness`.
+- If needed, go to Profile and tap `Reset sample data`, then confirm the reset.
 - Choose the preset you want to present.
 - Decide whether you want to show onboarding.
 - Keep one example note and one example intention in mind for the live check-in.
@@ -11,9 +12,10 @@
 ## During presenting
 
 - Start on Home.
-- Explain the pulse, streak, and weekly story first.
-- Show the daily check-in flow quickly.
-- Return to Home or Moments to show the saved result.
+- Explain the pulse, streak, connection trend, and weekly story first.
+- Use Home quick actions to open Check-In.
+- Show the daily check-in flow, including coaching hints and prompt suggestions.
+- Return to Home or Moments to show the saved result, then search Moments for a note or intention.
 - End with summary sharing or presets from Profile.
 
 ## If something goes wrong
