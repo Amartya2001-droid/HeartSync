@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var milestone = ""
     @State private var supportFocus = ""
     @State private var saveMessage = ""
+    @State private var showResetConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -54,11 +55,7 @@ struct SettingsView: View {
 
                 Section("Demo controls") {
                     Button("Reset sample data") {
-                        store.resetDemoData()
-                        partnerName = store.partner.name
-                        milestone = store.partner.milestone
-                        supportFocus = store.partner.supportFocus
-                        saveMessage = "Sample data restored."
+                        showResetConfirmation = true
                     }
                     .foregroundStyle(.red)
 
@@ -124,6 +121,23 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Profile")
+            .confirmationDialog(
+                "Reset HeartSync sample data?",
+                isPresented: $showResetConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Reset sample data", role: .destructive) {
+                    store.resetDemoData()
+                    partnerName = store.partner.name
+                    milestone = store.partner.milestone
+                    supportFocus = store.partner.supportFocus
+                    saveMessage = "Sample data restored."
+                }
+
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This replaces the current profile and check-in history with the default demo scenario.")
+            }
             .onAppear {
                 partnerName = store.partner.name
                 milestone = store.partner.milestone
