@@ -86,6 +86,19 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Local demo data") {
+                    Text("HeartSync stores the profile, draft, and moments locally on this device for a reliable no-backend demo.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    Button {
+                        store.clearDraft()
+                        saveMessage = "Current check-in draft cleared."
+                    } label: {
+                        Label("Clear current draft", systemImage: "eraser")
+                    }
+                }
+
                 Section("Demo readiness") {
                     ForEach(store.demoReadinessItems) { item in
                         HStack(alignment: .top, spacing: 12) {
