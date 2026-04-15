@@ -61,6 +61,13 @@ struct DemoReadinessItem: Identifiable, Hashable {
     let isReady: Bool
 }
 
+struct RitualRecommendation: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let detail: String
+    let symbol: String
+}
+
 @MainActor
 final class HeartSyncStore: ObservableObject {
     @Published var partner: PartnerProfile
@@ -146,6 +153,30 @@ final class HeartSyncStore: ObservableObject {
         }
 
         return "You have momentum. Protect one intentional ritual tonight so the good stretch keeps compounding."
+    }
+
+    var recommendedRituals: [RitualRecommendation] {
+        if snapshot.weeklyAverageConnection <= 3 {
+            return [
+                RitualRecommendation(id: "repair", title: "Repair first", detail: "Name one thing that felt hard without trying to solve everything.", symbol: "wrench.and.screwdriver.fill"),
+                RitualRecommendation(id: "ask", title: "Ask for support", detail: "Each person names one concrete support request for tomorrow.", symbol: "bubble.left.and.bubble.right.fill"),
+                RitualRecommendation(id: "close", title: "End softly", detail: "Close with one appreciation so the conversation does not end on tension.", symbol: "heart.fill")
+            ]
+        }
+
+        if snapshot.weeklyAverageEnergy <= 3 {
+            return [
+                RitualRecommendation(id: "light", title: "Keep it light", detail: "Choose a short check-in instead of a heavy conversation.", symbol: "feather.fill"),
+                RitualRecommendation(id: "rest", title: "Protect rest", detail: "Make the supportive move the one that reduces effort tonight.", symbol: "moon.zzz.fill"),
+                RitualRecommendation(id: "tomorrow", title: "Plan one thing", detail: "Pick a tiny tomorrow action while energy is still low.", symbol: "calendar.badge.clock")
+            ]
+        }
+
+        return [
+            RitualRecommendation(id: "celebrate", title: "Notice the win", detail: "Name what worked this week so it becomes repeatable.", symbol: "sparkles"),
+            RitualRecommendation(id: "walk", title: "Move together", detail: "Take a short walk and ask one better question.", symbol: "figure.walk"),
+            RitualRecommendation(id: "protect", title: "Protect the rhythm", detail: "Keep one phone-free moment on the calendar tonight.", symbol: "shield.lefthalf.filled")
+        ]
     }
 
     var weeklyStory: String {

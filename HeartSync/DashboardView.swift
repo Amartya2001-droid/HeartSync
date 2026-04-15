@@ -43,6 +43,7 @@ struct DashboardView: View {
 
                     trendCard
                     focusCard
+                    ritualPlanCard
                     quickActionsCard
                     todayStatusCard
                     insightCard
@@ -166,6 +167,49 @@ struct DashboardView: View {
             Label(store.recommendedAction, systemImage: "bolt.badge.clock")
                 .font(.subheadline)
                 .foregroundStyle(HeartSyncTheme.ink)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private var ritualPlanCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Tonight’s ritual plan")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+
+            Text("A practical next move based on this week’s energy and connection.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 10) {
+                ForEach(store.recommendedRituals) { ritual in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: ritual.symbol)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(HeartSyncTheme.blush)
+                            .frame(width: 28)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(ritual.title)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.ink)
+                            Text(ritual.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(14)
+                    .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                }
+            }
         }
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
