@@ -159,6 +159,8 @@ struct CheckInView: View {
                 action: store.applyIntentionSuggestion
             )
 
+            draftStatusRow
+
             Label("Drafts save automatically while you type.", systemImage: "checkmark.shield")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -171,9 +173,31 @@ struct CheckInView: View {
         )
     }
 
+    private var draftStatusRow: some View {
+        HStack(spacing: 10) {
+            draftStatusPill(
+                title: "Reflection",
+                isReady: !trimmedNote.isEmpty,
+                detail: trimmedNote.isEmpty ? "Add context" : "\(trimmedNote.count) chars"
+            )
+            draftStatusPill(
+                title: "Intention",
+                isReady: !trimmedIntention.isEmpty,
+                detail: trimmedIntention.isEmpty ? "Choose next step" : "Ready"
+            )
+        }
+    }
+
+    private var trimmedNote: String {
+        store.todayNote.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedIntention: String {
+        store.todayIntention.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var isDraftMostlyEmpty: Bool {
-        store.todayNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        store.todayIntention.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        trimmedNote.isEmpty && trimmedIntention.isEmpty
     }
 
     private var starterCard: some View {
@@ -277,6 +301,25 @@ struct CheckInView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+    }
+
+    private func draftStatusPill(title: String, isReady: Bool, detail: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: isReady ? "checkmark.circle.fill" : "circle.dashed")
+                .foregroundStyle(isReady ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color.white.opacity(0.74), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
