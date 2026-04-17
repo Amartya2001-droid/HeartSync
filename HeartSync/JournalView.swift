@@ -20,6 +20,20 @@ struct JournalView: View {
                             }
                         }
                         .pickerStyle(.segmented)
+
+                        HStack {
+                            Text(resultSummary)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.ink)
+                            Spacer()
+                            if !trimmedSearchText.isEmpty {
+                                Button("Clear search") {
+                                    searchText = ""
+                                }
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.blush)
+                            }
+                        }
                     }
                     .listRowBackground(Color.clear)
                 } header: {
@@ -137,6 +151,20 @@ struct JournalView: View {
         }
     }
 
+    private var resultSummary: String {
+        let count = filteredHistory.count
+        let label = count == 1 ? "moment" : "moments"
+        if trimmedSearchText.isEmpty {
+            return "\(count) \(label) in \(selectedFilter.title.lowercased())"
+        }
+
+        return "\(count) \(label) matching “\(trimmedSearchText)”"
+    }
+
+    private var trimmedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var bestConnectionEntry: DailyCheckIn? {
         store.history.max { lhs, rhs in
             if lhs.connection == rhs.connection {
@@ -160,7 +188,7 @@ struct JournalView: View {
     }
 
     private var emptyStateTitle: String {
-        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if !trimmedSearchText.isEmpty {
             return "No matching moments"
         }
 
@@ -175,7 +203,7 @@ struct JournalView: View {
     }
 
     private var emptyStateMessage: String {
-        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if !trimmedSearchText.isEmpty {
             return "Try a different word from a note, intention, or date label."
         }
 
