@@ -86,6 +86,19 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Presenter handoff") {
+                    Text("Copy a short talk track that matches the current app state and latest demo flow.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    Button {
+                        store.copyPresenterTalkTrackToClipboard()
+                        saveMessage = "Presenter talk track copied."
+                    } label: {
+                        Label("Copy presenter talk track", systemImage: "quote.bubble")
+                    }
+                }
+
                 Section("Local demo data") {
                     Text("HeartSync stores the profile, draft, and moments locally on this device for a reliable no-backend demo.")
                         .font(.footnote)

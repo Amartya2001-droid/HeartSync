@@ -367,6 +367,26 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    var presenterTalkTrack: String {
+        """
+        HeartSync demo talk track
+
+        HeartSync is a calm daily relationship check-in app. The MVP loop is simple: log energy and connection, capture one honest reflection, set one intention, and use the dashboard to understand the relationship pulse.
+
+        Today’s demo flow:
+        1. Start on Home and explain pulse, streak, trend, and tonight’s ritual plan.
+        2. Open Check-In and show the coaching hint plus prompt suggestions.
+        3. Save a check-in, then use Moments to search or share an individual entry.
+        4. End in Profile with demo readiness, presets, and weekly summary sharing.
+
+        Current story:
+        \(weeklyStory)
+
+        Recommended close:
+        \(recommendedAction)
+        """
+    }
+
     var demoReadinessItems: [DemoReadinessItem] {
         [
             DemoReadinessItem(
@@ -424,6 +444,10 @@ final class HeartSyncStore: ObservableObject {
 
     func copyWeeklySummaryToClipboard() {
         UIPasteboard.general.string = weeklySummaryText
+    }
+
+    func copyPresenterTalkTrackToClipboard() {
+        UIPasteboard.general.string = presenterTalkTrack
     }
 
     func loadTodayCheckInIntoDraft() {
