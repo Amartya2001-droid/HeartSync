@@ -109,6 +109,16 @@ struct JournalView: View {
                                 Label("Energy \(item.energy)/5", systemImage: "bolt.heart")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+
+                                ShareLink(
+                                    item: momentShareText(for: item),
+                                    subject: Text("HeartSync moment"),
+                                    message: Text("Shared from HeartSync")
+                                ) {
+                                    Label("Share this moment", systemImage: "square.and.arrow.up")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(HeartSyncTheme.blush)
+                                }
                             }
                             .padding(.vertical, 8)
                             .listRowBackground(
@@ -260,6 +270,22 @@ struct JournalView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(Color.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    private func momentShareText(for item: DailyCheckIn) -> String {
+        """
+        HeartSync moment
+
+        Date: \(store.dateContextLabel(for: item.date))
+        Energy: \(item.energy)/5
+        Connection: \(item.connection)/5
+
+        Note:
+        \(item.note.isEmpty ? "No note captured." : item.note)
+
+        Intention:
+        \(item.intention.isEmpty ? "No intention captured." : item.intention)
+        """
     }
 }
 
