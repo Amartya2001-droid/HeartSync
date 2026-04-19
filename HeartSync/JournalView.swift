@@ -5,6 +5,7 @@ struct JournalView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @State private var selectedFilter: JournalFilter = .all
     @State private var searchText = ""
+    @State private var sortOrder: JournalSortOrder = .newestFirst
 
     var body: some View {
         NavigationStack {
@@ -34,6 +35,13 @@ struct JournalView: View {
                                 .foregroundStyle(HeartSyncTheme.blush)
                             }
                         }
+
+                        Picker("Sort", selection: $sortOrder) {
+                            ForEach(JournalSortOrder.allCases) { sortOrder in
+                                Text(sortOrder.title).tag(sortOrder)
+                            }
+                        }
+                        .pickerStyle(.menu)
                     }
                     .listRowBackground(Color.clear)
                 } header: {
@@ -151,10 +159,19 @@ struct JournalView: View {
             entries = store.history.filter { $0.connection <= 3 || $0.energy <= 3 }
         }
 
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return entries }
+        let sortedEntries = entries.sorted { lhs, rhs in
+            switch sortOrder {
+            case .newestFirst:
+                return lhs.date > rhs.date
+            case .oldestFirst:
+                return lhs.date < rhs.date
+            }
+        }
 
-        return entries.filter { entry in
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return sortedEntries }
+
+        return sortedEntries.filter { entry in
             entry.note.localizedCaseInsensitiveContains(query) ||
             entry.intention.localizedCaseInsensitiveContains(query) ||
             store.dateContextLabel(for: entry.date).localizedCaseInsensitiveContains(query)
@@ -315,6 +332,22 @@ private enum JournalFilter: String, CaseIterable, Identifiable {
             return "Higher-connection days"
         case .care:
             return "Days needing extra care"
+        }
+    }
+}
+
+private enum JournalSortOrder: String, CaseIterable, Identifiable {
+    case newestFirst
+    case oldestFirst
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .newestFirst:
+            return "Newest first"
+        case .oldestFirst:
+            return "Oldest first"
         }
     }
 }
