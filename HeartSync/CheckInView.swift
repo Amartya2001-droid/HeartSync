@@ -50,6 +50,10 @@ struct CheckInView: View {
                             .background(HeartSyncTheme.accent, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                     }
                     .buttonStyle(.plain)
+
+                    if showSavedState {
+                        savedConfirmationCard
+                    }
                 }
                 .padding(20)
                 .padding(.bottom, 28)
@@ -68,6 +72,27 @@ struct CheckInView: View {
         }
 
         return store.hasCompletedTodayCheckIn ? "Update today’s check-in" : "Save today’s check-in"
+    }
+
+    private var savedConfirmationCard: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.sage)
+                .frame(width: 42, height: 42)
+                .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Saved for today")
+                    .font(.headline)
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Text("Home, Moments, and the weekly summary now reflect this check-in.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(18)
+        .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private func existingCheckInCard(_ checkIn: DailyCheckIn) -> some View {
