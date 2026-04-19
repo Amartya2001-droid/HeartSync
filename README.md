@@ -8,9 +8,9 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 - Connection trend storytelling and quick actions from Home
 - A daily check-in flow for energy, connection, notes, and intention
 - Quick prompt suggestions and coaching hints to make check-ins easier during demos and first use
-- A searchable moments view for recent history and pattern scanning
+- A searchable and sortable moments view for recent history, pattern scanning, and sharing individual entries
 - Local persistence for demo-ready state without requiring a backend
-- Basic profile customization, presets, and demo readiness checks
+- Basic profile customization, presets, demo readiness checks, and presenter talk-track copy
 
 ## Explicit non-goals
 
@@ -35,9 +35,10 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 2. Open the Home tab and introduce the weekly pulse, streak, connection trend, and support focus.
 3. Use the Home quick actions to move into Check-In.
 4. Show how coaching hints and prompt suggestions help a couple log energy, connection, and one intention.
-5. Save a new entry, then move back to Home or Moments to show the update reflected in history.
-6. Use Moments search to find a note, intention, or date label.
-7. Use Profile to confirm demo readiness, switch presets, or share the weekly summary.
+5. Save a new entry and point out the saved confirmation.
+6. Move back to Home or Moments to show the update reflected in history.
+7. Use Moments search, sort, and individual sharing to explain retrieval and handoff.
+8. Use Profile to confirm demo readiness, switch presets, copy the presenter talk track, or share the weekly summary.
 
 ## Best next improvements
 
