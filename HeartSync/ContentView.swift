@@ -66,19 +66,25 @@ private struct OnboardingSheetView: View {
         OnboardingStep(
             id: "pulse",
             title: "Track your relationship pulse",
-            detail: "See connection, energy, streaks, and recent reflections in one calm dashboard.",
+            detail: "See connection, energy, streaks, trends, and a ritual plan in one calm dashboard.",
             symbol: "heart.text.square.fill"
         ),
         OnboardingStep(
             id: "checkin",
             title: "Capture one honest check-in a day",
-            detail: "Log energy, connection, a short note, and a single intention in under a minute.",
+            detail: "Log energy, connection, a short note, and a single intention with coaching hints in under a minute.",
             symbol: "slider.horizontal.3"
+        ),
+        OnboardingStep(
+            id: "moments",
+            title: "Revisit and share moments",
+            detail: "Search, sort, and share individual reflections from the Moments timeline.",
+            symbol: "book.closed.fill"
         ),
         OnboardingStep(
             id: "demo",
             title: "Make demos easy",
-            detail: "Use presets and reset controls from Profile whenever you want a fresh presentation state.",
+            detail: "Use presets, demo readiness, and presenter handoff tools from Profile whenever you want a fresh presentation state.",
             symbol: "sparkles.rectangle.stack.fill"
         )
     ]
