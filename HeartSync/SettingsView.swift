@@ -97,6 +97,13 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy presenter talk track", systemImage: "quote.bubble")
                     }
+
+                    Button {
+                        store.copyLatestMomentToClipboard()
+                        saveMessage = "Latest moment copied."
+                    } label: {
+                        Label("Copy latest moment", systemImage: "doc.text")
+                    }
                 }
 
                 Section("Local demo data") {

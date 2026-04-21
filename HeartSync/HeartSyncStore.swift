@@ -387,6 +387,26 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    var latestMomentText: String {
+        guard let latest = history.first else {
+            return "No HeartSync moment has been captured yet."
+        }
+
+        return """
+        HeartSync latest moment
+
+        Date: \(dateContextLabel(for: latest.date))
+        Energy: \(latest.energy)/5
+        Connection: \(latest.connection)/5
+
+        Note:
+        \(latest.note.isEmpty ? "No note captured." : latest.note)
+
+        Intention:
+        \(latest.intention.isEmpty ? "No intention captured." : latest.intention)
+        """
+    }
+
     var demoReadinessItems: [DemoReadinessItem] {
         [
             DemoReadinessItem(
@@ -448,6 +468,10 @@ final class HeartSyncStore: ObservableObject {
 
     func copyPresenterTalkTrackToClipboard() {
         UIPasteboard.general.string = presenterTalkTrack
+    }
+
+    func copyLatestMomentToClipboard() {
+        UIPasteboard.general.string = latestMomentText
     }
 
     func loadTodayCheckInIntoDraft() {
