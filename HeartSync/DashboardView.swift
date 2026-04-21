@@ -330,6 +330,18 @@ struct DashboardView: View {
                     .padding(.vertical, 14)
                     .background(HeartSyncTheme.ink, in: Capsule())
             }
+
+            Button {
+                store.copyWeeklySummaryToClipboard()
+            } label: {
+                Label("Copy weekly summary text", systemImage: "doc.on.doc")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.blush)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.82), in: Capsule())
+            }
+            .buttonStyle(.plain)
         }
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
