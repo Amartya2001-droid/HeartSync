@@ -436,6 +436,15 @@ final class HeartSyncStore: ObservableObject {
         ]
     }
 
+    var demoReadinessSummary: String {
+        let readyCount = demoReadinessItems.filter(\.isReady).count
+        return "\(readyCount) of \(demoReadinessItems.count) demo checks ready"
+    }
+
+    var isDemoReady: Bool {
+        demoReadinessItems.allSatisfy(\.isReady)
+    }
+
     var notePromptSuggestions: [PromptSuggestion] {
         [
             PromptSuggestion(id: "repair", text: "We handled stress better once we said what we needed."),

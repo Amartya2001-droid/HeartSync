@@ -120,6 +120,19 @@ struct SettingsView: View {
                 }
 
                 Section("Demo readiness") {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: store.isDemoReady ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(store.isDemoReady ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(store.demoReadinessSummary)
+                                .font(.subheadline.weight(.semibold))
+                            Text(store.isDemoReady ? "You can present from the current state." : "Resolve the pending items below before a live demo.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
                     ForEach(store.demoReadinessItems) { item in
                         HStack(alignment: .top, spacing: 12) {
                             Image(systemName: item.isReady ? "checkmark.circle.fill" : "clock.badge.exclamationmark")
