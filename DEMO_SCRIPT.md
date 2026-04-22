@@ -11,7 +11,7 @@ Show HeartSync as a calm, demo-ready relationship check-in app that helps couple
 3. Use the Home quick action to open Check-In and log a fast daily update.
 4. Point out the saved confirmation, then return to Home or Moments to show the updated history.
 5. Search, sort, or share an individual Moment.
-6. Open Profile to show presets, demo readiness, presenter talk-track copy, reset controls, onboarding replay, and summary export.
+6. Open Profile to show presets, readiness summary, presenter talk-track copy, reset controls, onboarding replay, summary export, and full-history copy.
 
 ## 3-minute version
 
@@ -46,8 +46,9 @@ Show HeartSync as a calm, demo-ready relationship check-in app that helps couple
 ### Profile
 
 - Switch presets to demonstrate different presentation scenarios.
-- Show Demo readiness as the quick pre-presentation confidence check.
+- Show Demo readiness as the quick pre-presentation confidence check, including the summary count.
 - Copy the presenter talk track if you need a concise handoff script.
+- Copy the full moments history if someone wants the complete lightweight export.
 - Mention reset sample data for reliable demos.
 - Replay onboarding if you want to show the first-run experience.
 - Use the summary share action if someone asks what the exported output looks like.

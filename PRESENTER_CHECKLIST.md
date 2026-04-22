@@ -3,7 +3,7 @@
 ## Before presenting
 
 - Open the app once and confirm it lands on the expected sample state.
-- Go to Profile and scan `Demo readiness`.
+- Go to Profile and scan the `Demo readiness` summary.
 - If needed, go to Profile and tap `Reset sample data`, then confirm the reset.
 - Choose the preset you want to present.
 - Decide whether you want to show onboarding.
@@ -17,7 +17,7 @@
 - Show the daily check-in flow, including coaching hints and prompt suggestions.
 - Point out the saved confirmation after logging a check-in.
 - Return to Home or Moments to show the saved result, then search, sort, or share one Moment.
-- End with summary sharing, presenter talk-track copy, or presets from Profile.
+- End with summary sharing, presenter talk-track copy, full-history copy, or presets from Profile.
 
 ## If something goes wrong
 
