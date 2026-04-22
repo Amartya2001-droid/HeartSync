@@ -104,6 +104,13 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy latest moment", systemImage: "doc.text")
                     }
+
+                    Button {
+                        store.copyFullHistoryToClipboard()
+                        saveMessage = "Full moments history copied."
+                    } label: {
+                        Label("Copy full moments history", systemImage: "archivebox")
+                    }
                 }
 
                 Section("Local demo data") {

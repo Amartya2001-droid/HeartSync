@@ -407,6 +407,32 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    var fullHistoryText: String {
+        guard !history.isEmpty else {
+            return "No HeartSync moments have been captured yet."
+        }
+
+        let entries = history.map { entry in
+            """
+            \(dateContextLabel(for: entry.date))
+            Energy: \(entry.energy)/5
+            Connection: \(entry.connection)/5
+            Note: \(entry.note.isEmpty ? "No note captured." : entry.note)
+            Intention: \(entry.intention.isEmpty ? "No intention captured." : entry.intention)
+            """
+        }
+        .joined(separator: "\n\n---\n\n")
+
+        return """
+        HeartSync moments export
+
+        Partner: \(partner.name)
+        Milestone: \(partner.milestone)
+
+        \(entries)
+        """
+    }
+
     var demoReadinessItems: [DemoReadinessItem] {
         [
             DemoReadinessItem(
@@ -481,6 +507,10 @@ final class HeartSyncStore: ObservableObject {
 
     func copyLatestMomentToClipboard() {
         UIPasteboard.general.string = latestMomentText
+    }
+
+    func copyFullHistoryToClipboard() {
+        UIPasteboard.general.string = fullHistoryText
     }
 
     func loadTodayCheckInIntoDraft() {
