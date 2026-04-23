@@ -315,6 +315,13 @@ final class HeartSyncStore: ObservableObject {
         "HeartSync weekly summary"
     }
 
+    var weeklyDateRangeLabel: String {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        let start = calendar.date(byAdding: .day, value: -6, to: today) ?? today
+        return "\(start.formatted(.dateTime.month(.abbreviated).day())) - \(today.formatted(.dateTime.month(.abbreviated).day()))"
+    }
+
     var strongestMomentSummary: String {
         guard let strongest = history.max(by: compareMomentsForStrength) else {
             return "No standout moment captured yet."
@@ -340,6 +347,7 @@ final class HeartSyncStore: ObservableObject {
 
         return """
         \(weeklySummaryTitle)
+        Range: \(weeklyDateRangeLabel)
 
         Partner: \(partner.name)
         Milestone: \(partner.milestone)

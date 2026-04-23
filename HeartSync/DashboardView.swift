@@ -296,9 +296,15 @@ struct DashboardView: View {
 
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Take this week with you")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
+            HStack(alignment: .firstTextBaseline) {
+                Text("Take this week with you")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.ink)
+                Spacer()
+                Text(store.weeklyDateRangeLabel)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(HeartSyncTheme.blush)
+            }
 
             Text(store.weeklyStory)
                 .font(.body)

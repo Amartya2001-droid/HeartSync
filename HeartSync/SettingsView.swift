@@ -66,7 +66,7 @@ struct SettingsView: View {
                 }
 
                 Section("Share weekly summary") {
-                    Text(store.weeklyStory)
+                    Text("\(store.weeklyDateRangeLabel): \(store.weeklyStory)")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
 
