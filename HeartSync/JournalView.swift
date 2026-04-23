@@ -92,6 +92,20 @@ struct JournalView: View {
                             Text(emptyStateMessage)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+
+                            if !trimmedSearchText.isEmpty {
+                                Button("Clear search") {
+                                    searchText = ""
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.blush)
+                            } else if selectedFilter != .all {
+                                Button("Show all moments") {
+                                    selectedFilter = .all
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.blush)
+                            }
                         }
                         .padding(.vertical, 10)
                         .listRowBackground(Color.white.opacity(0.72))
