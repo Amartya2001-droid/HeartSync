@@ -7,7 +7,7 @@ Show HeartSync as a calm, demo-ready relationship check-in app that helps couple
 ## 60-second version
 
 1. Open Home and explain the relationship pulse, streak, and support focus.
-2. Point out the connection trend, weekly insight card, and summary-sharing action.
+2. Point out the connection trend, weekly range, weekly insight card, and summary-sharing action.
 3. Use the Home quick action to open Check-In and log a fast daily update.
 4. Point out the saved confirmation, then return to Home or Moments to show the updated history.
 5. Search, sort, or share an individual Moment.
@@ -23,6 +23,7 @@ Show HeartSync as a calm, demo-ready relationship check-in app that helps couple
 ### Home
 
 - Show the pulse, streak, energy, and latest reflection cards.
+- Point out the weekly range on the shareable summary card.
 - Show the connection trend card as the app’s quick “what changed?” readout.
 - Highlight the “What this week is saying” insight section.
 - Highlight the dashboard share action and explain that weekly context can be exported quickly.
@@ -41,6 +42,7 @@ Show HeartSync as a calm, demo-ready relationship check-in app that helps couple
 - Show that entries become a lightweight running history instead of disappearing after input.
 - Search for a word from a note, intention, or date label to show retrieval.
 - Switch sort order if you want to show oldest-first context.
+- Use the empty-state action if a search or filter returns nothing.
 - Share one individual moment to show lightweight handoff.
 
 ### Profile

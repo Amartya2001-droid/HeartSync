@@ -12,11 +12,11 @@
 ## During presenting
 
 - Start on Home.
-- Explain the pulse, streak, connection trend, and weekly story first.
+- Explain the pulse, streak, weekly range, connection trend, and weekly story first.
 - Use Home quick actions to open Check-In.
 - Show the daily check-in flow, including coaching hints and prompt suggestions.
 - Point out the saved confirmation after logging a check-in.
-- Return to Home or Moments to show the saved result, then search, sort, or share one Moment.
+- Return to Home or Moments to show the saved result, then search, sort, recover from an empty state, or share one Moment.
 - End with summary sharing, presenter talk-track copy, full-history copy, or presets from Profile.
 
 ## If something goes wrong
