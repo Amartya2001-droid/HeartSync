@@ -28,6 +28,8 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 
 - See [DEMO_SCRIPT.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/DEMO_SCRIPT.md) for a short presenter flow.
 - See [PRESENTER_CHECKLIST.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/PRESENTER_CHECKLIST.md) for a quick run-through before showing the app.
+- See [FINAL_HANDOFF.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/FINAL_HANDOFF.md) for the close-out project summary.
+- See [RELEASE_CHECKLIST.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/RELEASE_CHECKLIST.md) for the final validation pass in Xcode.
 
 ## Demo flow
 
