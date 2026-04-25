@@ -322,6 +322,10 @@ final class HeartSyncStore: ObservableObject {
         return "\(start.formatted(.dateTime.month(.abbreviated).day())) - \(today.formatted(.dateTime.month(.abbreviated).day()))"
     }
 
+    var exportGeneratedAtLabel: String {
+        Date.now.formatted(.dateTime.month(.abbreviated).day().hour().minute())
+    }
+
     var strongestMomentSummary: String {
         guard let strongest = history.max(by: compareMomentsForStrength) else {
             return "No standout moment captured yet."
@@ -348,6 +352,7 @@ final class HeartSyncStore: ObservableObject {
         return """
         \(weeklySummaryTitle)
         Range: \(weeklyDateRangeLabel)
+        Exported: \(exportGeneratedAtLabel)
 
         Partner: \(partner.name)
         Milestone: \(partner.milestone)
@@ -378,6 +383,7 @@ final class HeartSyncStore: ObservableObject {
     var presenterTalkTrack: String {
         """
         HeartSync demo talk track
+        Exported: \(exportGeneratedAtLabel)
 
         HeartSync is a calm daily relationship check-in app. The MVP loop is simple: log energy and connection, capture one honest reflection, set one intention, and use the dashboard to understand the relationship pulse.
 
@@ -402,6 +408,7 @@ final class HeartSyncStore: ObservableObject {
 
         return """
         HeartSync latest moment
+        Exported: \(exportGeneratedAtLabel)
 
         Date: \(dateContextLabel(for: latest.date))
         Energy: \(latest.energy)/5
@@ -433,6 +440,7 @@ final class HeartSyncStore: ObservableObject {
 
         return """
         HeartSync moments export
+        Exported: \(exportGeneratedAtLabel)
 
         Partner: \(partner.name)
         Milestone: \(partner.milestone)
