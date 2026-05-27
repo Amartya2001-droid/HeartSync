@@ -167,6 +167,13 @@ struct CheckInView: View {
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 
+            if !trimmedNote.isEmpty {
+                inlineDraftAction(title: "Clear reflection") {
+                    store.todayNote = ""
+                    showSavedState = false
+                }
+            }
+
             suggestionRow(
                 title: "Quick reflection prompts",
                 suggestions: store.notePromptSuggestions,
@@ -177,6 +184,13 @@ struct CheckInView: View {
                 .textFieldStyle(.plain)
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+            if !trimmedIntention.isEmpty {
+                inlineDraftAction(title: "Clear intention") {
+                    store.todayIntention = ""
+                    showSavedState = false
+                }
+            }
 
             suggestionRow(
                 title: "Quick intention ideas",
@@ -345,6 +359,15 @@ struct CheckInView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(Color.white.opacity(0.74), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func inlineDraftAction(title: String, action: @escaping () -> Void) -> some View {
+        HStack {
+            Spacer()
+            Button(title, action: action)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.blush)
+        }
     }
 }
 
