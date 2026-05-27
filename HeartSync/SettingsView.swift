@@ -53,6 +53,12 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Current scenario") {
+                    Text(store.currentScenarioSummary)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section("Demo controls") {
                     Button("Reset sample data") {
                         showResetConfirmation = true

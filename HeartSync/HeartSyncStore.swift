@@ -487,6 +487,17 @@ final class HeartSyncStore: ObservableObject {
         demoReadinessItems.allSatisfy(\.isReady)
     }
 
+    var currentScenarioSummary: String {
+        let latestLabel = latestCheckInDate.map(dateContextLabel(for:)) ?? "No check-ins yet"
+        return """
+        Partner: \(partner.name)
+        Milestone: \(partner.milestone)
+        Support focus: \(partner.supportFocus)
+        Moments loaded: \(history.count)
+        Latest check-in: \(latestLabel)
+        """
+    }
+
     var notePromptSuggestions: [PromptSuggestion] {
         [
             PromptSuggestion(id: "repair", text: "We handled stress better once we said what we needed."),
