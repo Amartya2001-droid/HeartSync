@@ -375,6 +375,16 @@ struct DashboardView: View {
                     Text("Intention: \(item.intention)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+
+                    ShareLink(
+                        item: recentMomentShareText(for: item),
+                        subject: Text("HeartSync moment"),
+                        message: Text("Shared from HeartSync")
+                    ) {
+                        Label("Share this moment", systemImage: "square.and.arrow.up")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(HeartSyncTheme.blush)
+                    }
                 }
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -431,6 +441,22 @@ struct DashboardView: View {
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    private func recentMomentShareText(for item: DailyCheckIn) -> String {
+        """
+        HeartSync moment
+
+        Date: \(store.dateContextLabel(for: item.date))
+        Energy: \(item.energy)/5
+        Connection: \(item.connection)/5
+
+        Note:
+        \(item.note.isEmpty ? "No note captured." : item.note)
+
+        Intention:
+        \(item.intention.isEmpty ? "No intention captured." : item.intention)
+        """
     }
 }
 
