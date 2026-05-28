@@ -80,6 +80,7 @@ final class HeartSyncStore: ObservableObject {
     private let defaults: UserDefaults
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
+    private let defaultIntentionText = "Protect 20 minutes for a no-phone check-in tonight."
 
     private enum StorageKeys {
         static let partner = "heartsync.partner"
@@ -121,7 +122,7 @@ final class HeartSyncStore: ObservableObject {
         todayEnergy = defaults.object(forKey: StorageKeys.draftEnergy) as? Double ?? Double(latest?.energy ?? 4)
         todayConnection = defaults.object(forKey: StorageKeys.draftConnection) as? Double ?? Double(latest?.connection ?? 4)
         todayNote = defaults.string(forKey: StorageKeys.draftNote) ?? ""
-        todayIntention = defaults.string(forKey: StorageKeys.draftIntention) ?? "Protect 20 minutes for a no-phone check-in tonight."
+        todayIntention = defaults.string(forKey: StorageKeys.draftIntention) ?? defaultIntentionText
     }
 
     var snapshot: HeartSyncSnapshot {
@@ -529,6 +530,10 @@ final class HeartSyncStore: ObservableObject {
         ]
     }
 
+    var defaultIntention: String {
+        defaultIntentionText
+    }
+
     func applyNoteSuggestion(_ suggestion: PromptSuggestion) {
         todayNote = suggestion.text
         saveDraft()
@@ -576,6 +581,11 @@ final class HeartSyncStore: ObservableObject {
         saveDraft()
     }
 
+    func restoreDefaultIntention() {
+        todayIntention = defaultIntentionText
+        saveDraft()
+    }
+
     func saveDraft() {
         defaults.set(todayEnergy, forKey: StorageKeys.draftEnergy)
         defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
@@ -598,7 +608,7 @@ final class HeartSyncStore: ObservableObject {
         persistHistory()
 
         todayNote = ""
-        todayIntention = "Protect 20 minutes for a no-phone check-in tonight."
+        todayIntention = defaultIntentionText
         saveDraft()
     }
 
@@ -632,7 +642,7 @@ final class HeartSyncStore: ObservableObject {
         todayEnergy = Double(Self.sampleHistory.first?.energy ?? 4)
         todayConnection = Double(Self.sampleHistory.first?.connection ?? 4)
         todayNote = ""
-        todayIntention = "Protect 20 minutes for a no-phone check-in tonight."
+        todayIntention = defaultIntentionText
         persistPartner()
         persistHistory()
         saveDraft()

@@ -190,6 +190,11 @@ struct CheckInView: View {
                     store.todayIntention = ""
                     showSavedState = false
                 }
+            } else {
+                inlineDraftAction(title: "Use default intention") {
+                    store.restoreDefaultIntention()
+                    showSavedState = false
+                }
             }
 
             suggestionRow(
