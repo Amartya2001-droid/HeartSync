@@ -42,6 +42,16 @@ struct JournalView: View {
                             }
                         }
                         .pickerStyle(.menu)
+
+                        if hasCustomViewState {
+                            Button("Reset view") {
+                                selectedFilter = .all
+                                searchText = ""
+                                sortOrder = .newestFirst
+                            }
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(HeartSyncTheme.blush)
+                        }
                     }
                     .listRowBackground(Color.clear)
                 } header: {
@@ -204,6 +214,10 @@ struct JournalView: View {
 
     private var trimmedSearchText: String {
         searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasCustomViewState: Bool {
+        selectedFilter != .all || !trimmedSearchText.isEmpty || sortOrder != .newestFirst
     }
 
     private var bestConnectionEntry: DailyCheckIn? {
