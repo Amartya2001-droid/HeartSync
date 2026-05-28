@@ -57,6 +57,13 @@ struct SettingsView: View {
                     Text(store.currentScenarioSummary)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+
+                    Button {
+                        store.copyCurrentScenarioToClipboard()
+                        saveMessage = "Current scenario copied."
+                    } label: {
+                        Label("Copy current scenario", systemImage: "rectangle.on.rectangle")
+                    }
                 }
 
                 Section("Demo controls") {

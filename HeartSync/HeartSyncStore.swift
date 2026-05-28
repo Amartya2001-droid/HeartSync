@@ -498,6 +498,21 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    var currentScenarioText: String {
+        """
+        HeartSync current scenario
+        Exported: \(exportGeneratedAtLabel)
+
+        \(currentScenarioSummary)
+
+        Weekly range: \(weeklyDateRangeLabel)
+        Readiness: \(demoReadinessSummary)
+        Relationship pulse: \(snapshot.relationshipPulse)/5
+        Average energy: \(snapshot.weeklyAverageEnergy)/5
+        Average connection: \(snapshot.weeklyAverageConnection)/5
+        """
+    }
+
     var notePromptSuggestions: [PromptSuggestion] {
         [
             PromptSuggestion(id: "repair", text: "We handled stress better once we said what we needed."),
@@ -538,6 +553,10 @@ final class HeartSyncStore: ObservableObject {
 
     func copyFullHistoryToClipboard() {
         UIPasteboard.general.string = fullHistoryText
+    }
+
+    func copyCurrentScenarioToClipboard() {
+        UIPasteboard.general.string = currentScenarioText
     }
 
     func loadTodayCheckInIntoDraft() {
