@@ -8,6 +8,7 @@ struct SettingsView: View {
     @State private var supportFocus = ""
     @State private var saveMessage = ""
     @State private var showResetConfirmation = false
+    @State private var showClearHistoryConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -124,6 +125,13 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy full moments history", systemImage: "archivebox")
                     }
+
+                    Button {
+                        store.copyBackupExportToClipboard()
+                        saveMessage = "Backup export copied."
+                    } label: {
+                        Label("Copy backup export (JSON)", systemImage: "externaldrive")
+                    }
                 }
 
                 Section("Local demo data") {
@@ -137,6 +145,11 @@ struct SettingsView: View {
                     } label: {
                         Label("Clear current draft", systemImage: "eraser")
                     }
+
+                    Button("Clear all moments history") {
+                        showClearHistoryConfirmation = true
+                    }
+                    .foregroundStyle(.red)
                 }
 
                 Section("Demo readiness") {
@@ -203,6 +216,20 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("This replaces the current profile and check-in history with the default demo scenario.")
+            }
+            .confirmationDialog(
+                "Clear all saved moments?",
+                isPresented: $showClearHistoryConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Clear history", role: .destructive) {
+                    store.clearAllHistory()
+                    saveMessage = "All moments history cleared."
+                }
+
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This removes every saved check-in from local history but keeps the current profile and draft.")
             }
             .onAppear {
                 partnerName = store.partner.name

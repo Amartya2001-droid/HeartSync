@@ -68,6 +68,16 @@ struct RitualRecommendation: Identifiable, Hashable {
     let symbol: String
 }
 
+private struct HeartSyncBackupExport: Codable {
+    let exportedAt: String
+    let partner: PartnerProfile
+    let history: [DailyCheckIn]
+    let draftEnergy: Double
+    let draftConnection: Double
+    let draftNote: String
+    let draftIntention: String
+}
+
 @MainActor
 final class HeartSyncStore: ObservableObject {
     @Published var partner: PartnerProfile
@@ -450,6 +460,25 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    var backupExportText: String {
+        let payload = HeartSyncBackupExport(
+            exportedAt: exportGeneratedAtLabel,
+            partner: partner,
+            history: history,
+            draftEnergy: todayEnergy,
+            draftConnection: todayConnection,
+            draftNote: todayNote,
+            draftIntention: todayIntention
+        )
+
+        guard let data = try? encoder.encode(payload),
+              let text = String(data: data, encoding: .utf8) else {
+            return "{ \"error\": \"Unable to encode HeartSync backup export.\" }"
+        }
+
+        return text
+    }
+
     var demoReadinessItems: [DemoReadinessItem] {
         [
             DemoReadinessItem(
@@ -564,6 +593,10 @@ final class HeartSyncStore: ObservableObject {
         UIPasteboard.general.string = currentScenarioText
     }
 
+    func copyBackupExportToClipboard() {
+        UIPasteboard.general.string = backupExportText
+    }
+
     func loadTodayCheckInIntoDraft() {
         guard let todayCheckIn else { return }
         todayEnergy = Double(todayCheckIn.energy)
@@ -646,6 +679,11 @@ final class HeartSyncStore: ObservableObject {
         persistPartner()
         persistHistory()
         saveDraft()
+    }
+
+    func clearAllHistory() {
+        history = []
+        persistHistory()
     }
 
     private func currentStreakDays() -> Int {
