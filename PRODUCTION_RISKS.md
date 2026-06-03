@@ -6,6 +6,7 @@
 - No cloud sync or account model
 - No analytics or crash reporting
 - Final signing/device validation still pending outside this environment
+- Cleared-history and first-run states still need real device validation
 
 ## Important product decision
 
