@@ -364,31 +364,52 @@ struct DashboardView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(HeartSyncTheme.ink)
 
-            ForEach(store.recentMoments) { item in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(store.dateContextLabel(for: item.date))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(HeartSyncTheme.blush)
-                    Text(item.note.isEmpty ? "No note captured for this day." : item.note)
-                        .font(.body)
+            if store.recentMoments.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("No moments yet")
+                        .font(.headline)
                         .foregroundStyle(HeartSyncTheme.ink)
-                    Text("Intention: \(item.intention)")
+                    Text("Your first check-in will show up here and start shaping the weekly story.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-
-                    ShareLink(
-                        item: recentMomentShareText(for: item),
-                        subject: Text("HeartSync moment"),
-                        message: Text("Shared from HeartSync")
-                    ) {
-                        Label("Share this moment", systemImage: "square.and.arrow.up")
-                            .font(.caption.weight(.semibold))
+                    Button {
+                        selectedTab = .checkIn
+                    } label: {
+                        Label("Start first check-in", systemImage: "square.and.pencil")
+                            .font(.subheadline.weight(.semibold))
                             .foregroundStyle(HeartSyncTheme.blush)
                     }
                 }
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            } else {
+                ForEach(store.recentMoments) { item in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(store.dateContextLabel(for: item.date))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(HeartSyncTheme.blush)
+                        Text(item.note.isEmpty ? "No note captured for this day." : item.note)
+                            .font(.body)
+                            .foregroundStyle(HeartSyncTheme.ink)
+                        Text("Intention: \(item.intention)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        ShareLink(
+                            item: recentMomentShareText(for: item),
+                            subject: Text("HeartSync moment"),
+                            message: Text("Shared from HeartSync")
+                        ) {
+                            Label("Share this moment", systemImage: "square.and.arrow.up")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(HeartSyncTheme.blush)
+                        }
+                    }
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                }
             }
         }
     }

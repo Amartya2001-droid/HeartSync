@@ -154,7 +154,15 @@ final class HeartSyncStore: ObservableObject {
         Array(history.prefix(5))
     }
 
+    var hasHistory: Bool {
+        !history.isEmpty
+    }
+
     var recommendedAction: String {
+        if history.isEmpty {
+            return "Start with one check-in so HeartSync has a real signal to work from."
+        }
+
         if snapshot.weeklyAverageConnection <= 3 {
             return "Prioritize a 10-minute repair conversation tonight before distractions take over."
         }
@@ -167,6 +175,14 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var recommendedRituals: [RitualRecommendation] {
+        if history.isEmpty {
+            return [
+                RitualRecommendation(id: "first-checkin", title: "Log the first check-in", detail: "Capture today’s energy, connection, and one honest note.", symbol: "square.and.pencil"),
+                RitualRecommendation(id: "small-intention", title: "Set one tiny intention", detail: "Choose a next step simple enough to follow through tonight.", symbol: "target"),
+                RitualRecommendation(id: "build-streak", title: "Build the baseline", detail: "Two or three entries are enough to make the dashboard more useful.", symbol: "flame")
+            ]
+        }
+
         if snapshot.weeklyAverageConnection <= 3 {
             return [
                 RitualRecommendation(id: "repair", title: "Repair first", detail: "Name one thing that felt hard without trying to solve everything.", symbol: "wrench.and.screwdriver.fill"),
@@ -191,6 +207,10 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var weeklyStory: String {
+        if history.isEmpty {
+            return "HeartSync is ready, but it needs a first check-in before the weekly story becomes meaningful."
+        }
+
         if snapshot.relationshipPulse >= 4 && snapshot.streakDays >= 3 {
             return "This week looks steady. Consistency is doing the work, and the relationship is benefiting from small intentional moments."
         }
@@ -214,6 +234,10 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var connectionTrendMessage: String {
+        guard !history.isEmpty else {
+            return "Once you log a few check-ins, HeartSync will compare recent connection against the previous stretch."
+        }
+
         guard history.count >= 4 else {
             return "Keep logging a few more check-ins and HeartSync will start comparing patterns over time."
         }
