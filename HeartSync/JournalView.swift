@@ -59,18 +59,24 @@ struct JournalView: View {
                 }
 
                 Section("Recap") {
-                    recapCard(
-                        title: "Strongest connection",
-                        value: bestConnectionEntry?.note ?? "No standout moment yet.",
-                        symbol: "heart.fill",
-                        tint: HeartSyncTheme.blush
-                    )
-                    recapCard(
-                        title: "Needs extra care",
-                        value: lowestConnectionEntry?.note ?? "No lower-connection moment yet.",
-                        symbol: "bolt.horizontal.circle",
-                        tint: HeartSyncTheme.coral
-                    )
+                    if store.hasHistory {
+                        recapCard(
+                            title: "Strongest connection",
+                            value: bestConnectionEntry?.note ?? "No standout moment yet.",
+                            symbol: "heart.fill",
+                            tint: HeartSyncTheme.blush
+                        )
+                        recapCard(
+                            title: "Needs extra care",
+                            value: lowestConnectionEntry?.note ?? "No lower-connection moment yet.",
+                            symbol: "bolt.horizontal.circle",
+                            tint: HeartSyncTheme.coral
+                        )
+                    } else {
+                        Text("Once a few check-ins are logged, this recap will surface the strongest and most repair-worthy moments.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Section("Week at a glance") {
