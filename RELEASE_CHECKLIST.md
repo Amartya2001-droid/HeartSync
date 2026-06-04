@@ -20,12 +20,14 @@
 - Copy presenter talk track
 - Copy latest moment
 - Copy full moments history
+- Copy backup export and confirm `Data safety` updates
 - Reset sample data and confirm the app returns to the default scenario
 
 ## Content verification
 
 - Confirm the selected preset matches the intended demo story
 - Confirm `Demo readiness` shows the expected state
+- Confirm `Backup export is current` flips back to pending after a later edit
 - Confirm the weekly range label looks correct
 - Confirm exported text includes timestamp context
 

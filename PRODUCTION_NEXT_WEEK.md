@@ -29,6 +29,7 @@ Move HeartSync from polished demo MVP to a production-ready first release candid
 - Validate all persistence paths after app relaunch
 - Review accessibility labels, Dynamic Type, and contrast
 - Confirm the cleared-history state feels intentional on Home, Moments, and Profile
+- Confirm backup-export status updates after copying a JSON backup and after later local edits
 
 ### 3. Release setup
 

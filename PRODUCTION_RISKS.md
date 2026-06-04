@@ -7,6 +7,7 @@
 - No analytics or crash reporting
 - Final signing/device validation still pending outside this environment
 - Cleared-history and first-run states still need real device validation
+- Backup recovery is still export-only, so recovering data depends on a manual copy/save workflow outside the app
 
 ## Important product decision
 
@@ -23,3 +24,4 @@ Those are different release tracks. The current codebase supports the first trac
 - Validate on real devices
 - Add store tests before release
 - Keep the release notes explicit about local data behavior
+- Verify the backup-export status messaging matches real user expectations on device

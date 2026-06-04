@@ -68,6 +68,12 @@ struct RitualRecommendation: Identifiable, Hashable {
     let symbol: String
 }
 
+struct ExportStatusSnapshot {
+    let title: String
+    let detail: String
+    let isCurrent: Bool
+}
+
 private struct HeartSyncBackupExport: Codable {
     let exportedAt: String
     let partner: PartnerProfile
@@ -99,6 +105,8 @@ final class HeartSyncStore: ObservableObject {
         static let draftConnection = "heartsync.draft.connection"
         static let draftNote = "heartsync.draft.note"
         static let draftIntention = "heartsync.draft.intention"
+        static let dataUpdatedAt = "heartsync.data.updatedAt"
+        static let lastBackupExportAt = "heartsync.backup.lastExportedAt"
     }
 
     init(defaults: UserDefaults = .standard) {
@@ -156,6 +164,60 @@ final class HeartSyncStore: ObservableObject {
 
     var hasHistory: Bool {
         !history.isEmpty
+    }
+
+    private var dataUpdatedAt: Date? {
+        defaults.object(forKey: StorageKeys.dataUpdatedAt) as? Date
+    }
+
+    private var lastBackupExportAt: Date? {
+        defaults.object(forKey: StorageKeys.lastBackupExportAt) as? Date
+    }
+
+    var hasCurrentBackupExport: Bool {
+        guard let dataUpdatedAt else { return lastBackupExportAt != nil }
+        guard let lastBackupExportAt else { return false }
+        return lastBackupExportAt >= dataUpdatedAt
+    }
+
+    var lastBackupExportLabel: String {
+        guard let lastBackupExportAt else {
+            return "No JSON backup exported yet"
+        }
+
+        return "Last backup export: \(lastBackupExportAt.formatted(.dateTime.month(.abbreviated).day().hour().minute()))"
+    }
+
+    var exportStatus: ExportStatusSnapshot {
+        guard hasHistory else {
+            return ExportStatusSnapshot(
+                title: "Backup export is optional right now",
+                detail: "History is empty, so a JSON backup is not urgent yet. Export after you rebuild sample data or log fresh moments.",
+                isCurrent: true
+            )
+        }
+
+        if hasCurrentBackupExport {
+            return ExportStatusSnapshot(
+                title: "Backup export is current",
+                detail: "The latest local profile, draft, and moments have been captured in a JSON export.",
+                isCurrent: true
+            )
+        }
+
+        if lastBackupExportAt == nil {
+            return ExportStatusSnapshot(
+                title: "Backup export recommended",
+                detail: "This device has local-only HeartSync data, but no JSON backup has been copied yet.",
+                isCurrent: false
+            )
+        }
+
+        return ExportStatusSnapshot(
+            title: "Backup export needs refresh",
+            detail: "Local data changed after the last JSON backup. Export again before handoff or release review.",
+            isCurrent: false
+        )
     }
 
     var recommendedAction: String {
@@ -528,6 +590,12 @@ final class HeartSyncStore: ObservableObject {
                 title: "Weekly summary is shareable",
                 detail: "The presenter can share or copy a concise relationship snapshot.",
                 isReady: !weeklySummaryText.isEmpty
+            ),
+            DemoReadinessItem(
+                id: "backup",
+                title: "Backup export is current",
+                detail: "Local demo data has a fresh JSON backup for handoff or recovery.",
+                isReady: hasCurrentBackupExport || !hasHistory
             )
         ]
     }
@@ -619,6 +687,7 @@ final class HeartSyncStore: ObservableObject {
 
     func copyBackupExportToClipboard() {
         UIPasteboard.general.string = backupExportText
+        markBackupExported()
     }
 
     func loadTodayCheckInIntoDraft() {
@@ -648,6 +717,7 @@ final class HeartSyncStore: ObservableObject {
         defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
         defaults.set(todayNote, forKey: StorageKeys.draftNote)
         defaults.set(todayIntention, forKey: StorageKeys.draftIntention)
+        markDataUpdated()
     }
 
     func submitCheckIn() {
@@ -710,6 +780,14 @@ final class HeartSyncStore: ObservableObject {
         persistHistory()
     }
 
+    private func markDataUpdated() {
+        defaults.set(Date.now, forKey: StorageKeys.dataUpdatedAt)
+    }
+
+    private func markBackupExported() {
+        defaults.set(Date.now, forKey: StorageKeys.lastBackupExportAt)
+    }
+
     private func currentStreakDays() -> Int {
         let calendar = Calendar.current
         var streak = 0
@@ -733,12 +811,14 @@ final class HeartSyncStore: ObservableObject {
         if let data = try? encoder.encode(history) {
             defaults.set(data, forKey: StorageKeys.history)
         }
+        markDataUpdated()
     }
 
     private func persistPartner() {
         if let data = try? encoder.encode(partner) {
             defaults.set(data, forKey: StorageKeys.partner)
         }
+        markDataUpdated()
     }
 
     private static let sampleHistory: [DailyCheckIn] = [

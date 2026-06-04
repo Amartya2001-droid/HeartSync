@@ -10,7 +10,7 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 - Quick prompt suggestions and coaching hints to make check-ins easier during demos and first use
 - A searchable and sortable moments view for recent history, pattern scanning, and sharing individual entries
 - Local persistence for demo-ready state without requiring a backend
-- Basic profile customization, presets, readiness summary, presenter talk-track copy, and full history export
+- Basic profile customization, presets, readiness summary, backup-export status, presenter talk-track copy, and full history export
 
 ## Explicit non-goals
 
@@ -42,11 +42,12 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 5. Save a new entry and point out the saved confirmation.
 6. Move back to Home or Moments to show the update reflected in history.
 7. Use Moments search, sort, empty-state actions, and individual sharing to explain retrieval and handoff.
-8. Use Profile to confirm demo readiness, switch presets, copy the presenter talk track, share the weekly summary, or export the full moments history.
+8. Use Profile to confirm demo readiness, check backup-export status, switch presets, copy the presenter talk track, share the weekly summary, or export the full moments history.
 
 ## Best next improvements
 
 - Replace placeholder app icon assets with final brand artwork
 - Add screenshots for handoff
 - Add tests around store persistence and streak calculation
+- Add import or restore-from-backup flow instead of export-only recovery
 - Polish copy and spacing after device-level review in Xcode

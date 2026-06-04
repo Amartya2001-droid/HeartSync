@@ -125,6 +125,24 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy full moments history", systemImage: "archivebox")
                     }
+                }
+
+                Section("Data safety") {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: store.exportStatus.isCurrent ? "externaldrive.fill.badge.checkmark" : "externaldrive.badge.exclamationmark")
+                            .foregroundStyle(store.exportStatus.isCurrent ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(store.exportStatus.title)
+                                .font(.subheadline.weight(.semibold))
+                            Text(store.exportStatus.detail)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Text(store.lastBackupExportLabel)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
 
                     Button {
                         store.copyBackupExportToClipboard()
