@@ -58,6 +58,8 @@ struct SettingsView: View {
                     Text(store.currentScenarioSummary)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                        .accessibilityLabel("Current scenario")
+                        .accessibilityValue(store.currentScenarioSummary.replacingOccurrences(of: "\n", with: ". "))
 
                     Button {
                         store.copyCurrentScenarioToClipboard()
@@ -143,6 +145,9 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Data safety")
+                    .accessibilityValue("\(store.exportStatus.title). \(store.exportStatus.detail). \(store.lastBackupExportLabel)")
 
                     Button {
                         store.copyBackupExportToClipboard()
@@ -183,6 +188,9 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Demo readiness")
+                    .accessibilityValue("\(store.demoReadinessSummary). \(store.isDemoReady ? "You can present from the current state." : "Resolve the pending items before a live demo.")")
 
                     ForEach(store.demoReadinessItems) { item in
                         HStack(alignment: .top, spacing: 12) {
@@ -197,6 +205,9 @@ struct SettingsView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(item.title)
+                        .accessibilityValue(item.isReady ? "Ready. \(item.detail)" : "Needs attention. \(item.detail)")
                     }
                 }
 

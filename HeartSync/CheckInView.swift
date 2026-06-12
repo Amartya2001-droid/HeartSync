@@ -93,6 +93,9 @@ struct CheckInView: View {
         }
         .padding(18)
         .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Check-in saved")
+        .accessibilityValue("Today's entry was saved and reflected across Home, Moments, and the weekly summary.")
     }
 
     private func existingCheckInCard(_ checkIn: DailyCheckIn) -> some View {
@@ -129,6 +132,10 @@ struct CheckInView: View {
         }
         .padding(20)
         .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Today's existing check-in")
+        .accessibilityValue("Energy \(checkIn.energy) out of 5. Connection \(checkIn.connection) out of 5.")
+        .accessibilityHint("Use saved values or start fresh before updating today's entry.")
     }
 
     private var coachingCard: some View {
@@ -150,6 +157,9 @@ struct CheckInView: View {
         }
         .padding(18)
         .background(Color.white.opacity(0.66), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Coaching hint")
+        .accessibilityValue("\(store.draftCoachingTitle). \(store.draftCoachingMessage)")
     }
 
     private var reflectionCard: some View {
@@ -215,6 +225,7 @@ struct CheckInView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
     }
 
     private var draftStatusRow: some View {
@@ -276,6 +287,9 @@ struct CheckInView: View {
         }
         .padding(16)
         .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Quick starting point")
+        .accessibilityValue("Prefill a reflection or intention with one tap, then edit it to sound like you.")
     }
 
     private func suggestionRow(
@@ -345,6 +359,9 @@ struct CheckInView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(title)
+        .accessibilityValue("\(Int(value.wrappedValue.rounded())) out of 5. \(subtitle)")
     }
 
     private func draftStatusPill(title: String, isReady: Bool, detail: String) -> some View {
@@ -364,6 +381,9 @@ struct CheckInView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(Color.white.opacity(0.74), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(isReady ? "Ready. \(detail)" : "Not ready. \(detail)")
     }
 
     private func inlineDraftAction(title: String, action: @escaping () -> Void) -> some View {

@@ -54,6 +54,7 @@ struct JournalView: View {
                         }
                     }
                     .listRowBackground(Color.clear)
+                    .accessibilityElement(children: .contain)
                 } header: {
                     Text("Weekly story")
                 }
@@ -125,6 +126,9 @@ struct JournalView: View {
                         }
                         .padding(.vertical, 10)
                         .listRowBackground(Color.white.opacity(0.72))
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(emptyStateTitle)
+                        .accessibilityValue(emptyStateMessage)
                     } else {
                         ForEach(filteredHistory) { item in
                             VStack(alignment: .leading, spacing: 10) {
@@ -164,6 +168,9 @@ struct JournalView: View {
                                     .fill(Color.white.opacity(0.88))
                                     .padding(.vertical, 4)
                             )
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("Moment")
+                            .accessibilityValue(momentAccessibilityText(for: item))
                         }
                         .onDelete { offsets in
                             store.deleteCheckIns(at: offsets, from: filteredHistory)
@@ -337,6 +344,12 @@ struct JournalView: View {
         Intention:
         \(item.intention.isEmpty ? "No intention captured." : item.intention)
         """
+    }
+
+    private func momentAccessibilityText(for item: DailyCheckIn) -> String {
+        let note = item.note.isEmpty ? "No note was captured for this day." : item.note
+        let intention = item.intention.isEmpty ? "No intention captured." : item.intention
+        return "\(store.dateContextLabel(for: item.date)). Connection \(item.connection) out of 5. Energy \(item.energy) out of 5. \(note) Intention: \(intention)"
     }
 }
 

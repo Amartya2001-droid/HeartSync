@@ -94,6 +94,9 @@ struct DashboardView: View {
             }
         }
         .foregroundStyle(.white)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("HeartSync overview")
+        .accessibilityValue("\(store.partner.name), \(store.partner.milestone). Weekly connection \(store.snapshot.weeklyAverageConnection) out of 5. Support focus: \(store.partner.supportFocus)")
     }
 
     private var focusCard: some View {
@@ -124,6 +127,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Connection trend")
+        .accessibilityValue("\(store.connectionTrendTitle). \(store.connectionTrendMessage)")
     }
 
     private var trendCard: some View {
@@ -150,6 +156,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Today's focus")
+        .accessibilityValue(store.todayIntention.isEmpty ? "No intention set yet." : store.todayIntention)
     }
 
     private var insightCard: some View {
@@ -175,6 +184,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Weekly insight")
+        .accessibilityValue("\(store.weeklyStory) Recommended next step: \(store.recommendedAction)")
     }
 
     private var ritualPlanCard: some View {
@@ -218,6 +230,7 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
     }
 
     private var todayStatusCard: some View {
@@ -247,6 +260,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Today's check-in status")
+        .accessibilityValue("\(store.todayStatusTitle). \(store.hasCompletedTodayCheckIn ? "Done" : "Pending"). \(store.todayStatusMessage)")
     }
 
     private var quickActionsCard: some View {
@@ -292,6 +308,7 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
     }
 
     private var summaryCard: some View {
@@ -356,6 +373,9 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Weekly summary")
+        .accessibilityHint("Share or copy the current weekly summary.")
     }
 
     private var recentMoments: some View {
@@ -383,6 +403,9 @@ struct DashboardView: View {
                 .padding(18)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("No recent moments yet")
+                .accessibilityValue("Your first check-in will appear here.")
             } else {
                 ForEach(store.recentMoments) { item in
                     VStack(alignment: .leading, spacing: 8) {
@@ -409,6 +432,9 @@ struct DashboardView: View {
                     .padding(18)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Recent moment")
+                    .accessibilityValue(recentMomentAccessibilityText(for: item))
                 }
             }
         }
@@ -478,6 +504,12 @@ struct DashboardView: View {
         Intention:
         \(item.intention.isEmpty ? "No intention captured." : item.intention)
         """
+    }
+
+    private func recentMomentAccessibilityText(for item: DailyCheckIn) -> String {
+        let note = item.note.isEmpty ? "No note captured." : item.note
+        let intention = item.intention.isEmpty ? "No intention captured." : item.intention
+        return "\(store.dateContextLabel(for: item.date)). Connection \(item.connection) out of 5. Energy \(item.energy) out of 5. \(note) Intention: \(intention)"
     }
 }
 

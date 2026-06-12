@@ -34,5 +34,9 @@ struct MetricCard: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(value)
+        .accessibilityHint(detail)
     }
 }
