@@ -12,6 +12,7 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 - Local persistence for demo-ready state without requiring a backend
 - Basic profile customization, presets, readiness summary, backup-export status, presenter talk-track copy, and full history export
 - Accessibility-focused semantics for key cards and status surfaces in Home, Check-In, Moments, and Profile
+- A real `HeartSyncTests` XCTest target covering store persistence, streak logic, and backup-export freshness
 
 ## Explicit non-goals
 
@@ -24,6 +25,11 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 ## Build note
 
 In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` inside the workspace. On machines where `xcode-select` points at Command Line Tools instead of full Xcode, switch the developer directory before running a full simulator build.
+
+## Tests
+
+- The repo now includes a `HeartSyncTests` target with focused `HeartSyncStore` coverage.
+- Run the tests from Xcode, or from the terminal once `xcode-select` points to full Xcode.
 
 ## Demo materials
 
@@ -49,6 +55,5 @@ In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` i
 
 - Replace placeholder app icon assets with final brand artwork
 - Add screenshots for handoff
-- Add tests around store persistence and streak calculation
 - Add import or restore-from-backup flow instead of export-only recovery
 - Polish copy, spacing, and VoiceOver behavior after device-level review in Xcode

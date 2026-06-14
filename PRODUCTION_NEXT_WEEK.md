@@ -25,7 +25,7 @@ Move HeartSync from polished demo MVP to a production-ready first release candid
 ### 2. Product hardening
 
 - Add a real empty-state onboarding path when history is cleared
-- Add automated tests for `HeartSyncStore`
+- Expand the new `HeartSyncTests` coverage beyond `HeartSyncStore` basics once Xcode validation is available
 - Validate all persistence paths after app relaunch
 - Review accessibility labels, Dynamic Type, and contrast
 - Confirm the cleared-history state feels intentional on Home, Moments, and Profile

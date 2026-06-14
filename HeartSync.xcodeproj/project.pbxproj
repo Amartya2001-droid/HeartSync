@@ -18,7 +18,18 @@
 		AEB300092D00000100AA0001 /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB300082D00000100AA0001 /* CheckInView.swift */; };
 		AEB3000B2D00000100AA0001 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB3000A2D00000100AA0001 /* JournalView.swift */; };
 		AEB3000D2D00000100AA0001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB3000C2D00000100AA0001 /* SettingsView.swift */; };
+		AEC100042D10000100AA0001 /* HeartSyncStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AEC1000A2D10000100AA0001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AEA604812C25B4D800CB3983 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEA604882C25B4D800CB3983;
+			remoteInfo = HeartSync;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AEA604892C25B4D800CB3983 /* HeartSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HeartSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -33,10 +44,19 @@
 		AEB300082D00000100AA0001 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
 		AEB3000A2D00000100AA0001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		AEB3000C2D00000100AA0001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AEC100012D10000100AA0001 /* HeartSyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeartSyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AEA604862C25B4D800CB3983 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEC100082D10000100AA0001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -50,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				AEA6048B2C25B4D800CB3983 /* HeartSync */,
+				AEC100022D10000100AA0001 /* HeartSyncTests */,
 				AEA6048A2C25B4D800CB3983 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				AEA604892C25B4D800CB3983 /* HeartSync.app */,
+				AEC100012D10000100AA0001 /* HeartSyncTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -88,6 +110,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		AEC100022D10000100AA0001 /* HeartSyncTests */ = {
+			isa = PBXGroup;
+			children = (
+				AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */,
+			);
+			path = HeartSyncTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -108,6 +138,24 @@
 			productReference = AEA604892C25B4D800CB3983 /* HeartSync.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AEC100052D10000100AA0001 /* HeartSyncTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AEC1000D2D10000100AA0001 /* Build configuration list for PBXNativeTarget "HeartSyncTests" */;
+			buildPhases = (
+				AEC100072D10000100AA0001 /* Sources */,
+				AEC100082D10000100AA0001 /* Frameworks */,
+				AEC100092D10000100AA0001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AEC1000B2D10000100AA0001 /* PBXTargetDependency */,
+			);
+			name = HeartSyncTests;
+			productName = HeartSyncTests;
+			productReference = AEC100012D10000100AA0001 /* HeartSyncTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -120,6 +168,10 @@
 				TargetAttributes = {
 					AEA604882C25B4D800CB3983 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					AEC100052D10000100AA0001 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = AEA604882C25B4D800CB3983;
 					};
 				};
 			};
@@ -137,6 +189,7 @@
 			projectRoot = "";
 			targets = (
 				AEA604882C25B4D800CB3983 /* HeartSync */,
+				AEC100052D10000100AA0001 /* HeartSyncTests */,
 			);
 		};
 /* End PBXProject section */
@@ -148,6 +201,13 @@
 			files = (
 				AEA604942C25B4D900CB3983 /* Preview Assets.xcassets in Resources */,
 				AEA604912C25B4D900CB3983 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEC100092D10000100AA0001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,7 +230,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AEC100072D10000100AA0001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AEC100042D10000100AA0001 /* HeartSyncStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AEC1000B2D10000100AA0001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AEA604882C25B4D800CB3983 /* HeartSync */;
+			targetProxy = AEC1000A2D10000100AA0001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AEA604952C25B4D900CB3983 /* Debug */ = {
@@ -352,6 +428,54 @@
 			};
 			name = Release;
 		};
+		AEC1000E2D10000100AA0001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T8K9L82F82;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amartyakarmakar.heartsyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HeartSync.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HeartSync";
+				TEST_TARGET_NAME = HeartSync;
+			};
+			name = Debug;
+		};
+		AEC1000F2D10000100AA0001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T8K9L82F82;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amartyakarmakar.heartsyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HeartSync.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HeartSync";
+				TEST_TARGET_NAME = HeartSync;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -369,6 +493,15 @@
 			buildConfigurations = (
 				AEA604982C25B4D900CB3983 /* Debug */,
 				AEA604992C25B4D900CB3983 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AEC1000D2D10000100AA0001 /* Build configuration list for PBXNativeTarget "HeartSyncTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AEC1000E2D10000100AA0001 /* Debug */,
+				AEC1000F2D10000100AA0001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

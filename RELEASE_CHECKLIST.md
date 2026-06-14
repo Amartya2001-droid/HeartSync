@@ -4,6 +4,7 @@
 
 - Confirm the active developer directory points to full Xcode
 - Build the `HeartSync` scheme
+- Run the `HeartSyncTests` target
 - Run on at least one Simulator
 - Run on one physical device if available
 - Check the onboarding sheet presentation
