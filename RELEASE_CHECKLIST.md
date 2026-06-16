@@ -23,6 +23,7 @@
 - Copy full moments history
 - Copy backup export and confirm `Data safety` updates
 - Reset sample data and confirm the app returns to the default scenario
+- Clear all moments history and confirm the recovery sheet offers a new first check-in or sample-data restore
 
 ## Content verification
 
