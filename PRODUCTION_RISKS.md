@@ -2,12 +2,12 @@
 
 ## Current risks
 
-- No automated tests yet
+- Test coverage exists for `HeartSyncStore`, but broader app/device validation is still pending
 - No cloud sync or account model
 - No analytics or crash reporting
 - Final signing/device validation still pending outside this environment
 - Cleared-history and first-run states still need real device validation
-- Backup recovery is still export-only, so recovering data depends on a manual copy/save workflow outside the app
+- Backup recovery now supports pasted JSON restore, but it still depends on users preserving exported backup text outside the app
 
 ## Important product decision
 
@@ -22,6 +22,6 @@ Those are different release tracks. The current codebase supports the first trac
 
 - Treat v1 as local-first unless product scope changes
 - Validate on real devices
-- Add store tests before release
+- Expand tests beyond the current store coverage before release
 - Keep the release notes explicit about local data behavior
 - Verify the backup-export status messaging matches real user expectations on device

@@ -84,6 +84,38 @@ final class HeartSyncStoreTests: XCTestCase {
         XCTAssertEqual(store.exportStatus.title, "Backup export needs refresh")
     }
 
+    func testRestoreFromBackupTextReplacesProfileHistoryAndDraft() {
+        let sourceStore = HeartSyncStore(defaults: defaults)
+        sourceStore.updatePartner(name: "Taylor", milestone: "Rebuild week", supportFocus: "More honest repair conversations")
+        sourceStore.todayEnergy = 5
+        sourceStore.todayConnection = 2
+        sourceStore.todayNote = "Draft note to restore"
+        sourceStore.todayIntention = "Draft intention to restore"
+        sourceStore.submitCheckIn()
+
+        let backupText = sourceStore.backupExportText
+
+        let restoreSuiteName = "HeartSyncStoreRestoreTests-\(UUID().uuidString)"
+        let otherDefaults = UserDefaults(suiteName: restoreSuiteName)!
+        otherDefaults.removePersistentDomain(forName: restoreSuiteName)
+        let restoredStore = HeartSyncStore(defaults: otherDefaults)
+
+        let result = restoredStore.restoreFromBackupText(backupText)
+
+        XCTAssertTrue(result.isSuccess)
+        XCTAssertEqual(result.title, "Backup restored")
+        XCTAssertEqual(restoredStore.partner.name, "Taylor")
+        XCTAssertEqual(restoredStore.partner.milestone, "Rebuild week")
+        XCTAssertEqual(restoredStore.partner.supportFocus, "More honest repair conversations")
+        XCTAssertEqual(restoredStore.todayEnergy, sourceStore.todayEnergy)
+        XCTAssertEqual(restoredStore.todayConnection, sourceStore.todayConnection)
+        XCTAssertEqual(restoredStore.history.count, sourceStore.history.count)
+        XCTAssertEqual(restoredStore.todayCheckIn?.note, sourceStore.todayCheckIn?.note)
+        XCTAssertTrue(restoredStore.hasCurrentBackupExport)
+
+        otherDefaults.removePersistentDomain(forName: restoreSuiteName)
+    }
+
     func testClearAllHistoryMakesBackupOptionalAndHistoryEmpty() {
         let store = HeartSyncStore(defaults: defaults)
 

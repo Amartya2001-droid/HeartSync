@@ -74,6 +74,12 @@ struct ExportStatusSnapshot {
     let isCurrent: Bool
 }
 
+struct BackupRestoreResult {
+    let title: String
+    let detail: String
+    let isSuccess: Bool
+}
+
 private struct HeartSyncBackupExport: Codable {
     let exportedAt: String
     let partner: PartnerProfile
@@ -688,6 +694,43 @@ final class HeartSyncStore: ObservableObject {
     func copyBackupExportToClipboard() {
         UIPasteboard.general.string = backupExportText
         markBackupExported()
+    }
+
+    func restoreFromBackupText(_ text: String) -> BackupRestoreResult {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return BackupRestoreResult(
+                title: "Paste a backup first",
+                detail: "Add the copied HeartSync backup JSON before trying to restore.",
+                isSuccess: false
+            )
+        }
+
+        guard let data = trimmed.data(using: .utf8),
+              let payload = try? decoder.decode(HeartSyncBackupExport.self, from: data) else {
+            return BackupRestoreResult(
+                title: "Backup could not be restored",
+                detail: "The pasted text is not valid HeartSync backup JSON.",
+                isSuccess: false
+            )
+        }
+
+        partner = payload.partner
+        history = payload.history.sorted { $0.date > $1.date }
+        todayEnergy = payload.draftEnergy
+        todayConnection = payload.draftConnection
+        todayNote = payload.draftNote
+        todayIntention = payload.draftIntention
+        persistPartner()
+        persistHistory()
+        saveDraft()
+        markBackupExported()
+
+        return BackupRestoreResult(
+            title: "Backup restored",
+            detail: "Profile, moments, and draft state were restored from the pasted backup.",
+            isSuccess: true
+        )
     }
 
     func loadTodayCheckInIntoDraft() {

@@ -6,9 +6,11 @@ struct SettingsView: View {
     @State private var partnerName = ""
     @State private var milestone = ""
     @State private var supportFocus = ""
+    @State private var backupImportText = ""
     @State private var saveMessage = ""
     @State private var showResetConfirmation = false
     @State private var showClearHistoryConfirmation = false
+    @State private var showRestoreBackupConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -155,6 +157,23 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
                     }
+
+                    TextEditor(text: $backupImportText)
+                        .frame(minHeight: 120)
+                        .padding(8)
+                        .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
+                        )
+                        .accessibilityLabel("Backup JSON input")
+
+                    Button {
+                        showRestoreBackupConfirmation = true
+                    } label: {
+                        Label("Restore from pasted backup", systemImage: "arrow.clockwise")
+                    }
+                    .disabled(backupImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
 
                 Section("Local demo data") {
@@ -245,6 +264,26 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("This replaces the current profile and check-in history with the default demo scenario.")
+            }
+            .confirmationDialog(
+                "Restore HeartSync backup?",
+                isPresented: $showRestoreBackupConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Restore backup", role: .destructive) {
+                    let result = store.restoreFromBackupText(backupImportText)
+                    if result.isSuccess {
+                        partnerName = store.partner.name
+                        milestone = store.partner.milestone
+                        supportFocus = store.partner.supportFocus
+                        backupImportText = ""
+                    }
+                    saveMessage = result.detail
+                }
+
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This replaces the current local profile, moments, and draft state with the pasted backup.")
             }
             .confirmationDialog(
                 "Clear all saved moments?",

@@ -14,6 +14,7 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 - Accessibility-focused semantics for key cards and status surfaces in Home, Check-In, Moments, and Profile
 - A real `HeartSyncTests` XCTest target covering store persistence, streak logic, and backup-export freshness
 - A dedicated cleared-history recovery sheet that guides users into a new first check-in or restores sample data
+- A pasted-backup restore flow in Profile so exported JSON can be brought back into the app
 
 ## Explicit non-goals
 
