@@ -696,6 +696,27 @@ final class HeartSyncStore: ObservableObject {
         markBackupExported()
     }
 
+    func backupPreviewSummary(for text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return "Paste a HeartSync backup JSON export here to preview what will be restored."
+        }
+
+        guard let payload = decodedBackupPayload(from: trimmed) else {
+            return "The pasted text does not look like a valid HeartSync backup yet."
+        }
+
+        let latestLabel = payload.history.first.map { dateContextLabel(for: $0.date) } ?? "No saved moments"
+        return """
+        Backup preview
+        Partner: \(payload.partner.name)
+        Milestone: \(payload.partner.milestone)
+        Moments: \(payload.history.count)
+        Latest moment: \(latestLabel)
+        Draft note: \(payload.draftNote.isEmpty ? "Empty" : "Included")
+        """
+    }
+
     func restoreFromBackupText(_ text: String) -> BackupRestoreResult {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
@@ -706,8 +727,7 @@ final class HeartSyncStore: ObservableObject {
             )
         }
 
-        guard let data = trimmed.data(using: .utf8),
-              let payload = try? decoder.decode(HeartSyncBackupExport.self, from: data) else {
+        guard let payload = decodedBackupPayload(from: trimmed) else {
             return BackupRestoreResult(
                 title: "Backup could not be restored",
                 detail: "The pasted text is not valid HeartSync backup JSON.",
@@ -829,6 +849,11 @@ final class HeartSyncStore: ObservableObject {
 
     private func markBackupExported() {
         defaults.set(Date.now, forKey: StorageKeys.lastBackupExportAt)
+    }
+
+    private func decodedBackupPayload(from text: String) -> HeartSyncBackupExport? {
+        guard let data = text.data(using: .utf8) else { return nil }
+        return try? decoder.decode(HeartSyncBackupExport.self, from: data)
     }
 
     private func currentStreakDays() -> Int {

@@ -116,6 +116,19 @@ final class HeartSyncStoreTests: XCTestCase {
         otherDefaults.removePersistentDomain(forName: restoreSuiteName)
     }
 
+    func testRestoreFromInvalidBackupTextFailsWithoutChangingState() {
+        let store = HeartSyncStore(defaults: defaults)
+        let originalPartnerName = store.partner.name
+        let originalHistoryCount = store.history.count
+
+        let result = store.restoreFromBackupText("not valid backup json")
+
+        XCTAssertFalse(result.isSuccess)
+        XCTAssertEqual(result.title, "Backup could not be restored")
+        XCTAssertEqual(store.partner.name, originalPartnerName)
+        XCTAssertEqual(store.history.count, originalHistoryCount)
+    }
+
     func testClearAllHistoryMakesBackupOptionalAndHistoryEmpty() {
         let store = HeartSyncStore(defaults: defaults)
 

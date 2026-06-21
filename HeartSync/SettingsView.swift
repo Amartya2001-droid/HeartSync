@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @EnvironmentObject private var store: HeartSyncStore
@@ -158,6 +159,13 @@ struct SettingsView: View {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
                     }
 
+                    Button {
+                        backupImportText = UIPasteboard.general.string ?? ""
+                        saveMessage = backupImportText.isEmpty ? "Clipboard did not contain backup text." : "Backup text pasted from clipboard."
+                    } label: {
+                        Label("Paste copied backup", systemImage: "doc.on.clipboard")
+                    }
+
                     TextEditor(text: $backupImportText)
                         .frame(minHeight: 120)
                         .padding(8)
@@ -167,6 +175,10 @@ struct SettingsView: View {
                                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
                         )
                         .accessibilityLabel("Backup JSON input")
+
+                    Text(store.backupPreviewSummary(for: backupImportText))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     Button {
                         showRestoreBackupConfirmation = true
