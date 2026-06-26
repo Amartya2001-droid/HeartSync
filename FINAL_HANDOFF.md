@@ -9,8 +9,9 @@ The app currently supports:
 - A Home dashboard with pulse, streak, trend, ritual plan, weekly summary, and recent moments
 - A daily Check-In flow with coaching hints, prompt suggestions, and saved confirmation
 - A Moments timeline with filtering, searching, sorting, sharing, and delete support
-- A Profile area with presets, readiness summary, onboarding replay, and multiple copy/share handoff tools
+- A Profile area with presets, readiness summary, onboarding replay, release info, backup export/restore, and multiple copy/share handoff tools
 - Local-only persistence for a reliable no-backend demo
+- A focused `HeartSyncTests` target covering store persistence, streaks, and backup behavior
 
 ## Best surfaces to show
 
@@ -33,7 +34,7 @@ The app currently supports:
 - No backend or cloud sync
 - No notifications
 - No analytics or CI/CD pipeline
-- No automated tests yet
+- Device-level Xcode validation still needs to be run outside this environment
 
 ## Recommended final demo order
 

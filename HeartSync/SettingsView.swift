@@ -242,6 +242,34 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Release info") {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Version \(appVersion) (\(buildNumber))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(HeartSyncTheme.ink)
+                        Text(bundleIdentifier)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        Text("Local-first release with backup export/restore and store-level XCTest coverage.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Release info")
+                    .accessibilityValue("Version \(appVersion), build \(buildNumber), bundle identifier \(bundleIdentifier).")
+
+                    Button {
+                        store.copyReleaseSummaryToClipboard(
+                            appVersion: appVersion,
+                            buildNumber: buildNumber,
+                            bundleIdentifier: bundleIdentifier
+                        )
+                        saveMessage = "Release summary copied."
+                    } label: {
+                        Label("Copy release summary", systemImage: "shippingbox")
+                    }
+                }
+
                 Section("MVP scope") {
                     Label("Daily check-in with local persistence", systemImage: "checkmark.circle.fill")
                     Label("Dashboard with pulse, streak, and recent moments", systemImage: "checkmark.circle.fill")
@@ -318,6 +346,18 @@ struct SettingsView: View {
                 saveMessage = ""
             }
         }
+    }
+
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    }
+
+    private var buildNumber: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+    }
+
+    private var bundleIdentifier: String {
+        Bundle.main.bundleIdentifier ?? "com.amartyakarmakar.heartsync"
     }
 }
 

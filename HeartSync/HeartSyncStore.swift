@@ -641,6 +641,30 @@ final class HeartSyncStore: ObservableObject {
         """
     }
 
+    func releaseSummaryText(appVersion: String, buildNumber: String, bundleIdentifier: String) -> String {
+        """
+        HeartSync release summary
+        Exported: \(exportGeneratedAtLabel)
+
+        Version: \(appVersion) (\(buildNumber))
+        Bundle ID: \(bundleIdentifier)
+        Release track: Local-first single-user iOS app
+
+        Included today:
+        - Daily check-ins with local persistence
+        - Dashboard pulse, trends, ritual plan, and weekly summary
+        - Searchable, sortable, shareable moments history
+        - Backup export plus pasted backup restore
+        - Presenter/demo handoff tools
+        - Store-level XCTest coverage
+
+        Not included:
+        - Accounts or cloud sync
+        - Notifications
+        - Analytics or CI/CD
+        """
+    }
+
     var notePromptSuggestions: [PromptSuggestion] {
         [
             PromptSuggestion(id: "repair", text: "We handled stress better once we said what we needed."),
@@ -694,6 +718,14 @@ final class HeartSyncStore: ObservableObject {
     func copyBackupExportToClipboard() {
         UIPasteboard.general.string = backupExportText
         markBackupExported()
+    }
+
+    func copyReleaseSummaryToClipboard(appVersion: String, buildNumber: String, bundleIdentifier: String) {
+        UIPasteboard.general.string = releaseSummaryText(
+            appVersion: appVersion,
+            buildNumber: buildNumber,
+            bundleIdentifier: bundleIdentifier
+        )
     }
 
     func backupPreviewSummary(for text: String) -> String {
