@@ -270,6 +270,50 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Launch review") {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: launchReviewItems.allSatisfy(\.isReady) ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(launchReviewItems.allSatisfy(\.isReady) ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(store.launchReviewSummary(
+                                appVersion: appVersion,
+                                buildNumber: buildNumber,
+                                bundleIdentifier: bundleIdentifier
+                            ))
+                            .font(.subheadline.weight(.semibold))
+                            Text("Use this quick pass before demo handoff, packaging, or a release review.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Launch review")
+                    .accessibilityValue(store.launchReviewSummary(
+                        appVersion: appVersion,
+                        buildNumber: buildNumber,
+                        bundleIdentifier: bundleIdentifier
+                    ))
+
+                    ForEach(launchReviewItems) { item in
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: item.isReady ? "checkmark.circle.fill" : "clock.badge.exclamationmark")
+                                .foregroundStyle(item.isReady ? HeartSyncTheme.sage : HeartSyncTheme.coral)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(item.detail)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(item.title)
+                        .accessibilityValue(item.isReady ? "Ready. \(item.detail)" : "Needs attention. \(item.detail)")
+                    }
+                }
+
                 Section("MVP scope") {
                     Label("Daily check-in with local persistence", systemImage: "checkmark.circle.fill")
                     Label("Dashboard with pulse, streak, and recent moments", systemImage: "checkmark.circle.fill")
@@ -358,6 +402,14 @@ struct SettingsView: View {
 
     private var bundleIdentifier: String {
         Bundle.main.bundleIdentifier ?? "com.amartyakarmakar.heartsync"
+    }
+
+    private var launchReviewItems: [LaunchReviewItem] {
+        store.launchReviewItems(
+            appVersion: appVersion,
+            buildNumber: buildNumber,
+            bundleIdentifier: bundleIdentifier
+        )
     }
 }
 

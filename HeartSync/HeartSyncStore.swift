@@ -61,6 +61,13 @@ struct DemoReadinessItem: Identifiable, Hashable {
     let isReady: Bool
 }
 
+struct LaunchReviewItem: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let detail: String
+    let isReady: Bool
+}
+
 struct RitualRecommendation: Identifiable, Hashable {
     let id: String
     let title: String
@@ -613,6 +620,51 @@ final class HeartSyncStore: ObservableObject {
 
     var isDemoReady: Bool {
         demoReadinessItems.allSatisfy(\.isReady)
+    }
+
+    func launchReviewItems(appVersion: String, buildNumber: String, bundleIdentifier: String) -> [LaunchReviewItem] {
+        [
+            LaunchReviewItem(
+                id: "release-id",
+                title: "Release identity is visible",
+                detail: "Version \(appVersion) (\(buildNumber)) and bundle ID \(bundleIdentifier) are ready for handoff.",
+                isReady: !appVersion.isEmpty && !buildNumber.isEmpty && !bundleIdentifier.isEmpty
+            ),
+            LaunchReviewItem(
+                id: "profile",
+                title: "Scenario is presentation-ready",
+                detail: "Partner profile, milestone, and support focus are set for the current story.",
+                isReady: !partner.name.isEmpty && !partner.milestone.isEmpty && !partner.supportFocus.isEmpty
+            ),
+            LaunchReviewItem(
+                id: "history",
+                title: "Moments history is loaded",
+                detail: "Home and Moments have enough data to show trends, recap, and recovery flows.",
+                isReady: hasHistory
+            ),
+            LaunchReviewItem(
+                id: "backup",
+                title: "Backup safety is covered",
+                detail: "A current backup exists or the app is intentionally in an empty-history state.",
+                isReady: hasCurrentBackupExport || !hasHistory
+            ),
+            LaunchReviewItem(
+                id: "summary",
+                title: "Handoff text is ready",
+                detail: "Weekly summary, release summary, and presenter copy actions are available from Profile.",
+                isReady: !weeklySummaryText.isEmpty
+            ),
+        ]
+    }
+
+    func launchReviewSummary(appVersion: String, buildNumber: String, bundleIdentifier: String) -> String {
+        let items = launchReviewItems(
+            appVersion: appVersion,
+            buildNumber: buildNumber,
+            bundleIdentifier: bundleIdentifier
+        )
+        let readyCount = items.filter(\.isReady).count
+        return "\(readyCount) of \(items.count) launch checks ready"
     }
 
     var currentScenarioSummary: String {

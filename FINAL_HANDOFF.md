@@ -10,6 +10,7 @@ The app currently supports:
 - A daily Check-In flow with coaching hints, prompt suggestions, and saved confirmation
 - A Moments timeline with filtering, searching, sorting, sharing, and delete support
 - A Profile area with presets, readiness summary, onboarding replay, release info, backup export/restore, and multiple copy/share handoff tools
+- A Profile area with presets, readiness summary, launch review, onboarding replay, release info, backup export/restore, and multiple copy/share handoff tools
 - Local-only persistence for a reliable no-backend demo
 - A focused `HeartSyncTests` target covering store persistence, streaks, and backup behavior
 

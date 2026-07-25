@@ -17,6 +17,7 @@ HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
 - A pasted-backup restore flow in Profile so exported JSON can be brought back into the app
 - Backup restore now includes clipboard paste support and a preview summary before destructive restore
 - Profile now surfaces release version/build information and a copyable release summary for handoff
+- Profile now includes an in-app launch review checklist for demos, packaging, and release sanity checks
 
 ## Explicit non-goals
 
