@@ -1,64 +1,65 @@
 # HeartSync
 
-HeartSync is a lightweight SwiftUI MVP for daily relationship check-ins.
+HeartSync is a SwiftUI iOS app for daily relationship check-ins, with local storage and sample data for demos. Requires iOS 17 or later.
 
-## This week's MVP
+## Live status
 
-- A polished dashboard that shows relationship pulse, streak, weekly range, and recent reflections
-- Connection trend storytelling and quick actions from Home
-- A daily check-in flow for energy, connection, notes, and intention
-- Quick prompt suggestions and coaching hints to make check-ins easier during demos and first use
-- A searchable and sortable moments view for recent history, pattern scanning, and sharing individual entries
-- Local persistence for demo-ready state without requiring a backend
-- Basic profile customization, presets, readiness summary, backup-export status, presenter talk-track copy, and full history export
-- Accessibility-focused semantics for key cards and status surfaces in Home, Check-In, Moments, and Profile
-- A real `HeartSyncTests` XCTest target covering store persistence, streak logic, and backup-export freshness
-- A dedicated cleared-history recovery sheet that guides users into a new first check-in or restores sample data
-- A pasted-backup restore flow in Profile so exported JSON can be brought back into the app
-- Backup restore now includes clipboard paste support and a preview summary before destructive restore
-- Profile now surfaces release version/build information and a copyable release summary for handoff
-- Profile now includes an in-app launch review checklist for demos, packaging, and release sanity checks
+**Not live yet — blocked by Xcode/device release validation and an App Store or TestFlight release.** No live distribution URL is recorded in this repository. Source code and demo materials are available; their presence does not establish a shipped app or verified UI.
 
-## Explicit non-goals
+## MVP definition (#6)
 
-- Authentication
-- Backend services or cloud sync
-- Notifications
-- HealthKit or other third-party integrations
-- Production analytics and CI/CD
+Core user story: as someone who wants a more intentional relationship, I can record today's energy, connection, reflection, and intention, then revisit recent entries and see a simple relationship pulse on the same device.
 
-## Build note
+Must-have screens:
 
-In constrained environments, `xcodebuild` may need a custom `-derivedDataPath` inside the workspace. On machines where `xcode-select` points at Command Line Tools instead of full Xcode, switch the developer directory before running a full simulator build.
+- **Home:** pulse, streak, recent reflections, and a route to the daily check-in.
+- **Check-In:** energy and connection ratings, note, intention, and save confirmation.
+- **Moments:** saved history, with an understandable empty state.
+- **Profile:** local partner details and demo/reset controls.
 
-## Tests
+Must-have behavior: save a check-in, reload it after relaunch, show it in Home/Moments, and recover from cleared history. Sample entries are fictional demo data; pulse and streak are local summaries, not clinical measures or measured product success.
 
-- The repo now includes a `HeartSyncTests` target with focused `HeartSyncStore` coverage.
-- Run the tests from Xcode, or from the terminal once `xcode-select` points to full Xcode.
+### Demo-ready acceptance criteria
 
-## Demo materials
+- On a clean simulator install, onboarding leads into the four-tab navigation shell.
+- Save a check-in and confirm its values in Home and Moments; relaunch and confirm persistence.
+- Clear history, inspect the empty state, and save a fresh entry or explicitly restore sample data.
+- Complete the flow offline without accounts, credentials, or a backend.
+- The iOS build and all XCTest cases pass in macOS CI; a person reviews layout, keyboard interaction, and VoiceOver in Xcode/on device before calling the demo verified.
 
-- See [DEMO_SCRIPT.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/DEMO_SCRIPT.md) for a short presenter flow.
-- See [PRESENTER_CHECKLIST.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/PRESENTER_CHECKLIST.md) for a quick run-through before showing the app.
-- See [FINAL_HANDOFF.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/FINAL_HANDOFF.md) for the close-out project summary.
-- See [RELEASE_CHECKLIST.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/RELEASE_CHECKLIST.md) for the final validation pass in Xcode.
-- See [PRODUCTION_NEXT_WEEK.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/PRODUCTION_NEXT_WEEK.md) for the launch-week production plan.
-- See [PRODUCTION_RISKS.md](/Users/amartyakarmakar/Documents/Codex1/HeartSync/PRODUCTION_RISKS.md) for the main remaining risks.
+These are pass/fail acceptance criteria, not claimed results or invented usage metrics.
 
-## Demo flow
+### Non-goals for this week
 
-1. Let the onboarding sheet introduce the app on first launch, or replay it from Profile.
-2. Open the Home tab and introduce the weekly pulse, streak, connection trend, and support focus.
-3. Use the Home quick actions to move into Check-In.
-4. Show how coaching hints and prompt suggestions help a couple log energy, connection, and one intention.
-5. Save a new entry and point out the saved confirmation.
-6. Move back to Home or Moments to show the update reflected in history.
-7. Use Moments search, sort, empty-state actions, and individual sharing to explain retrieval and handoff.
-8. Use Profile to confirm demo readiness, check backup-export status, switch presets, copy the presenter talk track, share the weekly summary, or export the full moments history.
+Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
-## Best next improvements
+## Current implementation and verification
 
-- Replace placeholder app icon assets with final brand artwork
-- Add screenshots for handoff
-- Add import or restore-from-backup flow instead of export-only recovery
-- Polish copy, spacing, and VoiceOver behavior after device-level review in Xcode
+The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Six `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, and cleared history. Code presence alone does not verify simulator behavior.
+
+Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repository checks with:
+
+```sh
+python3 -m unittest discover -s scripts -p 'test_*.py' -v
+```
+
+CI runs those checks and builds/tests the iOS app on a macOS simulator, without signing credentials. Before opening a PR, push its branch and wait for the branch CI tests to pass. For local Xcode verification:
+
+```sh
+xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -derivedDataPath .deriveddata CODE_SIGNING_ALLOWED=NO
+```
+
+Use an installed simulator name from `xcrun simctl list devices available`. Visual layout, accessibility, clipboard/share sheets, and device behavior still require a human Xcode/device review.
+
+## Demo and release materials
+
+- [Demo script](DEMO_SCRIPT.md)
+- [Presenter checklist](PRESENTER_CHECKLIST.md)
+- [Final handoff](FINAL_HANDOFF.md)
+- [Release checklist](RELEASE_CHECKLIST.md)
+- [Production plan](PRODUCTION_NEXT_WEEK.md)
+- [Production risks](PRODUCTION_RISKS.md)
+
+These are planning and handoff documents, not evidence of a release. Daily program reports live in [issue #7](https://github.com/Amartya2001-droid/HeartSync/issues/7).

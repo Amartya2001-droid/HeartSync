@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  repository:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select an available iPhone simulator
+        run: |
+          xcrun simctl list devices available -j > "$RUNNER_TEMP/devices.json"
+          python3 - <<'PY'
+          import json, os
+          with open(os.environ['RUNNER_TEMP'] + '/devices.json') as f:
+              devices = json.load(f)['devices']
+          iphones = [d for runtime, entries in devices.items() if 'iOS' in runtime
+                     for d in entries if d.get('isAvailable') and d['name'].startswith('iPhone')]
+          if not iphones:
+              raise SystemExit('No available iPhone simulator')
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('SIMULATOR_ID=' + iphones[0]['udid'] + '\n')
+          PY
+      - name: Build and run XCTest
+        run: >-
+          xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync
+          -destination "platform=iOS Simulator,id=$SIMULATOR_ID"
+          -derivedDataPath .deriveddata -resultBundlePath TestResults.xcresult
+          CODE_SIGNING_ALLOWED=NO
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-test-results
+          path: TestResults.xcresult
+          if-no-files-found: ignore
