@@ -14,6 +14,6 @@
 
    Then stop. Do not start new work after the report.
 
-Day 1 is TRIAGE: get oriented, get CI green, fix what's already open, and set up reporting. No new features. Work #6 before #4, with one PR per issue and a closing reference in each PR.
+Amartya authorized real product feature work after the completed Day 2 report. Work the issue queue in dependency order: #6, #4, #5, #3, #2, #1, with one PR per issue and a closing reference in each PR. Preserve honest platform and release claims. Build API integrations only with named configuration variables and mocked tests; never put service secrets in the iOS app or repository.
 
 This is a SwiftUI iOS app. Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable checks here, use macOS CI for simulator build/tests, and state what still needs Xcode/device review. Do not claim UI verification from static checks.

@@ -152,6 +152,15 @@ struct JournalView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
 
+                                if let partner = item.partnerResponse {
+                                    Divider()
+                                    Label("Both checked in", systemImage: "person.2.fill")
+                                        .font(.subheadline.bold())
+                                    Text("Partner: energy \(partner.energy)/5 · connection \(partner.connection)/5")
+                                    if !partner.note.isEmpty { Text(partner.note) }
+                                    if !partner.intention.isEmpty { Text("Partner's intention: \(partner.intention)") }
+                                }
+
                                 ShareLink(
                                     item: momentShareText(for: item),
                                     subject: Text("HeartSync moment"),
@@ -211,6 +220,8 @@ struct JournalView: View {
         return sortedEntries.filter { entry in
             entry.note.localizedCaseInsensitiveContains(query) ||
             entry.intention.localizedCaseInsensitiveContains(query) ||
+            (entry.partnerResponse?.note.localizedCaseInsensitiveContains(query) ?? false) ||
+            (entry.partnerResponse?.intention.localizedCaseInsensitiveContains(query) ?? false) ||
             store.dateContextLabel(for: entry.date).localizedCaseInsensitiveContains(query)
         }
     }
@@ -349,7 +360,8 @@ struct JournalView: View {
     private func momentAccessibilityText(for item: DailyCheckIn) -> String {
         let note = item.note.isEmpty ? "No note was captured for this day." : item.note
         let intention = item.intention.isEmpty ? "No intention captured." : item.intention
-        return "\(store.dateContextLabel(for: item.date)). Connection \(item.connection) out of 5. Energy \(item.energy) out of 5. \(note) Intention: \(intention)"
+        let partnerText = item.partnerResponse.map { " Partner: energy \($0.energy) out of 5. Connection \($0.connection) out of 5. \($0.note) Intention: \($0.intention)" } ?? ""
+        return "\(store.dateContextLabel(for: item.date)). Connection \(item.connection) out of 5. Energy \(item.energy) out of 5. \(note) Intention: \(intention)\(partnerText)"
     }
 }
 

@@ -22,6 +22,51 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testPartnerCheckInPersistsAndSurvivesEditingFirstResponse() {
+        let store = HeartSyncStore(defaults: defaults)
+        store.clearAllHistory()
+        XCTAssertFalse(store.submitPartnerCheckIn(energy: 3, connection: 3, note: "", intention: ""))
+        store.todayNote = "First perspective"
+        store.submitCheckIn()
+        XCTAssertFalse(store.submitPartnerCheckIn(energy: 0, connection: 3, note: "", intention: ""))
+        XCTAssertTrue(store.submitPartnerCheckIn(energy: 2, connection: 4, note: "  Partner perspective  ", intention: "  Take a walk  "))
+        XCTAssertEqual(store.todayCheckIn?.note, "First perspective")
+        XCTAssertEqual(store.todayCheckIn?.partnerResponse?.note, "Partner perspective")
+        let loaded = HeartSyncStore(defaults: defaults)
+        XCTAssertEqual(loaded.todayCheckIn?.partnerResponse?.intention, "Take a walk")
+        loaded.todayNote = "Edited first perspective"
+        loaded.submitCheckIn()
+        XCTAssertEqual(loaded.todayCheckIn?.partnerResponse?.connection, 4)
+        XCTAssertEqual(loaded.history.count, 1)
+        let backup = loaded.backupExportText
+        loaded.clearAllHistory()
+        XCTAssertTrue(loaded.restoreFromBackupText(backup).isSuccess)
+        XCTAssertEqual(loaded.todayCheckIn?.partnerResponse?.energy, 2)
+    }
+
+    func testLegacyCheckInDecodesWithoutPartnerResponse() throws {
+        let legacy = """
+        {"id":"EE0F3625-F325-4B1A-81CF-47D6EAD70AB3","date":0,"energy":3,"connection":4,"note":"Legacy","intention":"Listen"}
+        """
+        let entry = try JSONDecoder().decode(DailyCheckIn.self, from: Data(legacy.utf8))
+        XCTAssertNil(entry.partnerResponse)
+        XCTAssertNil(CoupleDailySummary(entry: entry))
+    }
+
+    func testCoupleSummaryRespondsToLowEnergyAndDifferentPerspectives() throws {
+        var entry = DailyCheckIn(date: .now, energy: 4, connection: 5, note: "", intention: "")
+        entry.partnerResponse = PartnerCheckIn(energy: 4, connection: 2, note: "", intention: "")
+        let summary = try XCTUnwrap(CoupleDailySummary(entry: entry))
+        XCTAssertEqual(summary.connectionGap, 3)
+        XCTAssertEqual(summary.averageConnection, 3.5)
+        XCTAssertTrue(summary.conversationPrompt.contains("differently"))
+        entry.partnerResponse?.energy = 1
+        XCTAssertTrue(try XCTUnwrap(CoupleDailySummary(entry: entry)).conversationPrompt.contains("running low"))
+        entry.partnerResponse?.energy = 5
+        entry.partnerResponse?.connection = 5
+        XCTAssertTrue(try XCTUnwrap(CoupleDailySummary(entry: entry)).conversationPrompt.contains("appreciated"))
+    }
+
     func testPreviewStoresKeepEditsAndEmptyHistoryIsolated() {
         let first = HeartSyncStore.makePreview(defaults: defaults)
         first.clearAllHistory()

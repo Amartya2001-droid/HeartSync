@@ -33,6 +33,12 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## Couples check-in flow (#5)
+
+Home now leads with **Today, together**. Save your energy, connection, reflection and intention, then choose **Continue together** or Home's **Add partner’s check-in**. Pass the device to your partner: they choose their own ratings, optionally add a reflection/intention, and explicitly consent to sharing on this device before saving. A daily comparison offers a concrete conversation prompt; both responses persist and appear in Moments, including partner-note search. Editing your response preserves theirs. Legacy entries and backups remain readable.
+
+This is a **same-device, local-only couples app**, with no remote accounts, pairing, cloud sync, or privacy boundary between the two people. JSON backups include both responses. Existing text/share exports contain the first person's response only; review any export before sharing. No API service or key is required. The summary is a rule-based reflection prompt, not AI or a clinical assessment.
+
 ## App structure (#4)
 
 - `HeartSync/App`: app entry point, four-tab navigation shell, and tab identifiers.
@@ -46,7 +52,7 @@ The existing navigation and demo behavior are retained. Xcode groups mirror the 
 
 ## Current implementation and verification
 
-The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Seven `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, cleared history, and preview storage isolation. Code presence alone does not verify simulator behavior.
+The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Ten `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, cleared history, preview storage isolation, legacy decoding, partner-response persistence/backup round trips, and shared-summary rules. Code presence alone does not verify simulator behavior.
 
 Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repository checks with:
 

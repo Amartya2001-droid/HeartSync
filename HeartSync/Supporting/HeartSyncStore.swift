@@ -775,7 +775,8 @@ final class HeartSyncStore: ObservableObject {
             energy: Int(todayEnergy.rounded()),
             connection: Int(todayConnection.rounded()),
             note: todayNote.trimmingCharacters(in: .whitespacesAndNewlines),
-            intention: todayIntention.trimmingCharacters(in: .whitespacesAndNewlines)
+            intention: todayIntention.trimmingCharacters(in: .whitespacesAndNewlines),
+            partnerResponse: todayCheckIn?.partnerResponse
         )
 
         history.removeAll { Calendar.current.isDate($0.date, inSameDayAs: today) }
@@ -785,6 +786,20 @@ final class HeartSyncStore: ObservableObject {
         todayNote = ""
         todayIntention = defaultIntentionText
         saveDraft()
+    }
+
+    /// Both people use the same device. A second response never replaces the first.
+    @discardableResult
+    func submitPartnerCheckIn(energy: Int, connection: Int, note: String, intention: String) -> Bool {
+        guard (1...5).contains(energy), (1...5).contains(connection),
+              let index = history.firstIndex(where: { Calendar.current.isDateInToday($0.date) }) else { return false }
+        history[index].partnerResponse = PartnerCheckIn(
+            energy: energy, connection: connection,
+            note: String(note.trimmingCharacters(in: .whitespacesAndNewlines).prefix(2000)),
+            intention: String(intention.trimmingCharacters(in: .whitespacesAndNewlines).prefix(500))
+        )
+        persistHistory()
+        return true
     }
 
     func deleteCheckIns(at offsets: IndexSet, from entries: [DailyCheckIn]) {

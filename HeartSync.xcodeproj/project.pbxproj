@@ -24,6 +24,8 @@
 		AE6D0BBCA9CFCF56C4E244AB /* OnboardingSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B322E61A8F73B213EC7FE2E5 /* OnboardingSheetView.swift */; };
 		93F27F8209652242C6A5027A /* HeartSyncSampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCCF36331B2644C386C34FC /* HeartSyncSampleData.swift */; };
 		0A0502052D9F046E0125DD4E /* HeartSyncPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */; };
+		37A4946433D81025A72A1F42 /* CoupleCheckIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */; };
+		9842F7D9F7898491150987D2 /* CoupleCheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B02AFA09B88A795CE41D44A /* CoupleCheckInView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,8 @@
 		B322E61A8F73B213EC7FE2E5 /* OnboardingSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSheetView.swift; sourceTree = "<group>"; };
 		FBCCF36331B2644C386C34FC /* HeartSyncSampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncSampleData.swift; sourceTree = "<group>"; };
 		67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncPreview.swift; sourceTree = "<group>"; };
+		BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoupleCheckIn.swift; sourceTree = "<group>"; };
+		3B02AFA09B88A795CE41D44A /* CoupleCheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoupleCheckInView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +142,7 @@
 		D61F0ED9BCD8264F492454E8 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				3B02AFA09B88A795CE41D44A /* CoupleCheckInView.swift */,
 				AEB300062D00000100AA0001 /* DashboardView.swift */,
 				AEB300082D00000100AA0001 /* CheckInView.swift */,
 				AEB3000A2D00000100AA0001 /* JournalView.swift */,
@@ -167,6 +172,7 @@
 		BF657CFE8769AAE6C0570C29 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */,
 				8DE8EF2C38C143F370B146D7 /* HeartSyncModels.swift */,
 			);
 			path = Models;
@@ -282,6 +288,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEB300092D00000100AA0001 /* CheckInView.swift in Sources */,
+				9842F7D9F7898491150987D2 /* CoupleCheckInView.swift in Sources */,
+				37A4946433D81025A72A1F42 /* CoupleCheckIn.swift in Sources */,
 				0A0502052D9F046E0125DD4E /* HeartSyncPreview.swift in Sources */,
 				93F27F8209652242C6A5027A /* HeartSyncSampleData.swift in Sources */,
 				AE6D0BBCA9CFCF56C4E244AB /* OnboardingSheetView.swift in Sources */,
