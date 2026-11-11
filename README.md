@@ -33,9 +33,20 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## App structure (#4)
+
+- `HeartSync/App`: app entry point, four-tab navigation shell, and tab identifiers.
+- `HeartSync/Screens`: Home, Check-In, Moments, Profile, and onboarding/recovery views. The existing app screens replace the original starter placeholder.
+- `HeartSync/Models`: Foundation-only check-in, profile, snapshot, and backup value types.
+- `HeartSync/Supporting`: observable store/persistence and visual theme.
+- `HeartSync/Components`: shared metric card.
+- `HeartSync/SampleData`: explicitly fictional fixtures and a preview container. Each preview uses a fresh UserDefaults suite for both store data and onboarding flags, so editing previews does not change normal app storage. The root preview offers sample-history and empty-history states.
+
+The existing navigation and demo behavior are retained. Xcode groups mirror the folders, and every Swift source is registered in the app target. Preview rendering still requires Xcode; portable checks validate source registration, not SwiftUI behavior.
+
 ## Current implementation and verification
 
-The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Six `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, and cleared history. Code presence alone does not verify simulator behavior.
+The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Seven `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, cleared history, and preview storage isolation. Code presence alone does not verify simulator behavior.
 
 Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repository checks with:
 

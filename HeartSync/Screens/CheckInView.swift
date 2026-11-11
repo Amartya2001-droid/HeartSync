@@ -398,7 +398,8 @@ struct CheckInView: View {
 
 struct CheckInView_Previews: PreviewProvider {
     static var previews: some View {
-        CheckInView()
-            .environmentObject(HeartSyncStore())
+        HeartSyncPreview {
+            CheckInView()
+        }
     }
 }

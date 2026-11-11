@@ -22,6 +22,33 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testPreviewStoresKeepEditsAndEmptyHistoryIsolated() {
+        let first = HeartSyncStore.makePreview(defaults: defaults)
+        first.clearAllHistory()
+        first.updatePartner(name: "Preview edit", milestone: "Preview", supportFocus: "Preview")
+
+        let secondDefaults = HeartSyncStore.makePreviewDefaults()
+        let emptyDefaults = HeartSyncStore.makePreviewDefaults()
+        defer {
+            // Remove any persisted preview edits from this test's temporary suites.
+            for previewDefaults in [secondDefaults, emptyDefaults] {
+                for key in previewDefaults.dictionaryRepresentation().keys where key.hasPrefix("heartsync.") {
+                    previewDefaults.removeObject(forKey: key)
+                }
+            }
+        }
+        let second = HeartSyncStore.makePreview(defaults: secondDefaults)
+        XCTAssertTrue(second.hasHistory)
+        XCTAssertEqual(second.partner.name, HeartSyncSampleData.partner.name)
+        XCTAssertEqual(secondDefaults.bool(forKey: "heartsync.shouldShowOnboarding"), false)
+        XCTAssertTrue(secondDefaults.bool(forKey: "heartsync.hasAcknowledgedEmptyHistory"))
+
+        let empty = HeartSyncStore.makePreview(defaults: emptyDefaults, emptyHistory: true)
+        XCTAssertFalse(empty.hasHistory)
+        XCTAssertTrue(second.hasHistory)
+        XCTAssertEqual(first.partner.name, "Preview edit")
+    }
+
     func testSubmitCheckInPersistsTrimmedEntryAndResetsDraft() {
         let store = HeartSyncStore(defaults: defaults)
 

@@ -19,6 +19,11 @@
 		AEB3000B2D00000100AA0001 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB3000A2D00000100AA0001 /* JournalView.swift */; };
 		AEB3000D2D00000100AA0001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB3000C2D00000100AA0001 /* SettingsView.swift */; };
 		AEC100042D10000100AA0001 /* HeartSyncStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */; };
+		2B9C154570CE418B9238A39B /* HeartSyncTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC75844045A7DF46F2840EA7 /* HeartSyncTab.swift */; };
+		804DBC28C1DE07F79457C20C /* HeartSyncModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE8EF2C38C143F370B146D7 /* HeartSyncModels.swift */; };
+		AE6D0BBCA9CFCF56C4E244AB /* OnboardingSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B322E61A8F73B213EC7FE2E5 /* OnboardingSheetView.swift */; };
+		93F27F8209652242C6A5027A /* HeartSyncSampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCCF36331B2644C386C34FC /* HeartSyncSampleData.swift */; };
+		0A0502052D9F046E0125DD4E /* HeartSyncPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +51,11 @@
 		AEB3000C2D00000100AA0001 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AEC100012D10000100AA0001 /* HeartSyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeartSyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncStoreTests.swift; sourceTree = "<group>"; };
+		BC75844045A7DF46F2840EA7 /* HeartSyncTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncTab.swift; sourceTree = "<group>"; };
+		8DE8EF2C38C143F370B146D7 /* HeartSyncModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncModels.swift; sourceTree = "<group>"; };
+		B322E61A8F73B213EC7FE2E5 /* OnboardingSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSheetView.swift; sourceTree = "<group>"; };
+		FBCCF36331B2644C386C34FC /* HeartSyncSampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncSampleData.swift; sourceTree = "<group>"; };
+		67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncPreview.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,15 +97,12 @@
 		AEA6048B2C25B4D800CB3983 /* HeartSync */ = {
 			isa = PBXGroup;
 			children = (
-				AEA6048C2C25B4D800CB3983 /* HeartSyncApp.swift */,
-				AEA6048E2C25B4D800CB3983 /* ContentView.swift */,
-				AEB300062D00000100AA0001 /* DashboardView.swift */,
-				AEB300082D00000100AA0001 /* CheckInView.swift */,
-				AEB3000A2D00000100AA0001 /* JournalView.swift */,
-				AEB3000C2D00000100AA0001 /* SettingsView.swift */,
-				AEB300002D00000100AA0001 /* HeartSyncStore.swift */,
-				AEB300022D00000100AA0001 /* HeartSyncTheme.swift */,
-				AEB300042D00000100AA0001 /* MetricCard.swift */,
+				1C48CE29E4E135EE62951B22 /* App */,
+				D61F0ED9BCD8264F492454E8 /* Screens */,
+				1B84F6CB2A6DAAAC44DC5A0C /* Supporting */,
+				54FE5E34995DE10F87DF7B85 /* Components */,
+				BF657CFE8769AAE6C0570C29 /* Models */,
+				D85A16CD0D3716433CE2F5EA /* SampleData */,
 				AEA604902C25B4D900CB3983 /* Assets.xcassets */,
 				AEA604922C25B4D900CB3983 /* Preview Content */,
 			);
@@ -116,6 +123,62 @@
 				AEC100032D10000100AA0001 /* HeartSyncStoreTests.swift */,
 			);
 			path = HeartSyncTests;
+			sourceTree = "<group>";
+		};
+		1C48CE29E4E135EE62951B22 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AEA6048C2C25B4D800CB3983 /* HeartSyncApp.swift */,
+				AEA6048E2C25B4D800CB3983 /* ContentView.swift */,
+				BC75844045A7DF46F2840EA7 /* HeartSyncTab.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D61F0ED9BCD8264F492454E8 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				AEB300062D00000100AA0001 /* DashboardView.swift */,
+				AEB300082D00000100AA0001 /* CheckInView.swift */,
+				AEB3000A2D00000100AA0001 /* JournalView.swift */,
+				AEB3000C2D00000100AA0001 /* SettingsView.swift */,
+				B322E61A8F73B213EC7FE2E5 /* OnboardingSheetView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		1B84F6CB2A6DAAAC44DC5A0C /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				AEB300002D00000100AA0001 /* HeartSyncStore.swift */,
+				AEB300022D00000100AA0001 /* HeartSyncTheme.swift */,
+			);
+			path = Supporting;
+			sourceTree = "<group>";
+		};
+		54FE5E34995DE10F87DF7B85 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				AEB300042D00000100AA0001 /* MetricCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		BF657CFE8769AAE6C0570C29 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8DE8EF2C38C143F370B146D7 /* HeartSyncModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D85A16CD0D3716433CE2F5EA /* SampleData */ = {
+			isa = PBXGroup;
+			children = (
+				FBCCF36331B2644C386C34FC /* HeartSyncSampleData.swift */,
+				67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */,
+			);
+			path = SampleData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,6 +282,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEB300092D00000100AA0001 /* CheckInView.swift in Sources */,
+				0A0502052D9F046E0125DD4E /* HeartSyncPreview.swift in Sources */,
+				93F27F8209652242C6A5027A /* HeartSyncSampleData.swift in Sources */,
+				AE6D0BBCA9CFCF56C4E244AB /* OnboardingSheetView.swift in Sources */,
+				804DBC28C1DE07F79457C20C /* HeartSyncModels.swift in Sources */,
+				2B9C154570CE418B9238A39B /* HeartSyncTab.swift in Sources */,
 				AEA6048F2C25B4D800CB3983 /* ContentView.swift in Sources */,
 				AEB300072D00000100AA0001 /* DashboardView.swift in Sources */,
 				AEA6048D2C25B4D800CB3983 /* HeartSyncApp.swift in Sources */,
