@@ -401,7 +401,8 @@ private enum JournalSortOrder: String, CaseIterable, Identifiable {
 
 struct JournalView_Previews: PreviewProvider {
     static var previews: some View {
-        JournalView()
-            .environmentObject(HeartSyncStore())
+        HeartSyncPreview {
+            JournalView()
+        }
     }
 }

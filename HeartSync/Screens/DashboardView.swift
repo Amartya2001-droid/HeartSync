@@ -515,7 +515,8 @@ struct DashboardView: View {
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardView(selectedTab: .constant(.home))
-            .environmentObject(HeartSyncStore())
+        HeartSyncPreview {
+            DashboardView(selectedTab: .constant(.home))
+        }
     }
 }
