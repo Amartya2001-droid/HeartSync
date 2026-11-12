@@ -3,6 +3,7 @@ import SwiftUI
 struct CheckInView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @State private var showSavedState = false
+    @State private var showCoupleCheckIn = false
 
     var body: some View {
         NavigationStack {
@@ -50,9 +51,13 @@ struct CheckInView: View {
                             .background(HeartSyncTheme.accent, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("checkIn.save")
 
                     if showSavedState {
                         savedConfirmationCard
+                        Button("Continue together") { showCoupleCheckIn = true }
+                            .buttonStyle(.borderedProminent)
+                            .accessibilityIdentifier("checkIn.continueTogether")
                     }
                 }
                 .padding(20)
@@ -60,6 +65,7 @@ struct CheckInView: View {
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Check-In")
+            .sheet(isPresented: $showCoupleCheckIn) { CoupleCheckInView() }
             .onAppear {
                 showSavedState = false
             }

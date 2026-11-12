@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var store: HeartSyncStore
+    @State private var showCoupleCheckIn = false
     @Binding var selectedTab: HeartSyncTab
 
     var body: some View {
@@ -9,6 +10,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
                     hero
+                    coupleCard
 
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                         MetricCard(
@@ -56,7 +58,48 @@ struct DashboardView: View {
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("HeartSync")
+            .sheet(isPresented: $showCoupleCheckIn) { CoupleCheckInView() }
         }
+    }
+
+    private var coupleCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Today, together", systemImage: "person.2.fill")
+                .font(.title2.bold())
+            Text("Two honest check-ins. One small way to show up for each other.")
+            if let entry = store.todayCheckIn {
+                Label("Your check-in is saved", systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(HeartSyncTheme.sage)
+                if let summary = CoupleDailySummary(entry: entry) {
+                    Text("Both checked in · Connection \(summary.averageConnection.formatted(.number.precision(.fractionLength(1))))/5")
+                        .font(.headline)
+                    Text(summary.conversationPrompt)
+                } else {
+                    Text("Ready for \(store.partner.name)'s perspective? Pass the device when they're ready.")
+                }
+                Button(entry.partnerResponse == nil ? "Add partner’s check-in" : "View shared check-in") {
+                    showCoupleCheckIn = true
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(HeartSyncTheme.blush)
+                .accessibilityIdentifier("home.coupleCheckIn")
+                Button("Edit your check-in") { selectedTab = .checkIn }
+                    .buttonStyle(.bordered)
+            } else {
+                Text("Start with your own reflection, then invite your partner to add theirs on this device.")
+                Button("Start today’s check-in") { selectedTab = .checkIn }
+                    .buttonStyle(.borderedProminent)
+                    .tint(HeartSyncTheme.blush)
+                    .accessibilityIdentifier("home.startCheckIn")
+            }
+            Text("Shared device · Offline · Both responses are visible to anyone using this app")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28))
+        .accessibilityElement(children: .contain)
     }
 
     private var hero: some View {

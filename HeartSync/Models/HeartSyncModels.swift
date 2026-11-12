@@ -13,6 +13,7 @@ struct DailyCheckIn: Identifiable, Codable, Equatable {
     var connection: Int
     var note: String
     var intention: String
+    var partnerResponse: PartnerCheckIn?
 
     init(
         id: UUID = UUID(),
@@ -20,7 +21,8 @@ struct DailyCheckIn: Identifiable, Codable, Equatable {
         energy: Int,
         connection: Int,
         note: String,
-        intention: String
+        intention: String,
+        partnerResponse: PartnerCheckIn? = nil
     ) {
         self.id = id
         self.date = date
@@ -28,6 +30,7 @@ struct DailyCheckIn: Identifiable, Codable, Equatable {
         self.connection = connection
         self.note = note
         self.intention = intention
+        self.partnerResponse = partnerResponse
     }
 }
 
