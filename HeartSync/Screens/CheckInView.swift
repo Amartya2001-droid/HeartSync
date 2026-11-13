@@ -4,6 +4,8 @@ struct CheckInView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @State private var showSavedState = false
     @State private var showCoupleCheckIn = false
+    @FocusState private var focusedField: Field?
+    private enum Field: Hashable { case note, intention }
 
     var body: some View {
         NavigationStack {
@@ -39,32 +41,52 @@ struct CheckInView: View {
 
                     reflectionCard
 
-                    Button {
-                        store.submitCheckIn()
-                        showSavedState = true
-                    } label: {
-                        Text(buttonTitle)
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(HeartSyncTheme.accent, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("checkIn.save")
+                    if showSavedState { savedConfirmationCard }
+                    if let message = store.recoveryMessage { Text(message).foregroundStyle(.red) }
 
-                    if showSavedState {
-                        savedConfirmationCard
-                        Button("Continue together") { showCoupleCheckIn = true }
-                            .buttonStyle(.borderedProminent)
-                            .accessibilityIdentifier("checkIn.continueTogether")
-                    }
                 }
                 .padding(20)
                 .padding(.bottom, 28)
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Check-In")
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 8) {
+                    Button(buttonTitle) {
+                        focusedField = nil
+                        showSavedState = store.submitCheckIn()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(HeartSyncTheme.ink)
+                    .disabled(store.recoveryMessage != nil || showSavedState)
+                    .accessibilityIdentifier("checkIn.save")
+                    if showSavedState {
+                        Button("Continue together") { showCoupleCheckIn = true }
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("checkIn.continueTogether")
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(.regularMaterial)
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { focusedField = nil }
+                        .accessibilityIdentifier("keyboard.done")
+                }
+            }
+            .onChange(of: store.todayNote) { _, value in
+                if value.count > 2000 { store.todayNote = String(value.prefix(2000)) }
+                showSavedState = false
+            }
+            .onChange(of: store.todayIntention) { _, value in
+                if value.count > 500 { store.todayIntention = String(value.prefix(500)) }
+                showSavedState = false
+            }
+            .onChange(of: store.todayEnergy) { _, _ in showSavedState = false }
+            .onChange(of: store.todayConnection) { _, _ in showSavedState = false }
             .sheet(isPresented: $showCoupleCheckIn) { CoupleCheckInView() }
             .onAppear {
                 showSavedState = false
@@ -179,6 +201,8 @@ struct CheckInView: View {
             }
 
             TextField("One sentence about the day, tension, or a bright moment", text: $store.todayNote, axis: .vertical)
+                .focused($focusedField, equals: .note)
+                .accessibilityIdentifier("checkIn.note")
                 .textFieldStyle(.plain)
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -197,6 +221,8 @@ struct CheckInView: View {
             )
 
             TextField("Today’s intention", text: $store.todayIntention, axis: .vertical)
+                .focused($focusedField, equals: .intention)
+                .accessibilityIdentifier("checkIn.intention")
                 .textFieldStyle(.plain)
                 .padding(16)
                 .background(Color.white.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))

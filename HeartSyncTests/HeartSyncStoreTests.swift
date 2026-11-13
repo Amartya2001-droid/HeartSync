@@ -23,6 +23,49 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testHomeOverviewChoosesTheNextActionFromBothPerspectives() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        var entry = DailyCheckIn(date: now, energy: 3, connection: 4, note: "", intention: "")
+        XCTAssertEqual(HomeOverview(history: [], needsRecovery: false, now: now, calendar: calendar).phase, .notStarted)
+        XCTAssertEqual(HomeOverview(history: [entry], needsRecovery: false, now: now, calendar: calendar).phase, .waitingForPartner)
+        entry.partnerResponse = PartnerCheckIn(energy: 3, connection: 3, note: "", intention: "")
+        let shared = HomeOverview(history: [entry], needsRecovery: false, now: now, calendar: calendar)
+        XCTAssertEqual(shared.phase, .together)
+        XCTAssertEqual(shared.daysTogether, 1)
+        XCTAssertEqual(HomeOverview(history: [entry], needsRecovery: true, now: now, calendar: calendar).phase, .recovery)
+    }
+
+    func testHomeWeekExcludesOldAndFutureEntriesAndNeverAssumesAnEmptyScore() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+        let today = calendar.startOfDay(for: now)
+        func entry(_ offset: Int, _ connection: Int) throws -> DailyCheckIn {
+            DailyCheckIn(date: try XCTUnwrap(calendar.date(byAdding: .day, value: offset, to: today)), energy: 3, connection: connection, note: "", intention: "")
+        }
+        let overview = HomeOverview(history: try [entry(-6, 2), entry(0, 5), entry(-7, 1), entry(1, 1)], needsRecovery: false, now: now, calendar: calendar)
+        XCTAssertEqual(overview.days.count, 7)
+        XCTAssertEqual(overview.daysCheckedIn, 2)
+        XCTAssertEqual(try XCTUnwrap(overview.averageConnection), 3.5)
+        let empty = HomeOverview(history: [], needsRecovery: false, now: now, calendar: calendar)
+        XCTAssertNil(empty.averageConnection)
+        XCTAssertEqual(empty.daysCheckedIn, 0)
+    }
+
+    func testHomeWeekUsesCalendarDaysAcrossDaylightSavingAndChangesAtMidnight() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(identifier: "America/Halifax"))
+        let now = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-11-02T04:30:00Z"))
+        let yesterday = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: now))
+        let entry = DailyCheckIn(date: yesterday, energy: 3, connection: 4, note: "", intention: "")
+        let overview = HomeOverview(history: [entry], needsRecovery: false, now: now, calendar: calendar)
+        XCTAssertEqual(Set(overview.days.map(\.date)).count, 7)
+        XCTAssertEqual(overview.phase, .notStarted)
+        XCTAssertEqual(overview.daysCheckedIn, 1)
+    }
+
     func testCleanInstallIsEmptyUntilSamplesAreExplicitlyRequested() {
         defaults.removePersistentDomain(forName: suiteName)
         let store = HeartSyncStore(defaults: defaults)
@@ -167,7 +210,7 @@ final class HeartSyncStoreTests: XCTestCase {
         XCTAssertEqual(first.partner.name, "Preview edit")
     }
 
-    func testSubmitCheckInPersistsTrimmedEntryAndResetsDraft() {
+    func testSubmitCheckInPersistsTrimmedEntryAndRetainsDraftForSafeEditing() {
         let store = HeartSyncStore(defaults: defaults)
 
         store.todayEnergy = 2
@@ -185,8 +228,10 @@ final class HeartSyncStoreTests: XCTestCase {
         XCTAssertEqual(todayCheckIn.connection, 4)
         XCTAssertEqual(todayCheckIn.note, "Needed a calmer conversation tonight.")
         XCTAssertEqual(todayCheckIn.intention, "Protect 15 minutes after dinner.")
-        XCTAssertEqual(store.todayNote, "")
-        XCTAssertEqual(store.todayIntention, store.defaultIntention)
+        XCTAssertEqual(store.todayNote, "  Needed a calmer conversation tonight.  ")
+        XCTAssertEqual(store.todayIntention, "  Protect 15 minutes after dinner.  ")
+        XCTAssertTrue(store.submitCheckIn())
+        XCTAssertEqual(store.todayCheckIn?.note, "Needed a calmer conversation tonight.")
 
         let reloadedStore = HeartSyncStore(defaults: defaults)
         XCTAssertEqual(reloadedStore.todayCheckIn?.note, "Needed a calmer conversation tonight.")

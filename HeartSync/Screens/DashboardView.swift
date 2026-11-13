@@ -2,576 +2,206 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var store: HeartSyncStore
-    @State private var showCoupleCheckIn = false
     @Binding var selectedTab: HeartSyncTab
+    @State private var showSharedCheckIn = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    if let message = store.recoveryMessage {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Label("Saved data needs attention", systemImage: "externaldrive.badge.exclamationmark")
-                                .font(.headline)
-                            Text(message)
-                            Button("Open Profile to recover") { selectedTab = .profile }
-                        }.padding().background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 20))
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                let overview = HomeOverview(history: store.history, needsRecovery: store.recoveryMessage != nil, now: context.date)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        header(date: context.date)
+                        if store.containsSampleData {
+                            Label("Fictional sample history — clear it in Profile to start your own story.", systemImage: "sparkles")
+                                .font(.callout)
+                                .padding(14)
+                                .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 16))
+                        }
+                        dailyCard(overview)
+                        if let entry = overview.today, let summary = CoupleDailySummary(entry: entry), overview.phase != .recovery {
+                            conversationCard(summary)
+                        }
+                        if overview.phase != .recovery {
+                            weekCard(overview)
+                            recentReflections
+                        }
+                        Label("Same device. No accounts. No partner sync.", systemImage: "iphone")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
-                    if store.containsSampleData {
-                        Label("Fictional sample history · Clear it in Profile to start your own story", systemImage: "sparkles")
-                            .font(.callout)
-                    }
-                    hero
-                    coupleCard
-
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                        MetricCard(
-                            title: "Pulse",
-                            value: "\(store.snapshot.relationshipPulse)/5",
-                            detail: "Average connection this week",
-                            symbol: "heart.fill",
-                            tint: HeartSyncTheme.blush
-                        )
-                        MetricCard(
-                            title: "Streak",
-                            value: "\(store.snapshot.streakDays) days",
-                            detail: "Consecutive daily check-ins",
-                            symbol: "flame.fill",
-                            tint: HeartSyncTheme.coral
-                        )
-                        MetricCard(
-                            title: "Energy",
-                            value: "\(store.snapshot.weeklyAverageEnergy)/5",
-                            detail: "Average emotional energy",
-                            symbol: "bolt.heart.fill",
-                            tint: HeartSyncTheme.sage
-                        )
-                        MetricCard(
-                            title: "Latest",
-                            value: latestDateLabel,
-                            detail: "Most recent reflection",
-                            symbol: "calendar",
-                            tint: HeartSyncTheme.ink
-                        )
-                    }
-
-                    trendCard
-                    focusCard
-                    ritualPlanCard
-                    quickActionsCard
-                    todayStatusCard
-                    insightCard
-                    summaryCard
-                    recentMoments
+                    .padding(20)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 18)
-                .padding(.bottom, 28)
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("HeartSync")
-            .sheet(isPresented: $showCoupleCheckIn) { CoupleCheckInView() }
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showSharedCheckIn) { CoupleCheckInView() }
         }
     }
 
-    private var coupleCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Label("Today, together", systemImage: "person.2.fill")
+    private func header(date: Date) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(date.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+            Text("A small pause.\nA closer connection.")
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                .foregroundStyle(HeartSyncTheme.ink)
+                .accessibilityAddTraits(.isHeader)
+            Text("Name how you feel, listen to each other, and choose one small intention together.")
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func dailyCard(_ overview: HomeOverview) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Label("TODAY, TOGETHER", systemImage: "heart.text.square.fill")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(HeartSyncTheme.blush)
+            Text(overview.phase.title)
                 .font(.title2.bold())
-            Text("Two honest check-ins. One small way to show up for each other.")
-            if let entry = store.todayCheckIn {
-                Label("Your check-in is saved", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(HeartSyncTheme.sage)
-                if let summary = CoupleDailySummary(entry: entry) {
-                    Text("Both checked in · Connection \(summary.averageConnection.formatted(.number.precision(.fractionLength(1))))/5")
-                        .font(.headline)
-                    Text(summary.conversationPrompt)
-                } else {
-                    Text("Ready for \(store.partner.name)'s perspective? Pass the device when they're ready.")
-                }
-                Button(entry.partnerResponse == nil ? "Add partner’s check-in" : "View shared check-in") {
-                    showCoupleCheckIn = true
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(HeartSyncTheme.blush)
-                .accessibilityIdentifier("home.coupleCheckIn")
-                Button("Edit your check-in") { selectedTab = .checkIn }
-                    .buttonStyle(.bordered)
+                .accessibilityIdentifier("home.phaseTitle")
+            if let message = store.recoveryMessage {
+                Text(message).foregroundStyle(.secondary)
             } else {
-                Text("Start with your own reflection, then invite your partner to add theirs on this device.")
-                Button("Start today’s check-in") { selectedTab = .checkIn }
-                    .buttonStyle(.borderedProminent)
-                    .tint(HeartSyncTheme.blush)
-                    .accessibilityIdentifier("home.startCheckIn")
+                VStack(alignment: .leading, spacing: 12) {
+                    progressRow("Your reflection", complete: overview.today != nil)
+                    progressRow("\(store.partner.name)’s perspective", complete: overview.today?.partnerResponse != nil)
+                    progressRow("A conversation to take with you", complete: overview.phase == .together)
+                }
+                if overview.phase == .notStarted {
+                    Text("Start with your own feelings. Your partner can add theirs when they’re ready.")
+                        .foregroundStyle(.secondary)
+                } else if overview.phase == .waitingForPartner {
+                    Text("Pass the device when your partner is ready. They choose what to share; both responses are visible in this app.")
+                        .foregroundStyle(.secondary)
+                }
             }
-            Text("Shared device · Offline · Both responses are visible to anyone using this app")
+            Button {
+                switch overview.phase {
+                case .recovery: selectedTab = .profile
+                case .notStarted: selectedTab = .checkIn
+                case .waitingForPartner, .together: showSharedCheckIn = true
+                }
+            } label: {
+                HStack {
+                    Text(overview.phase.actionTitle).font(.headline)
+                    Spacer(minLength: 8)
+                    Image(systemName: "arrow.right")
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .foregroundStyle(.white)
+                .background(HeartSyncTheme.ink, in: RoundedRectangle(cornerRadius: 18))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("home.primaryAction")
+            if overview.today != nil, overview.phase != .recovery {
+                Button("Edit your reflection") {
+                    store.loadTodayCheckInIntoDraft()
+                    selectedTab = .checkIn
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+                .padding(.vertical, 8)
+                .accessibilityIdentifier("home.editReflection")
+            }
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.88), in: RoundedRectangle(cornerRadius: 28))
+        .overlay(RoundedRectangle(cornerRadius: 28).stroke(HeartSyncTheme.cardBorder))
+    }
+
+    private func progressRow(_ title: String, complete: Bool) -> some View {
+        Label(title, systemImage: complete ? "checkmark.circle.fill" : "circle")
+            .font(.subheadline)
+            .foregroundStyle(complete ? HeartSyncTheme.ink : HeartSyncTheme.ink.opacity(0.6))
+            .accessibilityLabel("\(title), \(complete ? "complete" : "not yet")")
+    }
+
+    private func conversationCard(_ summary: CoupleDailySummary) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Take this into your evening", systemImage: "bubble.left.and.bubble.right")
+                .font(.headline)
+            Text(summary.conversationPrompt)
+                .font(.title3)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("A reflection prompt, not a relationship score.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28))
-        .accessibilityElement(children: .contain)
+        .background(HeartSyncTheme.sage.opacity(0.15), in: RoundedRectangle(cornerRadius: 24))
     }
 
-    private var hero: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("A calmer way to stay emotionally in sync.")
-                .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            Text("Track how the relationship feels, capture small moments that mattered, and set one intention for today.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 12) {
-                Label(store.partner.name, systemImage: "person.2.fill")
-                Label(store.partner.milestone, systemImage: "sparkles")
-            }
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(HeartSyncTheme.ink.opacity(0.85))
-
-            HStack(spacing: 14) {
-                statPill(title: "Connection", value: "\(store.snapshot.weeklyAverageConnection)/5")
-                statPill(title: "Support Focus", value: store.partner.supportFocus)
-            }
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 32, style: .continuous)
-                    .fill(HeartSyncTheme.accent)
-                Circle()
-                    .fill(Color.white.opacity(0.18))
-                    .frame(width: 180, height: 180)
-                    .offset(x: 48, y: -72)
-            }
-        }
-        .foregroundStyle(.white)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("HeartSync overview")
-        .accessibilityValue("\(store.partner.name), \(store.partner.milestone). Weekly connection \(store.snapshot.weeklyAverageConnection) out of 5. Support focus: \(store.partner.supportFocus)")
-    }
-
-    private var focusCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Today’s focus")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            Text(store.todayIntention.isEmpty ? "Name one small way you want to show up for each other today." : store.todayIntention)
-                .font(.body)
-                .foregroundStyle(.secondary)
-
-            NavigationLink {
-                CheckInView()
-            } label: {
-                Text("Update today’s check-in")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+    private func weekCard(_ overview: HomeOverview) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Your last seven days").font(.title3.bold()).accessibilityAddTraits(.isHeader)
+            HStack(alignment: .top, spacing: 6) {
+                ForEach(overview.days) { day in
+                    VStack(spacing: 10) {
+                        Text(day.date.formatted(.dateTime.weekday(.narrow))).font(.caption)
+                        Image(systemName: day.entry?.partnerResponse != nil ? "person.2.circle.fill" : day.entry != nil ? "checkmark.circle.fill" : "circle.dotted")
+                            .font(.title3)
+                            .foregroundStyle(day.entry == nil ? HeartSyncTheme.ink.opacity(0.35) : HeartSyncTheme.blush)
+                    }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(HeartSyncTheme.ink, in: Capsule())
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), \(day.entry?.partnerResponse != nil ? "both checked in" : day.entry != nil ? "you checked in" : "no check-in")")
+                }
+            }
+            Divider()
+            if let average = overview.averageConnection {
+                Text("\(overview.daysCheckedIn) of 7 days checked in · \(overview.daysTogether) together")
+                    .font(.subheadline.weight(.semibold))
+                Text("Your average connection: \(average.formatted(.number.precision(.fractionLength(1))))/5, from your recorded days only.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            } else {
+                Text("No check-ins in the last seven days. Your first reflection will begin the picture — no score is assumed.")
+                    .font(.subheadline).foregroundStyle(.secondary)
             }
         }
         .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Connection trend")
-        .accessibilityValue("\(store.connectionTrendTitle). \(store.connectionTrendMessage)")
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 24))
     }
 
-    private var trendCard: some View {
-        HStack(alignment: .top, spacing: 14) {
-            Image(systemName: "chart.line.uptrend.xyaxis")
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.sage)
-                .frame(width: 44, height: 44)
-                .background(Color.white.opacity(0.76), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(store.connectionTrendTitle)
-                    .font(.title3.weight(.semibold))
+    private var recentReflections: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Your story so far").font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                Spacer()
+                Button("All moments") { selectedTab = .moments }
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(HeartSyncTheme.ink)
-                Text(store.connectionTrendMessage)
-                    .font(.body)
+                    .accessibilityIdentifier("home.allMoments")
+            }
+            if let latest = store.history.first {
+                Text(latest.date.formatted(date: .abbreviated, time: .omitted)).font(.caption).foregroundStyle(.secondary)
+                Text(latest.note.isEmpty ? "You made space to name how you felt." : latest.note)
+                    .lineLimit(4)
+                if !latest.intention.isEmpty { Label(latest.intention, systemImage: "sparkles").font(.subheadline) }
+            } else {
+                Text("The ordinary moments count. Save one today, then revisit it here whenever you need a reminder.")
                     .foregroundStyle(.secondary)
             }
         }
         .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Today's focus")
-        .accessibilityValue(store.todayIntention.isEmpty ? "No intention set yet." : store.todayIntention)
-    }
-
-    private var insightCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("What this week is saying")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            Text(store.weeklyStory)
-                .font(.body)
-                .foregroundStyle(.secondary)
-
-            Divider()
-
-            Label(store.recommendedAction, systemImage: "bolt.badge.clock")
-                .font(.subheadline)
-                .foregroundStyle(HeartSyncTheme.ink)
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Weekly insight")
-        .accessibilityValue("\(store.weeklyStory) Recommended next step: \(store.recommendedAction)")
-    }
-
-    private var ritualPlanCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Tonight’s ritual plan")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            Text("A practical next move based on this week’s energy and connection.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-
-            VStack(spacing: 10) {
-                ForEach(store.recommendedRituals) { ritual in
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: ritual.symbol)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(HeartSyncTheme.blush)
-                            .frame(width: 28)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(ritual.title)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(HeartSyncTheme.ink)
-                            Text(ritual.detail)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-
-                        Spacer(minLength: 0)
-                    }
-                    .padding(14)
-                    .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                }
-            }
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .contain)
-    }
-
-    private var todayStatusCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(store.todayStatusTitle)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(HeartSyncTheme.ink)
-                Spacer()
-                Label(
-                    store.hasCompletedTodayCheckIn ? "Done" : "Pending",
-                    systemImage: store.hasCompletedTodayCheckIn ? "checkmark.circle.fill" : "clock.fill"
-                )
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(store.hasCompletedTodayCheckIn ? HeartSyncTheme.sage : HeartSyncTheme.coral)
-            }
-
-            Text(store.todayStatusMessage)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .lineLimit(4)
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Today's check-in status")
-        .accessibilityValue("\(store.todayStatusTitle). \(store.hasCompletedTodayCheckIn ? "Done" : "Pending"). \(store.todayStatusMessage)")
-    }
-
-    private var quickActionsCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Jump back in")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            Text("Use Home as the launch point for your next check-in, recap, or profile tweak.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 10) {
-                quickActionButton(
-                    title: "Check-In",
-                    symbol: "slider.horizontal.3",
-                    tint: HeartSyncTheme.coral
-                ) {
-                    selectedTab = .checkIn
-                }
-
-                quickActionButton(
-                    title: "Moments",
-                    symbol: "book.closed",
-                    tint: HeartSyncTheme.sage
-                ) {
-                    selectedTab = .moments
-                }
-
-                quickActionButton(
-                    title: "Profile",
-                    symbol: "person.crop.circle",
-                    tint: HeartSyncTheme.blush
-                ) {
-                    selectedTab = .profile
-                }
-            }
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .contain)
-    }
-
-    private var summaryCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Take this week with you")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(HeartSyncTheme.ink)
-                Spacer()
-                Text(store.weeklyDateRangeLabel)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(HeartSyncTheme.blush)
-            }
-
-            Text(store.weeklyStory)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .lineLimit(4)
-
-            VStack(alignment: .leading, spacing: 10) {
-                summaryHighlight(
-                    title: "What helped",
-                    detail: store.strongestMomentSummary,
-                    tint: HeartSyncTheme.sage
-                )
-                summaryHighlight(
-                    title: "Needs care",
-                    detail: store.needsCareSummary,
-                    tint: HeartSyncTheme.coral
-                )
-            }
-
-            ShareLink(
-                item: store.weeklySummaryText,
-                subject: Text(store.weeklySummaryTitle),
-                message: Text("Shared from HeartSync")
-            ) {
-                Label("Share weekly summary", systemImage: "square.and.arrow.up")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(HeartSyncTheme.ink, in: Capsule())
-            }
-
-            Button {
-                store.copyWeeklySummaryToClipboard()
-            } label: {
-                Label("Copy weekly summary text", systemImage: "doc.on.doc")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(HeartSyncTheme.blush)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.82), in: Capsule())
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
-        )
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Weekly summary")
-        .accessibilityHint("Share or copy the current weekly summary.")
-    }
-
-    private var recentMoments: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Recent moments")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(HeartSyncTheme.ink)
-
-            if store.recentMoments.isEmpty {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("No moments yet")
-                        .font(.headline)
-                        .foregroundStyle(HeartSyncTheme.ink)
-                    Text("Your first check-in will show up here and start shaping the weekly story.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Button {
-                        selectedTab = .checkIn
-                    } label: {
-                        Label("Start first check-in", systemImage: "square.and.pencil")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(HeartSyncTheme.blush)
-                    }
-                }
-                .padding(18)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("No recent moments yet")
-                .accessibilityValue("Your first check-in will appear here.")
-            } else {
-                ForEach(store.recentMoments) { item in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(store.dateContextLabel(for: item.date))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(HeartSyncTheme.blush)
-                        Text(item.note.isEmpty ? "No note captured for this day." : item.note)
-                            .font(.body)
-                            .foregroundStyle(HeartSyncTheme.ink)
-                        Text("Intention: \(item.intention)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
-                        ShareLink(
-                            item: recentMomentShareText(for: item),
-                            subject: Text("HeartSync moment"),
-                            message: Text("Shared from HeartSync")
-                        ) {
-                            Label("Share this moment", systemImage: "square.and.arrow.up")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(HeartSyncTheme.blush)
-                        }
-                    }
-                    .padding(18)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Recent moment")
-                    .accessibilityValue(recentMomentAccessibilityText(for: item))
-                }
-            }
-        }
-    }
-
-    private var latestDateLabel: String {
-        guard let latest = store.latestCheckInDate else { return "None" }
-        return store.dateContextLabel(for: latest)
-    }
-
-    private func statPill(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.bold))
-                .opacity(0.78)
-            Text(value)
-                .font(.subheadline.weight(.semibold))
-                .lineLimit(2)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-
-    private func quickActionButton(title: String, symbol: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 10) {
-                Image(systemName: symbol)
-                    .font(.headline)
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-            }
-            .foregroundStyle(tint)
-            .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
-            .padding(.horizontal, 14)
-            .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func summaryHighlight(title: String, detail: String, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(tint)
-            Text(detail)
-                .font(.caption)
-                .foregroundStyle(HeartSyncTheme.ink)
-                .lineLimit(2)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-
-    private func recentMomentShareText(for item: DailyCheckIn) -> String {
-        """
-        HeartSync moment
-
-        Date: \(store.dateContextLabel(for: item.date))
-        Energy: \(item.energy)/5
-        Connection: \(item.connection)/5
-
-        Note:
-        \(item.note.isEmpty ? "No note captured." : item.note)
-
-        Intention:
-        \(item.intention.isEmpty ? "No intention captured." : item.intention)
-        """
-    }
-
-    private func recentMomentAccessibilityText(for item: DailyCheckIn) -> String {
-        let note = item.note.isEmpty ? "No note captured." : item.note
-        let intention = item.intention.isEmpty ? "No intention captured." : item.intention
-        return "\(store.dateContextLabel(for: item.date)). Connection \(item.connection) out of 5. Energy \(item.energy) out of 5. \(note) Intention: \(intention)"
+        .background(HeartSyncTheme.card, in: RoundedRectangle(cornerRadius: 24))
     }
 }
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
-        HeartSyncPreview {
-            DashboardView(selectedTab: .constant(.home))
+        Group {
+            HeartSyncPreview(emptyHistory: true) { DashboardView(selectedTab: .constant(.home)) }
+                .previewDisplayName("Start your story")
+            HeartSyncPreview { DashboardView(selectedTab: .constant(.home)) }
+                .previewDisplayName("Waiting for partner")
         }
     }
 }

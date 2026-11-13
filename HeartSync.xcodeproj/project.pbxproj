@@ -27,10 +27,19 @@
 		37A4946433D81025A72A1F42 /* CoupleCheckIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */; };
 		9842F7D9F7898491150987D2 /* CoupleCheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B02AFA09B88A795CE41D44A /* CoupleCheckInView.swift */; };
 		8C9367E28284EEFDD937486C /* StoredHeartSyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64744E423117108570F9E85C /* StoredHeartSyncState.swift */; };
+		C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32F3F28C5D0449693592238 /* HomeOverview.swift */; };
+		9B9F12C4055D03A8E4B7FB10 /* HeartSyncFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		AEC1000A2D10000100AA0001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AEA604812C25B4D800CB3983 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEA604882C25B4D800CB3983;
+			remoteInfo = HeartSync;
+		};
+		DC18C42B34C47918E16D33EE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AEA604812C25B4D800CB3983 /* Project object */;
 			proxyType = 1;
@@ -62,6 +71,9 @@
 		BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoupleCheckIn.swift; sourceTree = "<group>"; };
 		3B02AFA09B88A795CE41D44A /* CoupleCheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoupleCheckInView.swift; sourceTree = "<group>"; };
 		64744E423117108570F9E85C /* StoredHeartSyncState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredHeartSyncState.swift; sourceTree = "<group>"; };
+		C32F3F28C5D0449693592238 /* HomeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeOverview.swift; sourceTree = "<group>"; };
+		DAB8ACA82DB04D9A959782BD /* HeartSyncUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeartSyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncFlowUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +91,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6402CDF720B3D614A418588F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -87,6 +106,7 @@
 			children = (
 				AEA6048B2C25B4D800CB3983 /* HeartSync */,
 				AEC100022D10000100AA0001 /* HeartSyncTests */,
+				5C537A5824986BC9477FDC88 /* HeartSyncUITests */,
 				AEA6048A2C25B4D800CB3983 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -96,6 +116,7 @@
 			children = (
 				AEA604892C25B4D800CB3983 /* HeartSync.app */,
 				AEC100012D10000100AA0001 /* HeartSyncTests.xctest */,
+				DAB8ACA82DB04D9A959782BD /* HeartSyncUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -174,6 +195,7 @@
 		BF657CFE8769AAE6C0570C29 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C32F3F28C5D0449693592238 /* HomeOverview.swift */,
 				64744E423117108570F9E85C /* StoredHeartSyncState.swift */,
 				BEC0C296D57FA18F43981AB1 /* CoupleCheckIn.swift */,
 				8DE8EF2C38C143F370B146D7 /* HeartSyncModels.swift */,
@@ -188,6 +210,14 @@
 				67DA3017FCB0F709254CEE97 /* HeartSyncPreview.swift */,
 			);
 			path = SampleData;
+			sourceTree = "<group>";
+		};
+		5C537A5824986BC9477FDC88 /* HeartSyncUITests */ = {
+			isa = PBXGroup;
+			children = (
+				21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */,
+			);
+			path = HeartSyncUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -228,6 +258,24 @@
 			productReference = AEC100012D10000100AA0001 /* HeartSyncTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		3543AFB78CC38B2EE9321204 /* HeartSyncUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7AD95242DE4E0F8936F4817F /* Build configuration list for PBXNativeTarget "HeartSyncUITests" */;
+			buildPhases = (
+				B9BA0A9E2C2B09D56EC49C34 /* Sources */,
+				6402CDF720B3D614A418588F /* Frameworks */,
+				CC72D7694C5771CBB167C625 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5D8ED46073D26C572EFC0BDC /* PBXTargetDependency */,
+			);
+			name = HeartSyncUITests;
+			productName = HeartSyncUITests;
+			productReference = DAB8ACA82DB04D9A959782BD /* HeartSyncUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -262,6 +310,7 @@
 			targets = (
 				AEA604882C25B4D800CB3983 /* HeartSync */,
 				AEC100052D10000100AA0001 /* HeartSyncTests */,
+				3543AFB78CC38B2EE9321204 /* HeartSyncUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -283,6 +332,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CC72D7694C5771CBB167C625 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -291,6 +347,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEB300092D00000100AA0001 /* CheckInView.swift in Sources */,
+				C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */,
 				8C9367E28284EEFDD937486C /* StoredHeartSyncState.swift in Sources */,
 				9842F7D9F7898491150987D2 /* CoupleCheckInView.swift in Sources */,
 				37A4946433D81025A72A1F42 /* CoupleCheckIn.swift in Sources */,
@@ -318,6 +375,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B9BA0A9E2C2B09D56EC49C34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B9F12C4055D03A8E4B7FB10 /* HeartSyncFlowUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -325,6 +390,11 @@
 			isa = PBXTargetDependency;
 			target = AEA604882C25B4D800CB3983 /* HeartSync */;
 			targetProxy = AEC1000A2D10000100AA0001 /* PBXContainerItemProxy */;
+		};
+		5D8ED46073D26C572EFC0BDC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AEA604882C25B4D800CB3983 /* HeartSync */;
+			targetProxy = DC18C42B34C47918E16D33EE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -556,6 +626,54 @@
 			};
 			name = Release;
 		};
+		3C989FE8B34DE0DF9D80D042 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T8K9L82F82;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amartyakarmakar.heartsyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+
+				TEST_TARGET_NAME = HeartSync;
+			};
+			name = Debug;
+		};
+		E244A3F2A699FF448E27BAB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = T8K9L82F82;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amartyakarmakar.heartsyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+
+				TEST_TARGET_NAME = HeartSync;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -582,6 +700,15 @@
 			buildConfigurations = (
 				AEC1000E2D10000100AA0001 /* Debug */,
 				AEC1000F2D10000100AA0001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7AD95242DE4E0F8936F4817F /* Build configuration list for PBXNativeTarget "HeartSyncUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3C989FE8B34DE0DF9D80D042 /* Debug */,
+				E244A3F2A699FF448E27BAB6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

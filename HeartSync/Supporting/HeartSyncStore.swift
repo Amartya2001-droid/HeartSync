@@ -819,8 +819,9 @@ final class HeartSyncStore: ObservableObject {
         persistState()
     }
 
-    func submitCheckIn() {
-        guard recoveryMessage == nil, HeartSyncValidation.draft(currentState.draft) else { return }
+    @discardableResult
+    func submitCheckIn() -> Bool {
+        guard recoveryMessage == nil, HeartSyncValidation.draft(currentState.draft) else { return false }
         let today = Calendar.current.startOfDay(for: .now)
         let newCheckIn = DailyCheckIn(
             date: today,
@@ -833,11 +834,8 @@ final class HeartSyncStore: ObservableObject {
 
         history.removeAll { Calendar.current.isDate($0.date, inSameDayAs: today) }
         history.insert(newCheckIn, at: 0)
-        isApplyingState = true
-        todayNote = ""
-        todayIntention = defaultIntentionText
-        isApplyingState = false
         persistState()
+        return true
     }
 
     /// Both people use the same device. A second response never replaces the first.

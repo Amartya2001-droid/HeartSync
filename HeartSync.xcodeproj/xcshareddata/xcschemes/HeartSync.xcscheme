@@ -12,6 +12,9 @@
       <TestableReference skipped="NO">
         <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="AEC100052D10000100AA0001" BuildableName="HeartSyncTests.xctest" BlueprintName="HeartSyncTests" ReferencedContainer="container:HeartSync.xcodeproj"/>
       </TestableReference>
+      <TestableReference skipped="NO">
+        <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="3543AFB78CC38B2EE9321204" BuildableName="HeartSyncUITests.xctest" BlueprintName="HeartSyncUITests" ReferencedContainer="container:HeartSync.xcodeproj"/>
+      </TestableReference>
     </Testables>
   </TestAction>
   <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES">
