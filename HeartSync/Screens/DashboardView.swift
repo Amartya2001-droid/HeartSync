@@ -2,40 +2,41 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var store: HeartSyncStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Binding var selectedTab: HeartSyncTab
     @State private var showSharedCheckIn = false
 
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
-            TimelineView(.periodic(from: .now, by: 60)) { context in
-                let overview = HomeOverview(history: store.history, needsRecovery: store.recoveryMessage != nil, now: context.date)
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        header(date: context.date)
-                        if store.containsSampleData {
-                            Label("Fictional sample history — clear it in Profile to start your own story.", systemImage: "sparkles")
-                                .font(.callout)
-                                .padding(14)
-                                .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 16))
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    let overview = HomeOverview(history: store.history, needsRecovery: store.recoveryMessage != nil, now: context.date)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            header(date: context.date)
+                            if store.containsSampleData {
+                                Label("Fictional sample history — clear it in Profile to start your own story.", systemImage: "sparkles")
+                                    .font(.callout)
+                                    .padding(14)
+                                    .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 16))
+                            }
+                            dailyCard(overview)
+                            if let entry = overview.today, let summary = CoupleDailySummary(entry: entry), overview.phase != .recovery {
+                                conversationCard(summary)
+                            }
+                            if overview.phase != .recovery {
+                                weekCard(overview)
+                                recentReflections
+                            }
+                            Label("Same device. No accounts. No partner sync.", systemImage: "iphone")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
-                        dailyCard(overview)
-                        if let entry = overview.today, let summary = CoupleDailySummary(entry: entry), overview.phase != .recovery {
-                            conversationCard(summary)
-                        }
-                        if overview.phase != .recovery {
-                            weekCard(overview)
-                            recentReflections
-                        }
-                        Label("Same device. No accounts. No partner sync.", systemImage: "iphone")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                        .frame(width: max(0, geometry.size.width - 40), alignment: .leading)
+                        .padding(20)
+                        .padding(.bottom, 20)
                     }
-                    .frame(width: max(0, geometry.size.width - 40), alignment: .leading)
-                    .padding(20)
-                    .padding(.bottom, 20)
                 }
-            }
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("HeartSync")
@@ -96,7 +97,7 @@ struct DashboardView: View {
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    Image(systemName: "arrow.right")
+                    if !dynamicTypeSize.isAccessibilitySize { Image(systemName: "arrow.right") }
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, minHeight: 52)
