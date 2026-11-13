@@ -96,4 +96,6 @@ struct HeartSyncBackupExport: Codable {
     let draftConnection: Double
     let draftNote: String
     let draftIntention: String
+    var schemaVersion: Int? = 1
+    var containsSampleData: Bool? = false
 }

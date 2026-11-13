@@ -11,11 +11,19 @@ struct SettingsView: View {
     @State private var saveMessage = ""
     @State private var showResetConfirmation = false
     @State private var showClearHistoryConfirmation = false
+    @State private var showRecoveryResetConfirmation = false
     @State private var showRestoreBackupConfirmation = false
 
     var body: some View {
         NavigationStack {
             Form {
+                if let message = store.recoveryMessage {
+                    Section("Recover local data") {
+                        Text(message)
+                        Button("Start fresh", role: .destructive) { showRecoveryResetConfirmation = true }
+                    }
+                }
+
                 Section("Partner profile") {
                     TextField("Partner name", text: $partnerName)
                     TextField("Current milestone", text: $milestone)
@@ -332,6 +340,11 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Profile")
+            .confirmationDialog("Start fresh?", isPresented: $showRecoveryResetConfirmation, titleVisibility: .visible) {
+                Button("Keep unreadable copy and start fresh", role: .destructive) { store.startFreshAfterRecovery() }
+            } message: {
+                Text("This replaces the active local state with an empty history. The unreadable state is kept on this device for troubleshooting; it is not a usable backup.")
+            }
             .confirmationDialog(
                 "Reset HeartSync sample data?",
                 isPresented: $showResetConfirmation,

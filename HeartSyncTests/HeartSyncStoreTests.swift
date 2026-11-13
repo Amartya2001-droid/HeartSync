@@ -11,6 +11,7 @@ final class HeartSyncStoreTests: XCTestCase {
         suiteName = "HeartSyncStoreTests-\(UUID().uuidString)"
         defaults = UserDefaults(suiteName: suiteName)
         defaults.removePersistentDomain(forName: suiteName)
+        HeartSyncStore(defaults: defaults).resetDemoData()
     }
 
     override func tearDown() {
@@ -20,6 +21,78 @@ final class HeartSyncStoreTests: XCTestCase {
         defaults = nil
         suiteName = nil
         super.tearDown()
+    }
+
+    func testCleanInstallIsEmptyUntilSamplesAreExplicitlyRequested() {
+        defaults.removePersistentDomain(forName: suiteName)
+        let store = HeartSyncStore(defaults: defaults)
+        XCTAssertFalse(store.hasHistory)
+        XCTAssertFalse(store.containsSampleData)
+        XCTAssertEqual(store.partner.name, "Your partner")
+        store.resetDemoData()
+        XCTAssertTrue(store.hasHistory)
+        XCTAssertTrue(HeartSyncStore(defaults: defaults).containsSampleData)
+        store.clearAllHistory()
+        XCTAssertFalse(HeartSyncStore(defaults: defaults).hasHistory)
+        XCTAssertFalse(store.containsSampleData)
+    }
+
+    func testDraftAutosavesWithoutAViewAndReloadsBothResponses() {
+        let store = HeartSyncStore(defaults: defaults)
+        store.todayNote = "A draft survives app termination"
+        store.todayEnergy = 2
+        let reloaded = HeartSyncStore(defaults: defaults)
+        XCTAssertEqual(reloaded.todayNote, "A draft survives app termination")
+        XCTAssertEqual(reloaded.todayEnergy, 2)
+        XCTAssertNil(reloaded.recoveryMessage)
+    }
+
+    func testCorruptVersionedStateIsPreservedUntilRecoveryIsChosen() {
+        let corrupt = Data("unreadable".utf8)
+        defaults.set(corrupt, forKey: "heartsync.state.v1")
+        let store = HeartSyncStore(defaults: defaults)
+        XCTAssertNotNil(store.recoveryMessage)
+        XCTAssertFalse(store.hasHistory)
+        store.todayNote = "Do not overwrite corrupted data"
+        store.resetDemoData()
+        XCTAssertEqual(defaults.data(forKey: "heartsync.state.v1"), corrupt)
+        store.startFreshAfterRecovery()
+        XCTAssertNil(store.recoveryMessage)
+        XCTAssertEqual(defaults.data(forKey: "heartsync.recovery.unreadable"), corrupt)
+        XCTAssertFalse(HeartSyncStore(defaults: defaults).hasHistory)
+    }
+
+    func testInvalidBackupIsRejectedWithoutPartialReplacement() throws {
+        let store = HeartSyncStore(defaults: defaults)
+        let original = store.history
+        let originalPartner = store.partner.name
+        let json = try XCTUnwrap(store.backupExportText.data(using: .utf8))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: json) as? [String: Any])
+        payload["partner"] = ["name": "Must not apply", "milestone": "", "supportFocus": ""]
+        payload["draftEnergy"] = 999
+        let bad = String(decoding: try JSONSerialization.data(withJSONObject: payload), as: UTF8.self)
+        XCTAssertFalse(store.restoreFromBackupText(bad).isSuccess)
+        XCTAssertEqual(store.history, original)
+        XCTAssertEqual(store.partner.name, originalPartner)
+        payload["draftEnergy"] = 3
+        payload["schemaVersion"] = 99
+        let future = String(decoding: try JSONSerialization.data(withJSONObject: payload), as: UTF8.self)
+        XCTAssertFalse(store.restoreFromBackupText(future).isSuccess)
+    }
+
+    func testDuplicateHistoryAndPartnerRatingsAreRejected() throws {
+        let store = HeartSyncStore(defaults: defaults)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        var payload = try decoder.decode(HeartSyncBackupExport.self, from: Data(store.backupExportText.utf8))
+        let first = try XCTUnwrap(payload.history.first)
+        payload = HeartSyncBackupExport(exportedAt: payload.exportedAt, partner: payload.partner,
+            history: [first, first], draftEnergy: 3, draftConnection: 3, draftNote: "", draftIntention: "")
+        let encoder = JSONEncoder.iso8601
+        XCTAssertFalse(store.restoreFromBackupText(String(decoding: try encoder.encode(payload), as: UTF8.self)).isSuccess)
+        var entry = first
+        entry.partnerResponse = PartnerCheckIn(energy: -1, connection: 3, note: "", intention: "")
+        XCTAssertFalse(HeartSyncValidation.history([entry]))
     }
 
     func testPartnerCheckInPersistsAndSurvivesEditingFirstResponse() {
@@ -132,6 +205,7 @@ final class HeartSyncStoreTests: XCTestCase {
         ]
 
         let data = try JSONEncoder.iso8601.encode(history)
+        defaults.removeObject(forKey: "heartsync.state.v1")
         defaults.set(data, forKey: "heartsync.history")
 
         let reloadedStore = HeartSyncStore(defaults: defaults)

@@ -35,10 +35,6 @@ struct ContentView: View {
         }
         .tint(HeartSyncTheme.blush)
         .preferredColorScheme(.light)
-        .onChange(of: store.todayEnergy) { _, _ in store.saveDraft() }
-        .onChange(of: store.todayConnection) { _, _ in store.saveDraft() }
-        .onChange(of: store.todayNote) { _, _ in store.saveDraft() }
-        .onChange(of: store.todayIntention) { _, _ in store.saveDraft() }
         .onAppear {
             updateSheetPresentation()
         }

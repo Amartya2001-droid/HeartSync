@@ -9,6 +9,18 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
+                    if let message = store.recoveryMessage {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Saved data needs attention", systemImage: "externaldrive.badge.exclamationmark")
+                                .font(.headline)
+                            Text(message)
+                            Button("Open Profile to recover") { selectedTab = .profile }
+                        }.padding().background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 20))
+                    }
+                    if store.containsSampleData {
+                        Label("Fictional sample history · Clear it in Profile to start your own story", systemImage: "sparkles")
+                            .font(.callout)
+                    }
                     hero
                     coupleCard
 
