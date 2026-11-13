@@ -7,6 +7,7 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
+            GeometryReader { geometry in
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 let overview = HomeOverview(history: store.history, needsRecovery: store.recoveryMessage != nil, now: context.date)
                 ScrollView {
@@ -30,9 +31,11 @@ struct DashboardView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
+                    .frame(width: max(0, geometry.size.width - 40), alignment: .leading)
                     .padding(20)
                     .padding(.bottom, 20)
                 }
+            }
             }
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("HeartSync")
@@ -63,6 +66,7 @@ struct DashboardView: View {
                 .foregroundStyle(HeartSyncTheme.blush)
             Text(overview.phase.title)
                 .font(.title2.bold())
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("home.phaseTitle")
             if let message = store.recoveryMessage {
                 Text(message).foregroundStyle(.secondary)
@@ -88,7 +92,9 @@ struct DashboardView: View {
                 }
             } label: {
                 HStack {
-                    Text(overview.phase.actionTitle).font(.headline)
+                    Text(overview.phase.actionTitle)
+                        .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
                     Image(systemName: "arrow.right")
                 }
@@ -142,12 +148,12 @@ struct DashboardView: View {
     private func weekCard(_ overview: HomeOverview) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your last seven days").font(.title3.bold()).accessibilityAddTraits(.isHeader)
-            HStack(alignment: .top, spacing: 6) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 12) {
                 ForEach(overview.days) { day in
                     VStack(spacing: 10) {
-                        Text(day.date.formatted(.dateTime.weekday(.narrow))).font(.caption)
+                        Text(day.date.formatted(.dateTime.weekday(.narrow))).font(.caption2)
                         Image(systemName: day.entry?.partnerResponse != nil ? "person.2.circle.fill" : day.entry != nil ? "checkmark.circle.fill" : "circle.dotted")
-                            .font(.title3)
+                            .font(.system(size: 22))
                             .foregroundStyle(day.entry == nil ? HeartSyncTheme.ink.opacity(0.35) : HeartSyncTheme.blush)
                     }
                     .frame(maxWidth: .infinity)
@@ -172,14 +178,11 @@ struct DashboardView: View {
 
     private var recentReflections: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Your story so far").font(.title3.bold()).accessibilityAddTraits(.isHeader)
-                Spacer()
-                Button("All moments") { selectedTab = .moments }
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(HeartSyncTheme.ink)
-                    .accessibilityIdentifier("home.allMoments")
-            }
+            Text("Your story so far").font(.title3.bold()).accessibilityAddTraits(.isHeader)
+            Button("All moments") { selectedTab = .moments }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(HeartSyncTheme.ink)
+                .accessibilityIdentifier("home.allMoments")
             if let latest = store.history.first {
                 Text(latest.date.formatted(date: .abbreviated, time: .omitted)).font(.caption).foregroundStyle(.secondary)
                 Text(latest.note.isEmpty ? "You made space to name how you felt." : latest.note)

@@ -20,6 +20,11 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertTrue(element.exists && element.isHittable, "Element should be reachable by scrolling: \(element)")
     }
 
+    private func assertWithinScreenWidth(_ element: XCUIElement, in app: XCUIApplication) {
+        XCTAssertGreaterThanOrEqual(element.frame.minX, app.frame.minX, "Leading edge must not be clipped")
+        XCTAssertLessThanOrEqual(element.frame.maxX, app.frame.maxX, "Trailing edge must not be clipped")
+    }
+
     private func screenshot(_ app: XCUIApplication, name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name
@@ -89,6 +94,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertTrue(start.waitForExistence(timeout: 15))
         reveal(start, in: app)
         XCTAssertTrue(start.isHittable)
+        assertWithinScreenWidth(start, in: app)
         screenshot(app, name: "Empty home at accessibility text size")
         app.terminate()
         app = launch(samples: true, largeType: true)
@@ -96,6 +102,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertTrue(shared.waitForExistence(timeout: 15))
         reveal(shared, in: app)
         XCTAssertTrue(shared.isHittable)
+        assertWithinScreenWidth(shared, in: app)
         screenshot(app, name: "Fictional sample home at accessibility text size")
     }
 }

@@ -41,7 +41,7 @@ The seven-day strip uses calendar days ending today, including daylight-saving c
 
 Check-In keeps save/continue controls at the bottom of the screen and retains the saved draft, so tapping save again cannot silently erase your reflection. Home's edit action loads your saved values. Recovery blocks the save action. Both people still share the same device and local data.
 
-Focused simulator UI tests exercise first-launch routing and Home → reflection → explicit partner consent → shared summary → relaunch, and capture empty/sample Home screenshots at accessibility text size in CI's `ios-test-results` artifact. Test launch/reset controls exist only in DEBUG and use a separate UserDefaults suite. CI screenshots and automated reachability checks do not replace Amartya's visual/VoiceOver or physical-device review.
+Focused simulator UI tests exercise first-launch routing and Home → reflection → explicit partner consent → shared summary → relaunch, and assert that the primary action stays within the screen width at accessibility text size; they also capture empty/sample Home screenshots in CI's `ios-test-results` artifact. Test launch/reset controls exist only in DEBUG and use a separate UserDefaults suite. CI screenshots and automated reachability checks do not replace Amartya's visual/VoiceOver or physical-device review.
 
 ## State and recovery (#3)
 
