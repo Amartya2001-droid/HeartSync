@@ -5,11 +5,15 @@ import UIKit
 @MainActor
 final class HeartSyncStore: ObservableObject {
     @Published var partner: PartnerProfile
-    @Published var todayEnergy: Double
-    @Published var todayConnection: Double
-    @Published var todayNote: String
-    @Published var todayIntention: String
+    @Published var todayEnergy: Double { didSet { saveDraft() } }
+    @Published var todayConnection: Double { didSet { saveDraft() } }
+    @Published var todayNote: String { didSet { saveDraft() } }
+    @Published var todayIntention: String { didSet { saveDraft() } }
     @Published private(set) var history: [DailyCheckIn]
+
+    @Published private(set) var containsSampleData = false
+    @Published private(set) var recoveryMessage: String?
+    private var isApplyingState = false
 
     private let defaults: UserDefaults
     private let encoder = JSONEncoder()
@@ -17,6 +21,8 @@ final class HeartSyncStore: ObservableObject {
     private let defaultIntentionText = "Protect 20 minutes for a no-phone check-in tonight."
 
     private enum StorageKeys {
+        static let state = "heartsync.state.v1"
+        static let unreadableState = "heartsync.recovery.unreadable"
         static let partner = "heartsync.partner"
         static let history = "heartsync.history"
         static let draftEnergy = "heartsync.draft.energy"
@@ -33,28 +39,78 @@ final class HeartSyncStore: ObservableObject {
         encoder.dateEncodingStrategy = .iso8601
         decoder.dateDecodingStrategy = .iso8601
 
-        if let data = defaults.data(forKey: StorageKeys.partner),
-           let storedPartner = try? decoder.decode(PartnerProfile.self, from: data) {
-            partner = storedPartner
-        } else {
-            partner = HeartSyncSampleData.partner
+        partner = PartnerProfile(name: "Your partner", milestone: "Our daily check-in", supportFocus: "Listen and make time for each other")
+        history = []
+        todayEnergy = 3
+        todayConnection = 3
+        todayNote = ""
+        todayIntention = defaultIntentionText
+
+        if let data = defaults.data(forKey: StorageKeys.state) {
+            if let state = try? decoder.decode(StoredHeartSyncState.self, from: data), state.isValid {
+                apply(state)
+            } else {
+                recoveryMessage = "Saved data could not be read. It has not been replaced. Restore a valid JSON backup in Profile, or choose Start fresh to keep an unreadable copy and begin again."
+            }
+        } else if defaults.object(forKey: StorageKeys.history) != nil || defaults.object(forKey: StorageKeys.partner) != nil {
+            // Migrate the previous unversioned keys without substituting fictional history.
+            let oldHistory = defaults.data(forKey: StorageKeys.history).flatMap { try? decoder.decode([DailyCheckIn].self, from: $0) }
+            let oldPartner = defaults.data(forKey: StorageKeys.partner).flatMap { try? decoder.decode(PartnerProfile.self, from: $0) }
+            let draft = CheckInDraft(
+                energy: defaults.object(forKey: StorageKeys.draftEnergy) as? Double ?? 3,
+                connection: defaults.object(forKey: StorageKeys.draftConnection) as? Double ?? 3,
+                note: defaults.string(forKey: StorageKeys.draftNote) ?? "",
+                intention: defaults.string(forKey: StorageKeys.draftIntention) ?? defaultIntentionText
+            )
+            let legacy = StoredHeartSyncState(partner: oldPartner ?? partner, history: oldHistory ?? [], draft: draft, containsSampleData: false)
+            if (defaults.object(forKey: StorageKeys.history) == nil || oldHistory != nil),
+               (defaults.object(forKey: StorageKeys.partner) == nil || oldPartner != nil), legacy.isValid {
+                apply(legacy)
+                persistState()
+            } else {
+                recoveryMessage = "Existing local data could not be migrated safely. Restore a backup in Profile or choose Start fresh. The original keys have not been replaced."
+            }
         }
+    }
 
-        let initialHistory: [DailyCheckIn]
-        if let data = defaults.data(forKey: StorageKeys.history),
-           let storedHistory = try? decoder.decode([DailyCheckIn].self, from: data) {
-            initialHistory = storedHistory.sorted { $0.date > $1.date }
-        } else {
-            initialHistory = HeartSyncSampleData.history
+    private var currentState: StoredHeartSyncState {
+        StoredHeartSyncState(partner: partner, history: history,
+            draft: CheckInDraft(energy: todayEnergy, connection: todayConnection, note: todayNote, intention: todayIntention),
+            containsSampleData: containsSampleData)
+    }
+
+    private func apply(_ state: StoredHeartSyncState) {
+        isApplyingState = true
+        partner = state.partner
+        history = state.history.sorted { $0.date > $1.date }
+        todayEnergy = state.draft.energy
+        todayConnection = state.draft.connection
+        todayNote = state.draft.note
+        todayIntention = state.draft.intention
+        containsSampleData = state.containsSampleData
+        isApplyingState = false
+    }
+
+    private func preserveUnreadableState() {
+        if recoveryMessage != nil, let data = defaults.data(forKey: StorageKeys.state) {
+            defaults.set(data, forKey: StorageKeys.unreadableState)
         }
+    }
 
-        history = initialHistory
+    func startFreshAfterRecovery() {
+        preserveUnreadableState()
+        recoveryMessage = nil
+        apply(StoredHeartSyncState(
+            partner: PartnerProfile(name: "Your partner", milestone: "Our daily check-in", supportFocus: "Listen and make time for each other"),
+            history: [], draft: CheckInDraft(), containsSampleData: false))
+        persistState()
+    }
 
-        let latest = initialHistory.first
-        todayEnergy = defaults.object(forKey: StorageKeys.draftEnergy) as? Double ?? Double(latest?.energy ?? 4)
-        todayConnection = defaults.object(forKey: StorageKeys.draftConnection) as? Double ?? Double(latest?.connection ?? 4)
-        todayNote = defaults.string(forKey: StorageKeys.draftNote) ?? ""
-        todayIntention = defaults.string(forKey: StorageKeys.draftIntention) ?? defaultIntentionText
+    private func persistState() {
+        guard !isApplyingState, recoveryMessage == nil else { return }
+        guard currentState.isValid, let data = try? encoder.encode(currentState) else { return }
+        defaults.set(data, forKey: StorageKeys.state)
+        markDataUpdated()
     }
 
     var snapshot: HeartSyncSnapshot {
@@ -468,7 +524,9 @@ final class HeartSyncStore: ObservableObject {
             draftEnergy: todayEnergy,
             draftConnection: todayConnection,
             draftNote: todayNote,
-            draftIntention: todayIntention
+            draftIntention: todayIntention,
+            schemaVersion: 1,
+            containsSampleData: containsSampleData
         )
 
         guard let data = try? encoder.encode(payload),
@@ -715,20 +773,17 @@ final class HeartSyncStore: ObservableObject {
         guard let payload = decodedBackupPayload(from: trimmed) else {
             return BackupRestoreResult(
                 title: "Backup could not be restored",
-                detail: "The pasted text is not valid HeartSync backup JSON.",
+                detail: "The backup is unreadable, unsupported, or contains invalid ratings, duplicate days, or oversized text. Nothing was changed.",
                 isSuccess: false
             )
         }
 
-        partner = payload.partner
-        history = payload.history.sorted { $0.date > $1.date }
-        todayEnergy = payload.draftEnergy
-        todayConnection = payload.draftConnection
-        todayNote = payload.draftNote
-        todayIntention = payload.draftIntention
-        persistPartner()
-        persistHistory()
-        saveDraft()
+        preserveUnreadableState()
+        recoveryMessage = nil
+        apply(StoredHeartSyncState(partner: payload.partner, history: payload.history,
+            draft: CheckInDraft(energy: payload.draftEnergy, connection: payload.draftConnection, note: payload.draftNote, intention: payload.draftIntention),
+            containsSampleData: payload.containsSampleData ?? false))
+        persistState()
         markBackupExported()
 
         return BackupRestoreResult(
@@ -761,14 +816,11 @@ final class HeartSyncStore: ObservableObject {
     }
 
     func saveDraft() {
-        defaults.set(todayEnergy, forKey: StorageKeys.draftEnergy)
-        defaults.set(todayConnection, forKey: StorageKeys.draftConnection)
-        defaults.set(todayNote, forKey: StorageKeys.draftNote)
-        defaults.set(todayIntention, forKey: StorageKeys.draftIntention)
-        markDataUpdated()
+        persistState()
     }
 
     func submitCheckIn() {
+        guard recoveryMessage == nil, HeartSyncValidation.draft(currentState.draft) else { return }
         let today = Calendar.current.startOfDay(for: .now)
         let newCheckIn = DailyCheckIn(
             date: today,
@@ -781,17 +833,17 @@ final class HeartSyncStore: ObservableObject {
 
         history.removeAll { Calendar.current.isDate($0.date, inSameDayAs: today) }
         history.insert(newCheckIn, at: 0)
-        persistHistory()
-
+        isApplyingState = true
         todayNote = ""
         todayIntention = defaultIntentionText
-        saveDraft()
+        isApplyingState = false
+        persistState()
     }
 
     /// Both people use the same device. A second response never replaces the first.
     @discardableResult
     func submitPartnerCheckIn(energy: Int, connection: Int, note: String, intention: String) -> Bool {
-        guard (1...5).contains(energy), (1...5).contains(connection),
+        guard recoveryMessage == nil, (1...5).contains(energy), (1...5).contains(connection),
               let index = history.firstIndex(where: { Calendar.current.isDateInToday($0.date) }) else { return false }
         history[index].partnerResponse = PartnerCheckIn(
             energy: energy, connection: connection,
@@ -823,18 +875,15 @@ final class HeartSyncStore: ObservableObject {
     }
 
     func resetDemoData() {
-        partner = HeartSyncSampleData.partner
-        history = HeartSyncSampleData.history
-        todayEnergy = Double(HeartSyncSampleData.history.first?.energy ?? 4)
-        todayConnection = Double(HeartSyncSampleData.history.first?.connection ?? 4)
-        todayNote = ""
-        todayIntention = defaultIntentionText
-        persistPartner()
-        persistHistory()
-        saveDraft()
+        guard recoveryMessage == nil else { return }
+        apply(StoredHeartSyncState(partner: HeartSyncSampleData.partner, history: HeartSyncSampleData.history,
+            draft: CheckInDraft(energy: 4, connection: 5, note: "", intention: defaultIntentionText), containsSampleData: true))
+        persistState()
     }
 
     func clearAllHistory() {
+        guard recoveryMessage == nil else { return }
+        containsSampleData = false
         history = []
         persistHistory()
     }
@@ -848,8 +897,12 @@ final class HeartSyncStore: ObservableObject {
     }
 
     private func decodedBackupPayload(from text: String) -> HeartSyncBackupExport? {
-        guard let data = text.data(using: .utf8) else { return nil }
-        return try? decoder.decode(HeartSyncBackupExport.self, from: data)
+        guard text.utf8.count <= 5_000_000, let data = text.data(using: .utf8),
+              let payload = try? decoder.decode(HeartSyncBackupExport.self, from: data),
+              (payload.schemaVersion ?? 1) == 1,
+              HeartSyncValidation.profile(payload.partner), HeartSyncValidation.history(payload.history),
+              HeartSyncValidation.draft(CheckInDraft(energy: payload.draftEnergy, connection: payload.draftConnection, note: payload.draftNote, intention: payload.draftIntention)) else { return nil }
+        return payload
     }
 
     private func currentStreakDays() -> Int {
@@ -871,19 +924,9 @@ final class HeartSyncStore: ObservableObject {
         return streak
     }
 
-    private func persistHistory() {
-        if let data = try? encoder.encode(history) {
-            defaults.set(data, forKey: StorageKeys.history)
-        }
-        markDataUpdated()
-    }
+    private func persistHistory() { persistState() }
 
-    private func persistPartner() {
-        if let data = try? encoder.encode(partner) {
-            defaults.set(data, forKey: StorageKeys.partner)
-        }
-        markDataUpdated()
-    }
+    private func persistPartner() { persistState() }
 
     static var demoPresets: [DemoPreset] { HeartSyncSampleData.demoPresets }
 

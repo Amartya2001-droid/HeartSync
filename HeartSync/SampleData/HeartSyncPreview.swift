@@ -43,7 +43,7 @@ extension HeartSyncStore {
 
     static func makePreview(defaults: UserDefaults? = nil, emptyHistory: Bool = false) -> HeartSyncStore {
         let store = HeartSyncStore(defaults: defaults ?? makePreviewDefaults())
-        if emptyHistory { store.clearAllHistory() }
+        if emptyHistory { store.clearAllHistory() } else { store.resetDemoData() }
         return store
     }
 }

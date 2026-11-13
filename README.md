@@ -33,6 +33,14 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## State and recovery (#3)
+
+A fresh install starts with an empty history and a neutral partner profile. Fictional samples are opt-in through Profile's reset-sample-data control and are labelled on Home; previews seed their isolated storage explicitly. Clearing samples persists an empty state.
+
+Profile, both people's responses, the current draft, and the sample-data flag are encoded together in a versioned local UserDefaults value. Drafts persist from the store as you edit, without depending on a particular screen. Existing unversioned data migrates on launch. If data cannot be decoded or validated, Home/Profile show recovery options instead of silently substituting sample history. Restore a valid JSON backup, or explicitly start fresh; the unreadable versioned bytes are retained on-device and old migration keys are left intact.
+
+Backup restore rejects unsupported schema versions, ratings outside 1–5, duplicate IDs/days, excessive text/history, and payloads over 5 MB before replacing any current data. Legacy unversioned backups remain supported. This is local storage, not encrypted multi-user storage or cloud backup; deleting the app can remove it. Export a JSON backup before uninstalling.
+
 ## Couples check-in flow (#5)
 
 Home now leads with **Today, together**. Save your energy, connection, reflection and intention, then choose **Continue together** or Home's **Add partner’s check-in**. Pass the device to your partner: they choose their own ratings, optionally add a reflection/intention, and explicitly consent to sharing on this device before saving. A daily comparison offers a concrete conversation prompt; both responses persist and appear in Moments, including partner-note search. Editing your response preserves theirs. Legacy entries and backups remain readable.
@@ -52,7 +60,7 @@ The existing navigation and demo behavior are retained. Xcode groups mirror the 
 
 ## Current implementation and verification
 
-The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Ten `HeartSyncStoreTests` cover persistence, consecutive-day streaks, backup freshness, restore success/failure, cleared history, preview storage isolation, legacy decoding, partner-response persistence/backup round trips, and shared-summary rules. Code presence alone does not verify simulator behavior.
+The source contains the four screens, onboarding/recovery shell, local UserDefaults persistence, sample history, profile editing, JSON backup export/restore, and sharing helpers. Store regression tests cover persistence, consecutive-day streaks, backup freshness, restore success/failure, cleared history, preview storage isolation, legacy decoding, partner-response persistence/backup round trips, and shared-summary rules. Code presence alone does not verify simulator behavior.
 
 Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repository checks with:
 
