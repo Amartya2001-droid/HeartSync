@@ -35,9 +35,17 @@ jobs:
           -destination "platform=iOS Simulator,id=$SIMULATOR_ID"
           -derivedDataPath .deriveddata -resultBundlePath TestResults.xcresult
           -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
+      - name: Export simulator screenshots
+        if: always()
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            xcrun xcresulttool export attachments --path TestResults.xcresult --output-path SimulatorScreenshots
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ios-test-results
-          path: TestResults.xcresult
+          path: |
+            TestResults.xcresult
+            SimulatorScreenshots/
           if-no-files-found: ignore

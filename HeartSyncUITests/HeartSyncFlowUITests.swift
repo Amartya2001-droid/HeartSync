@@ -61,7 +61,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         reveal(shared, in: app)
         shared.tap()
         XCTAssertTrue(app.staticTexts["couple.summary"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch.exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch.exists)
     }
 
     func testEmptyAndSampleHomesAtAccessibilityTextSize() {
