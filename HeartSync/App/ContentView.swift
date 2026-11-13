@@ -76,6 +76,7 @@ struct ContentView: View {
     private func dismissSheet(for mode: OnboardingSheetMode) {
         switch mode {
         case .welcome:
+            hasAcknowledgedEmptyHistory = true
             shouldShowOnboarding = false
         case .emptyHistory:
             hasAcknowledgedEmptyHistory = true

@@ -27,6 +27,19 @@ final class HeartSyncFlowUITests: XCTestCase {
         add(attachment)
     }
 
+    func testFirstLaunchStartsCheckInWithoutAnEmptyHistoryDetour() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset"]
+        app.launch()
+        let start = app.buttons["onboarding.primary"]
+        XCTAssertTrue(start.waitForExistence(timeout: 15))
+        reveal(start, in: app)
+        start.tap()
+        XCTAssertTrue(app.navigationBars["Check-In"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["checkIn.save"].exists)
+        XCTAssertFalse(app.staticTexts["Moments history was cleared"].exists)
+    }
+
     func testCouplesCheckInConsentSummaryAndRelaunch() {
         let app = launch()
         let start = app.buttons["home.primaryAction"]

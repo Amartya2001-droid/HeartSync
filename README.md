@@ -35,13 +35,13 @@ Authentication, backend/cloud or partner sync, notifications, HealthKit, third-p
 
 ## Home and the primary flow (#5)
 
-Home shows one next action based on today's saved state: start your reflection, invite your partner, open the shared check-in, or recover unreadable data in Profile. The daily progress list distinguishes your response, your partner's response and the shared conversation. When both people have checked in, Home offers the rule-based conversation prompt directly.
+First-launch onboarding leads directly to Check-In without an extra empty-history detour. Home shows one next action based on today's saved state: start your reflection, invite your partner, open the shared check-in, or recover unreadable data in Profile. The daily progress list distinguishes your response, your partner's response and the shared conversation. When both people have checked in, Home offers the rule-based conversation prompt directly.
 
 The seven-day strip uses calendar days ending today, including daylight-saving changes. Missing days are shown explicitly, old/future entries are excluded from the Home average, and an empty week has no assumed score. The average is labelled as **your** recorded connection; it is not a measured relationship-health score. Moments are one tap away.
 
 Check-In keeps save/continue controls at the bottom of the screen and retains the saved draft, so tapping save again cannot silently erase your reflection. Home's edit action loads your saved values. Recovery blocks the save action. Both people still share the same device and local data.
 
-Focused simulator UI tests exercise Home → reflection → explicit partner consent → shared summary → relaunch, and capture empty/sample Home screenshots at accessibility text size in CI's `ios-test-results` artifact. Test launch/reset controls exist only in DEBUG and use a separate UserDefaults suite. CI screenshots and automated reachability checks do not replace Amartya's visual/VoiceOver or physical-device review.
+Focused simulator UI tests exercise first-launch routing and Home → reflection → explicit partner consent → shared summary → relaunch, and capture empty/sample Home screenshots at accessibility text size in CI's `ios-test-results` artifact. Test launch/reset controls exist only in DEBUG and use a separate UserDefaults suite. CI screenshots and automated reachability checks do not replace Amartya's visual/VoiceOver or physical-device review.
 
 ## State and recovery (#3)
 
