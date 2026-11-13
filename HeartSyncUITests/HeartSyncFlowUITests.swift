@@ -59,7 +59,13 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertFalse(savePartner.isEnabled)
         let consent = app.switches["couple.consent"]
         reveal(consent, in: app)
-        consent.tap()
+        // SwiftUI exposes the entire labelled row as the switch. Tap its trailing control,
+        // not the centre of the long consent label.
+        consent.coordinate(withNormalizedOffset: CGVector(dx: 0.93, dy: 0.5)).tap()
+        let agreed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == '1'"), object: consent)
+        XCTAssertEqual(XCTWaiter.wait(for: [agreed], timeout: 5), .completed)
+        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: savePartner)
+        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
         reveal(savePartner, in: app)
         XCTAssertTrue(savePartner.isEnabled)
         savePartner.tap()

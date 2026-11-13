@@ -49,3 +49,9 @@ jobs:
             TestResults.xcresult
             SimulatorScreenshots/
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: home-screenshots
+          path: SimulatorScreenshots/**/*.png
+          if-no-files-found: ignore
