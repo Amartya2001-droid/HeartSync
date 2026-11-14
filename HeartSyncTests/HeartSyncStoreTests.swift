@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 @testable import HeartSync
 
 @MainActor
@@ -21,6 +22,68 @@ final class HeartSyncStoreTests: XCTestCase {
         defaults = nil
         suiteName = nil
         super.tearDown()
+    }
+
+    func testProfileValidationReportsFailureAndKeepsPersistedData() {
+        let store = HeartSyncStore(defaults: defaults)
+        XCTAssertTrue(store.updatePartner(name: "  Taylor  ", milestone: "  Our week  ", supportFocus: "  Listen  "))
+        XCTAssertEqual(HeartSyncStore(defaults: defaults).partner.name, "Taylor")
+        XCTAssertEqual(store.partner.milestone, "Our week")
+        XCTAssertFalse(store.updatePartner(name: "   ", milestone: "", supportFocus: ""))
+        XCTAssertFalse(store.updatePartner(name: String(repeating: "x", count: 201), milestone: "", supportFocus: ""))
+        XCTAssertEqual(store.partner.name, "Taylor")
+        store.todayEnergy = .nan
+        XCTAssertFalse(store.updatePartner(name: "Not persisted", milestone: "", supportFocus: ""))
+        XCTAssertEqual(store.partner.name, "Taylor")
+        XCTAssertEqual(HeartSyncStore(defaults: defaults).partner.name, "Taylor")
+    }
+
+    func testUnreadableStateCannotBePresentedAsABackupOrUpdatedProfile() {
+        defaults.removeObject(forKey: "heartsync.backup.lastExportedAt")
+        defaults.set(Data("corrupt".utf8), forKey: "heartsync.state.v1")
+        let store = HeartSyncStore(defaults: defaults)
+        let originalName = store.partner.name
+        XCTAssertFalse(store.copyBackupExportToClipboard())
+        XCTAssertFalse(store.hasCurrentBackupExport)
+        XCTAssertFalse(store.exportStatus.isCurrent)
+        XCTAssertTrue(store.exportStatus.title.contains("Recover"))
+        XCTAssertFalse(store.updatePartner(name: "Do not claim saved", milestone: "", supportFocus: ""))
+        XCTAssertEqual(store.partner.name, originalName)
+    }
+
+    func testWeeklySnapshotDoesNotIncludeOldOrFutureCheckIns() throws {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        func entry(_ offset: Int, _ rating: Int) throws -> DailyCheckIn {
+            DailyCheckIn(date: try XCTUnwrap(calendar.date(byAdding: .day, value: offset, to: today)), energy: rating, connection: rating, note: "", intention: "")
+        }
+        defaults.removeObject(forKey: "heartsync.state.v1")
+        defaults.set(try JSONEncoder.iso8601.encode([entry(-8, 1), entry(1, 1), entry(0, 5)]), forKey: "heartsync.history")
+        let store = HeartSyncStore(defaults: defaults)
+        XCTAssertEqual(store.snapshot.weeklyAverageEnergy, 5)
+        XCTAssertEqual(store.snapshot.weeklyAverageConnection, 5)
+        defaults.removeObject(forKey: "heartsync.state.v1")
+        defaults.set(try JSONEncoder.iso8601.encode([entry(-8, 1)]), forKey: "heartsync.history")
+        let oldOnly = HeartSyncStore(defaults: defaults)
+        XCTAssertTrue(oldOnly.weeklyStory.contains("No check-ins were recorded"))
+        XCTAssertTrue(oldOnly.weeklySummaryText.contains("not recorded"))
+    }
+
+    func testRecommendedRitualSymbolsExistForEachRatingBranch() {
+        let store = HeartSyncStore(defaults: defaults)
+        store.clearAllHistory()
+        func assertSymbols() {
+            for ritual in store.recommendedRituals {
+                XCTAssertNotNil(UIImage(systemName: ritual.symbol), ritual.symbol)
+            }
+        }
+        assertSymbols()
+        for (energy, connection) in [(1.0, 5.0), (5.0, 1.0), (5.0, 5.0)] {
+            store.todayEnergy = energy
+            store.todayConnection = connection
+            XCTAssertTrue(store.submitCheckIn())
+            assertSymbols()
+        }
     }
 
     func testHomeOverviewChoosesTheNextActionFromBothPerspectives() throws {

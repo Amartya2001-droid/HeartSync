@@ -32,6 +32,34 @@ final class HeartSyncFlowUITests: XCTestCase {
         add(attachment)
     }
 
+    func testProfileValidationAndRelaunchKeepTheLastSavedName() {
+        let app = launch()
+        app.tabBars.buttons["Profile"].tap()
+        let name = app.textFields["profile.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        name.tap()
+        let original = name.value as? String ?? ""
+        name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: original.count) + "Taylor")
+        app.buttons["profile.keyboardDone"].tap()
+        app.buttons["profile.save"].tap()
+        XCTAssertTrue(app.staticTexts["profile.status"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["profile.status"].label, "Profile saved locally.")
+
+        name.tap()
+        name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 6) + String(repeating: "x", count: 201))
+        app.buttons["profile.keyboardDone"].tap()
+        app.buttons["profile.save"].tap()
+        XCTAssertTrue(app.staticTexts["profile.status"].label.contains("Profile was not saved"))
+        screenshot(app, name: "Profile validation explains unsaved input")
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--skip-onboarding"]
+        app.launch()
+        app.tabBars.buttons["Profile"].tap()
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        XCTAssertEqual(name.value as? String, "Taylor")
+    }
+
     func testFirstLaunchStartsCheckInWithoutAnEmptyHistoryDetour() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset"]

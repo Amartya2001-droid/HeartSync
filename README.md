@@ -33,6 +33,12 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## QA and demo (#2)
+
+Profile saves now validate and trim input, report persistence failure, and preserve the last saved profile instead of claiming success for unsaved edits. Backup copy refuses unreadable/invalid active state and does not mark it current. Weekly summary statistics use actual calendar days ending today, show unrecorded periods explicitly, and retain fractional averages in text exports. The unsupported ritual symbol `feather.fill` is replaced with `leaf.fill`.
+
+The shared test scheme includes profile-validation/relaunch UI coverage, data-safety regressions and a check that every recommended ritual symbol exists in the simulator. Follow the [QA checklist](QA_CHECKLIST.md) and [current demo script](DEMO_SCRIPT.md). Focused CI layout tests and captures cover their stated cases; broader layouts, VoiceOver, physical devices and signing/distribution remain unverified here and are Amartya's calls.
+
 ## Home and the primary flow (#5)
 
 First-launch onboarding leads directly to Check-In without an extra empty-history detour. Home shows one next action based on today's saved state: start your reflection, invite your partner, open the shared check-in, or recover unreadable data in Profile. The daily progress list distinguishes your response, your partner's response and the shared conversation. When both people have checked in, Home offers the rule-based conversation prompt directly.

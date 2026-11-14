@@ -1,0 +1,34 @@
+# HeartSync QA checklist
+
+## Repeatable simulator coverage
+
+Run the shared `HeartSync` scheme with `xcodebuild test` (the README has the command). GitHub Actions runs the same scheme on an available iPhone simulator, without signing. The suite checks:
+
+- First launch enters Check-In without a second empty-history sheet.
+- Home leads to a saved reflection, partner consent is required, both perspectives produce a shared summary, and relaunch preserves the pair.
+- Empty/sample Home primary actions remain reachable and within the screen at accessibility text size. Captures are exported for inspection.
+- Profile accepts a valid name, explains an oversized name without claiming success, and relaunch retains the last saved name.
+- Unit regressions cover profile rollback, unreadable-state backup rejection, calendar-week bounds, supported ritual symbols, backup validation, migration and both-response persistence.
+
+CI artifacts: `ios-test-results` contains the xcresult bundle and exported attachment manifest; `home-screenshots` contains PNG captures. A passing test is evidence for its assertions, not blanket accessibility or release approval.
+
+## Short demo / acceptance pass
+
+1. Use a clean install or a separate simulator. Real installs start empty. Onboarding → Start checking in → enter your ratings, reflection and intention → Save → Continue together.
+2. Hand the device to a consenting partner. Confirm saving is disabled before consent. Add their response, consent and save. Read the conversation prompt together.
+3. Close Together. Home should offer the shared check-in. Relaunch and confirm both perspectives and your reflection remain.
+4. Edit your reflection; verify the partner's response remains. Open Moments and search a word from either response.
+5. In Profile, save a real partner name and relaunch. An empty/over-limit name must explain that it was not saved.
+6. Copy a JSON backup and store it outside the clipboard before any destructive action. Review it: it contains both people's responses. Clear history only after confirming the warning, then restore the valid backup. Invalid JSON must leave the current data unchanged.
+7. Use Reset sample data only for an explicitly fictional demo. Home must label it. Clear it before entering real check-ins.
+
+## Amartya's manual checks — pending
+
+These were not performed in this Linux environment:
+
+- VoiceOver reading order, labels, rotor actions and consent controls on all four screens.
+- Full small-phone/iPad and landscape layout, large text beyond the specific automated Home assertions, keyboard dismissal and interaction throughout the app.
+- Physical-device clipboard permission prompts, share sheets, backup transfer/storage and relaunch after force quit.
+- App signing, provisioning, privacy/release decisions, TestFlight/App Store distribution.
+
+Do not call these checks passed from CI screenshots alone. The app is not live until a real distribution URL exists.

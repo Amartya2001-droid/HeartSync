@@ -106,15 +106,21 @@ final class HeartSyncStore: ObservableObject {
         persistState()
     }
 
-    private func persistState() {
-        guard !isApplyingState, recoveryMessage == nil else { return }
-        guard currentState.isValid, let data = try? encoder.encode(currentState) else { return }
+    @discardableResult
+    private func persistState() -> Bool {
+        guard !isApplyingState, recoveryMessage == nil else { return false }
+        guard currentState.isValid, let data = try? encoder.encode(currentState) else { return false }
         defaults.set(data, forKey: StorageKeys.state)
         markDataUpdated()
+        return true
+    }
+
+    private var weeklyEntries: [DailyCheckIn] {
+        HomeOverview(history: history, needsRecovery: false).days.compactMap(\.entry)
     }
 
     var snapshot: HeartSyncSnapshot {
-        let lastSeven = Array(history.prefix(7))
+        let lastSeven = weeklyEntries
         let pulse = lastSeven.isEmpty ? 0 : Int(lastSeven.map(\.connection).reduce(0, +) / lastSeven.count)
         let energyAverage = lastSeven.isEmpty ? 0 : Int(lastSeven.map(\.energy).reduce(0, +) / lastSeven.count)
         let connectionAverage = lastSeven.isEmpty ? 0 : Int(lastSeven.map(\.connection).reduce(0, +) / lastSeven.count)
@@ -145,6 +151,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var hasCurrentBackupExport: Bool {
+        guard recoveryMessage == nil else { return false }
         guard let dataUpdatedAt else { return lastBackupExportAt != nil }
         guard let lastBackupExportAt else { return false }
         return lastBackupExportAt >= dataUpdatedAt
@@ -159,6 +166,9 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var exportStatus: ExportStatusSnapshot {
+        if let recoveryMessage {
+            return ExportStatusSnapshot(title: "Recover local data before exporting", detail: recoveryMessage, isCurrent: false)
+        }
         guard hasHistory else {
             return ExportStatusSnapshot(
                 title: "Backup export is optional right now",
@@ -191,7 +201,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var recommendedAction: String {
-        if history.isEmpty {
+        if weeklyEntries.isEmpty {
             return "Start with one check-in so HeartSync has a real signal to work from."
         }
 
@@ -207,9 +217,9 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var recommendedRituals: [RitualRecommendation] {
-        if history.isEmpty {
+        if weeklyEntries.isEmpty {
             return [
-                RitualRecommendation(id: "first-checkin", title: "Log the first check-in", detail: "Capture today’s energy, connection, and one honest note.", symbol: "square.and.pencil"),
+                RitualRecommendation(id: "first-checkin", title: "Log a check-in", detail: "Capture today’s energy, connection, and one honest note.", symbol: "square.and.pencil"),
                 RitualRecommendation(id: "small-intention", title: "Set one tiny intention", detail: "Choose a next step simple enough to follow through tonight.", symbol: "target"),
                 RitualRecommendation(id: "build-streak", title: "Build the baseline", detail: "Two or three entries are enough to make the dashboard more useful.", symbol: "flame")
             ]
@@ -225,7 +235,7 @@ final class HeartSyncStore: ObservableObject {
 
         if snapshot.weeklyAverageEnergy <= 3 {
             return [
-                RitualRecommendation(id: "light", title: "Keep it light", detail: "Choose a short check-in instead of a heavy conversation.", symbol: "feather.fill"),
+                RitualRecommendation(id: "light", title: "Keep it light", detail: "Choose a short check-in instead of a heavy conversation.", symbol: "leaf.fill"),
                 RitualRecommendation(id: "rest", title: "Protect rest", detail: "Make the supportive move the one that reduces effort tonight.", symbol: "moon.zzz.fill"),
                 RitualRecommendation(id: "tomorrow", title: "Plan one thing", detail: "Pick a tiny tomorrow action while energy is still low.", symbol: "calendar.badge.clock")
             ]
@@ -239,8 +249,8 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var weeklyStory: String {
-        if history.isEmpty {
-            return "HeartSync is ready, but it needs a first check-in before the weekly story becomes meaningful."
+        if weeklyEntries.isEmpty {
+            return "No check-ins were recorded in the last seven days. Older entries remain in Moments; no current relationship score is assumed."
         }
 
         if snapshot.relationshipPulse >= 4 && snapshot.streakDays >= 3 {
@@ -378,6 +388,13 @@ final class HeartSyncStore: ObservableObject {
         }
     }
 
+    private func weeklyRatingLabel(_ keyPath: KeyPath<DailyCheckIn, Int>) -> String {
+        let entries = weeklyEntries
+        guard !entries.isEmpty else { return "not recorded" }
+        let average = Double(entries.reduce(0) { $0 + $1[keyPath: keyPath] }) / Double(entries.count)
+        return "\(average.formatted(.number.precision(.fractionLength(1))))/5"
+    }
+
     var weeklySummaryTitle: String {
         "HeartSync weekly summary"
     }
@@ -394,7 +411,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var strongestMomentSummary: String {
-        guard let strongest = history.max(by: compareMomentsForStrength) else {
+        guard let strongest = weeklyEntries.max(by: compareMomentsForStrength) else {
             return "No standout moment captured yet."
         }
 
@@ -404,7 +421,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var needsCareSummary: String {
-        guard let lowest = history.min(by: compareMomentsForStrength) else {
+        guard let lowest = weeklyEntries.min(by: compareMomentsForStrength) else {
             return "No lower-connection moment captured yet."
         }
 
@@ -414,7 +431,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     var weeklySummaryText: String {
-        let latestMoment = history.first?.note.isEmpty == false ? history.first?.note ?? "No recent moment captured." : "No recent moment captured."
+        let latestMoment = weeklyEntries.last.flatMap { $0.note.isEmpty ? nil : $0.note } ?? "No reflection captured in this seven-day period."
 
         return """
         \(weeklySummaryTitle)
@@ -425,9 +442,9 @@ final class HeartSyncStore: ObservableObject {
         Milestone: \(partner.milestone)
         Support focus: \(partner.supportFocus)
 
-        Relationship pulse: \(snapshot.relationshipPulse)/5
-        Average energy: \(snapshot.weeklyAverageEnergy)/5
-        Average connection: \(snapshot.weeklyAverageConnection)/5
+        Relationship pulse: \(weeklyRatingLabel(\.connection))
+        Average energy: \(weeklyRatingLabel(\.energy))
+        Average connection: \(weeklyRatingLabel(\.connection))
         Check-in streak: \(snapshot.streakDays) day(s)
 
         Weekly story:
@@ -646,9 +663,9 @@ final class HeartSyncStore: ObservableObject {
 
         Weekly range: \(weeklyDateRangeLabel)
         Readiness: \(demoReadinessSummary)
-        Relationship pulse: \(snapshot.relationshipPulse)/5
-        Average energy: \(snapshot.weeklyAverageEnergy)/5
-        Average connection: \(snapshot.weeklyAverageConnection)/5
+        Relationship pulse: \(weeklyRatingLabel(\.connection))
+        Average energy: \(weeklyRatingLabel(\.energy))
+        Average connection: \(weeklyRatingLabel(\.connection))
         """
     }
 
@@ -726,9 +743,12 @@ final class HeartSyncStore: ObservableObject {
         UIPasteboard.general.string = currentScenarioText
     }
 
-    func copyBackupExportToClipboard() {
+    @discardableResult
+    func copyBackupExportToClipboard() -> Bool {
+        guard recoveryMessage == nil, currentState.isValid else { return false }
         UIPasteboard.general.string = backupExportText
         markBackupExported()
+        return true
     }
 
     func copyReleaseSummaryToClipboard(appVersion: String, buildNumber: String, bundleIdentifier: String) {
@@ -858,9 +878,20 @@ final class HeartSyncStore: ObservableObject {
         persistHistory()
     }
 
-    func updatePartner(name: String, milestone: String, supportFocus: String) {
-        partner = PartnerProfile(name: name, milestone: milestone, supportFocus: supportFocus)
-        persistPartner()
+    @discardableResult
+    func updatePartner(name: String, milestone: String, supportFocus: String) -> Bool {
+        let candidate = PartnerProfile(
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            milestone: milestone.trimmingCharacters(in: .whitespacesAndNewlines),
+            supportFocus: supportFocus.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard recoveryMessage == nil, !candidate.name.isEmpty, HeartSyncValidation.profile(candidate) else { return false }
+        let previous = partner
+        partner = candidate
+        guard persistState() else {
+            partner = previous
+            return false
+        }
+        return true
     }
 
     func applyPreset(_ preset: DemoPreset) {
