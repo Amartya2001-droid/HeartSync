@@ -138,6 +138,7 @@ struct OnboardingSheetView: View {
                             .background(HeartSyncTheme.accent, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("onboarding.primary")
                 }
                 .padding(20)
             }
@@ -222,6 +223,7 @@ struct OnboardingSheetView: View {
     private func primaryAction() {
         switch mode {
         case .welcome:
+            selectedTab = .checkIn
             dismissSheet(.welcome)
         case .emptyHistory:
             selectedTab = .checkIn

@@ -12,6 +12,7 @@ jobs:
       - run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
   ios:
     runs-on: macos-15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Select an available iPhone simulator
@@ -33,10 +34,24 @@ jobs:
           xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync
           -destination "platform=iOS Simulator,id=$SIMULATOR_ID"
           -derivedDataPath .deriveddata -resultBundlePath TestResults.xcresult
-          CODE_SIGNING_ALLOWED=NO
+          -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
+      - name: Export simulator screenshots
+        if: always()
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            xcrun xcresulttool export attachments --path TestResults.xcresult --output-path SimulatorScreenshots
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ios-test-results
-          path: TestResults.xcresult
+          path: |
+            TestResults.xcresult
+            SimulatorScreenshots/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: home-screenshots
+          path: SimulatorScreenshots/**/*.png
           if-no-files-found: ignore

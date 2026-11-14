@@ -47,7 +47,7 @@ class RepositoryTests(unittest.TestCase):
         references = scheme.findall('.//BuildableReference')
         self.assertTrue(any(r.get('BlueprintName') == 'HeartSync' for r in references))
         tests = scheme.findall('.//TestableReference/BuildableReference')
-        self.assertEqual([r.get('BlueprintName') for r in tests], ['HeartSyncTests'])
+        self.assertEqual([r.get('BlueprintName') for r in tests], ['HeartSyncTests', 'HeartSyncUITests'])
 
 
 if __name__ == '__main__':
