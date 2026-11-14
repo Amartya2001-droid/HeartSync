@@ -5,7 +5,7 @@ struct SettingsView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @AppStorage("heartsync.shouldShowOnboarding") private var shouldShowOnboarding = true
     @FocusState private var profileField: ProfileField?
-    private enum ProfileField: Hashable { case name, milestone, focus }
+    private enum ProfileField: Hashable { case name, milestone, focus, backup }
     @State private var partnerName = ""
     @State private var milestone = ""
     @State private var supportFocus = ""
@@ -174,6 +174,12 @@ struct SettingsView: View {
                     } label: {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
                     }
+                    if saveMessage.hasPrefix("Backup") {
+                        Text(saveMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .accessibilityIdentifier("backup.status")
+                    }
 
                     Button {
                         backupImportText = UIPasteboard.general.string ?? ""
@@ -183,6 +189,7 @@ struct SettingsView: View {
                     }
 
                     TextEditor(text: $backupImportText)
+                        .focused($profileField, equals: .backup)
                         .frame(minHeight: 120)
                         .padding(8)
                         .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
