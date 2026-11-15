@@ -4,6 +4,8 @@ import UIKit
 struct SettingsView: View {
     @EnvironmentObject private var store: HeartSyncStore
     @AppStorage("heartsync.shouldShowOnboarding") private var shouldShowOnboarding = true
+    @FocusState private var profileField: ProfileField?
+    private enum ProfileField: Hashable { case name, milestone, focus, backup }
     @State private var partnerName = ""
     @State private var milestone = ""
     @State private var supportFocus = ""
@@ -26,21 +28,28 @@ struct SettingsView: View {
 
                 Section("Partner profile") {
                     TextField("Partner name", text: $partnerName)
+                        .focused($profileField, equals: .name)
+                        .accessibilityLabel("Partner name")
+                        .accessibilityIdentifier("profile.name")
                     TextField("Current milestone", text: $milestone)
+                        .focused($profileField, equals: .milestone)
+                        .accessibilityIdentifier("profile.milestone")
                     TextField("Support focus", text: $supportFocus, axis: .vertical)
+                        .focused($profileField, equals: .focus)
+                        .accessibilityIdentifier("profile.focus")
 
                     Button("Save profile") {
-                        store.updatePartner(
-                            name: partnerName.isEmpty ? "Jordan" : partnerName,
-                            milestone: milestone.isEmpty ? "This week’s reset" : milestone,
-                            supportFocus: supportFocus.isEmpty ? "More honest daily check-ins" : supportFocus
-                        )
-                        saveMessage = "Profile updated for your next demo."
+                        profileField = nil
+                        let saved = store.updatePartner(name: partnerName, milestone: milestone, supportFocus: supportFocus)
+                        saveMessage = saved ? "Profile saved locally." : "Profile was not saved. Use a name of 1–200 characters, milestone up to 500 and support focus up to 2,000. Resolve any data-recovery warning first."
                     }
-                    .foregroundStyle(HeartSyncTheme.blush)
+                    .foregroundStyle(HeartSyncTheme.ink)
+                    .disabled(store.recoveryMessage != nil)
+                    .accessibilityIdentifier("profile.save")
 
                     if !saveMessage.isEmpty {
                         Text(saveMessage)
+                            .accessibilityIdentifier("profile.status")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -161,10 +170,15 @@ struct SettingsView: View {
                     .accessibilityValue("\(store.exportStatus.title). \(store.exportStatus.detail). \(store.lastBackupExportLabel)")
 
                     Button {
-                        store.copyBackupExportToClipboard()
-                        saveMessage = "Backup export copied."
+                        saveMessage = store.copyBackupExportToClipboard() ? "Backup export copied. Store it somewhere safe; the clipboard is not a permanent backup." : "Backup was not copied. Resolve data recovery or invalid draft values first."
                     } label: {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
+                    }
+                    if saveMessage.hasPrefix("Backup") {
+                        Text(saveMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .accessibilityIdentifier("backup.status")
                     }
 
                     Button {
@@ -175,6 +189,7 @@ struct SettingsView: View {
                     }
 
                     TextEditor(text: $backupImportText)
+                        .focused($profileField, equals: .backup)
                         .frame(minHeight: 120)
                         .padding(8)
                         .background(Color.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -340,6 +355,13 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Profile")
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { profileField = nil }
+                        .accessibilityIdentifier("profile.keyboardDone")
+                }
+            }
             .confirmationDialog("Start fresh?", isPresented: $showRecoveryResetConfirmation, titleVisibility: .visible) {
                 Button("Keep unreadable copy and start fresh", role: .destructive) { store.startFreshAfterRecovery() }
             } message: {

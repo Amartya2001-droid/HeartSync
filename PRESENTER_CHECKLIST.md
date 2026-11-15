@@ -1,33 +1,9 @@
-# HeartSync Presenter Checklist
+# Presenter checklist
 
-## Before presenting
-
-- Open the app once and confirm it lands on the expected sample state.
-- Go to Profile and scan the `Demo readiness` summary.
-- If needed, go to Profile and tap `Reset sample data`, then confirm the reset.
-- Choose the preset you want to present.
-- Decide whether you want to show onboarding.
-- Keep one example note and one example intention in mind for the live check-in.
-
-## During presenting
-
-- Start on Home.
-- Explain the pulse, streak, weekly range, connection trend, and weekly story first.
-- Use Home quick actions to open Check-In.
-- Show the daily check-in flow, including coaching hints and prompt suggestions.
-- Point out the saved confirmation after logging a check-in.
-- Return to Home or Moments to show the saved result, then search, sort, recover from an empty state, or share one Moment.
-- End with summary sharing, presenter talk-track copy, full-history copy, or presets from Profile.
-
-## If something goes wrong
-
-- Reset sample data.
-- Replay onboarding.
-- Switch to a simpler preset and continue.
-
-## Best flow when short on time
-
-1. Home
-2. Check-In
-3. Home again
-4. Share weekly summary
+- Use a dedicated simulator or an explicitly fictional sample profile. Do not overwrite real data for a demo.
+- Check the latest PR's CI and inspect its captures; keep [the QA checklist](QA_CHECKLIST.md) open for manual checks.
+- Show Home → your reflection → partner consent → shared summary → relaunch → Moments.
+- Demonstrate a valid Profile save and the clear error for invalid input.
+- Review and safely store a JSON backup before clearing or resetting data. Backups include both responses; text/share exports contain the first person's response only.
+- Say plainly: shared device, local storage, no account/sync, no live distribution URL. Rule-based prompts are not medical advice or measured product outcomes.
+- Leave Xcode/device review, VoiceOver approval and signing/distribution decisions with Amartya.
