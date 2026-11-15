@@ -24,6 +24,31 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testRecoveryRejectsUnavailableMutationsWithoutReplacingUnreadableData() throws {
+        let corrupt = Data("Unreadable QA fixture".utf8)
+        defaults.set(corrupt, forKey: "heartsync.state.v1")
+        let store = HeartSyncStore(defaults: defaults)
+        let name = store.partner.name
+        let draft = store.todayIntention
+        XCTAssertFalse(store.applyPreset(try XCTUnwrap(HeartSyncStore.demoPresets.first)))
+        XCTAssertFalse(store.resetDemoData())
+        XCTAssertFalse(store.clearAllHistory())
+        XCTAssertFalse(store.clearDraft())
+        XCTAssertEqual(store.partner.name, name)
+        XCTAssertEqual(store.todayIntention, draft)
+        XCTAssertEqual(defaults.data(forKey: "heartsync.state.v1"), corrupt)
+        XCTAssertNotNil(store.recoveryMessage)
+    }
+
+    func testClearHistoryRejectsAnInvalidDraftWithoutPretendingItPersisted() {
+        let store = HeartSyncStore(defaults: defaults)
+        let history = store.history
+        store.todayEnergy = .nan
+        XCTAssertFalse(store.clearAllHistory())
+        XCTAssertEqual(store.history, history)
+        XCTAssertEqual(HeartSyncStore(defaults: defaults).history, history)
+    }
+
     func testProfileValidationReportsFailureAndKeepsPersistedData() {
         let store = HeartSyncStore(defaults: defaults)
         XCTAssertTrue(store.updatePartner(name: "  Taylor  ", milestone: "  Our week  ", supportFocus: "  Listen  "))

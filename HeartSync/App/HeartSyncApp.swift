@@ -13,6 +13,9 @@ struct HeartSyncApp: App {
             let suite = "HeartSync.UITests"
             storage = UserDefaults(suiteName: suite)!
             if arguments.contains("--reset") { storage.removePersistentDomain(forName: suite) }
+            if arguments.contains("--unreadable-state") {
+                storage.set(Data("QA unreadable state fixture".utf8), forKey: "heartsync.state.v1")
+            }
             if arguments.contains("--skip-onboarding") {
                 storage.set(false, forKey: "heartsync.shouldShowOnboarding")
                 storage.set(true, forKey: "heartsync.hasAcknowledgedEmptyHistory")
@@ -22,7 +25,12 @@ struct HeartSyncApp: App {
         defaults = storage
         let initialStore = HeartSyncStore(defaults: storage)
         #if DEBUG
-        if arguments.contains("--ui-testing"), arguments.contains("--samples") { initialStore.resetDemoData() }
+        if arguments.contains("--ui-testing"), arguments.contains("--samples") {
+            initialStore.resetDemoData()
+            if arguments.contains("--paired-samples") {
+                initialStore.submitPartnerCheckIn(energy: 4, connection: 4, note: "Fictional partner perspective", intention: "Listen together")
+            }
+        }
         #endif
         _store = StateObject(wrappedValue: initialStore)
     }

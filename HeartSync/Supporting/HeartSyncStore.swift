@@ -822,12 +822,16 @@ final class HeartSyncStore: ObservableObject {
         saveDraft()
     }
 
-    func clearDraft() {
+    @discardableResult
+    func clearDraft() -> Bool {
+        guard recoveryMessage == nil else { return false }
+        isApplyingState = true
         todayEnergy = 3
         todayConnection = 3
         todayNote = ""
         todayIntention = ""
-        saveDraft()
+        isApplyingState = false
+        return persistState()
     }
 
     func restoreDefaultIntention() {
@@ -894,27 +898,28 @@ final class HeartSyncStore: ObservableObject {
         return true
     }
 
-    func applyPreset(_ preset: DemoPreset) {
-        partner = PartnerProfile(
-            name: preset.partnerName,
-            milestone: preset.milestone,
-            supportFocus: preset.supportFocus
-        )
-        persistPartner()
+    @discardableResult
+    func applyPreset(_ preset: DemoPreset) -> Bool {
+        updatePartner(name: preset.partnerName, milestone: preset.milestone, supportFocus: preset.supportFocus)
     }
 
-    func resetDemoData() {
-        guard recoveryMessage == nil else { return }
+    @discardableResult
+    func resetDemoData() -> Bool {
+        guard recoveryMessage == nil else { return false }
         apply(StoredHeartSyncState(partner: HeartSyncSampleData.partner, history: HeartSyncSampleData.history,
             draft: CheckInDraft(energy: 4, connection: 5, note: "", intention: defaultIntentionText), containsSampleData: true))
-        persistState()
+        return persistState()
     }
 
-    func clearAllHistory() {
-        guard recoveryMessage == nil else { return }
-        containsSampleData = false
-        history = []
-        persistHistory()
+    @discardableResult
+    func clearAllHistory() -> Bool {
+        guard recoveryMessage == nil else { return false }
+        var cleared = currentState
+        cleared.containsSampleData = false
+        cleared.history = []
+        guard cleared.isValid else { return false }
+        apply(cleared)
+        return persistState()
     }
 
     private func markDataUpdated() {
