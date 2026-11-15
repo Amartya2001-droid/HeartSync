@@ -37,4 +37,4 @@ Do not call these checks passed from CI screenshots alone. The app is not live u
 
 ## Handoff completion gate
 
-A pushed branch, a green run, and a drafted report are not completion. Before ending: confirm tests on the exact head, create the PR, post the daily-log report with its link, and confirm the comment call succeeded. The Day 6 CI wait performs PR creation and reporting in the same continuation after green results, so it does not depend on a separate return to the task. If CI fails, fix the failure and repeat the gate; never publish a passing claim for a failed run.
+A pushed branch, a green run, and a drafted report are not completion. Before ending: confirm tests on the exact head, create the PR, post the daily-log report with its link, and confirm the comment call succeeded. If CI fails, fix the failure and repeat the gate; never publish a passing claim for a failed run.

@@ -76,6 +76,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         restore.tap()
         app.buttons["Restore backup"].tap()
         let status = app.staticTexts["backup.restoreStatus"]
+        seekProfile(status, in: app, upward: true)
         XCTAssertTrue(status.waitForExistence(timeout: 5))
         XCTAssertTrue(status.label.contains("Backup restored"))
         screenshot(app, name: "Restore result remains beside backup controls")
@@ -86,7 +87,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertTrue(app.buttons["home.primaryAction"].label.contains("View your shared check-in"))
         reveal(app.buttons["home.primaryAction"], in: app)
         app.buttons["home.primaryAction"].tap()
-        XCTAssertTrue(app.staticTexts["Fictional partner perspective"].exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Fictional partner perspective")).firstMatch.exists)
     }
 
     func testRecoveryDisablesUnavailableActionsAndExplicitFreshStartPersists() {
@@ -109,7 +110,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         let fresh = app.buttons["recovery.startFresh"]
         seekProfile(fresh, in: app, upward: false)
         fresh.tap()
-        app.buttons["recovery.confirmFresh"].tap()
+        app.buttons["Keep unreadable copy and start fresh"].tap()
         app.tabBars.buttons["Home"].tap()
         XCTAssertTrue(primary.label.contains("Start today’s check-in"))
         app.terminate()
