@@ -20,6 +20,17 @@ final class HeartSyncFlowUITests: XCTestCase {
         XCTAssertTrue(element.exists && element.isHittable, "Element should be reachable by scrolling: \(element)")
     }
 
+    private func seekProfile(_ element: XCUIElement, in app: XCUIApplication, upward: Bool) {
+        for _ in 0..<14 {
+            if element.exists && element.isHittable { return }
+            // Drag in the form's margin so a nested JSON editor cannot consume the scroll.
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: upward ? 0.75 : 0.30))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: upward ? 0.30 : 0.75))
+            start.press(forDuration: 0.05, thenDragTo: end)
+        }
+        XCTAssertTrue(element.exists && element.isHittable, "Profile control must be reachable: \(element)")
+    }
+
     private func assertWithinScreenWidth(_ element: XCUIElement, in app: XCUIApplication) {
         XCTAssertGreaterThanOrEqual(element.frame.minX, app.frame.minX, "Leading edge must not be clipped")
         XCTAssertLessThanOrEqual(element.frame.maxX, app.frame.maxX, "Trailing edge must not be clipped")
@@ -30,6 +41,83 @@ final class HeartSyncFlowUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    func testCancelClearThenRestorePairedBackupAndRelaunch() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--samples", "--paired-samples"]
+        app.launch()
+        XCTAssertTrue(app.buttons["home.primaryAction"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["home.primaryAction"].label.contains("View your shared check-in"))
+        app.tabBars.buttons["Profile"].tap()
+        let copy = app.buttons["backup.copy"]
+        seekProfile(copy, in: app, upward: true)
+        copy.tap()
+        let clear = app.buttons["data.clearHistory"]
+        seekProfile(clear, in: app, upward: true)
+        clear.tap()
+        app.buttons["Cancel"].tap()
+        app.tabBars.buttons["Home"].tap()
+        XCTAssertTrue(app.buttons["home.primaryAction"].label.contains("View your shared check-in"))
+
+        app.tabBars.buttons["Profile"].tap()
+        seekProfile(clear, in: app, upward: true)
+        clear.tap()
+        app.buttons["Clear history"].tap()
+        let notNow = app.buttons["Not now"]
+        XCTAssertTrue(notNow.waitForExistence(timeout: 10))
+        notNow.tap()
+        let paste = app.buttons["backup.paste"]
+        seekProfile(paste, in: app, upward: false)
+        paste.tap()
+        let restore = app.buttons["backup.restore"]
+        seekProfile(restore, in: app, upward: true)
+        XCTAssertTrue(restore.isEnabled)
+        restore.tap()
+        app.buttons["Restore backup"].tap()
+        let status = app.staticTexts["backup.restoreStatus"]
+        seekProfile(status, in: app, upward: true)
+        XCTAssertTrue(status.waitForExistence(timeout: 5))
+        XCTAssertTrue(status.label.contains("Backup restored"))
+        screenshot(app, name: "Restore result remains beside backup controls")
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--skip-onboarding"]
+        app.launch()
+        XCTAssertTrue(app.buttons["home.primaryAction"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["home.primaryAction"].label.contains("View your shared check-in"))
+        reveal(app.buttons["home.primaryAction"], in: app)
+        app.buttons["home.primaryAction"].tap()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Fictional partner perspective")).firstMatch.exists)
+    }
+
+    func testRecoveryDisablesUnavailableActionsAndExplicitFreshStartPersists() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--unreadable-state"]
+        app.launch()
+        let primary = app.buttons["home.primaryAction"]
+        XCTAssertTrue(primary.waitForExistence(timeout: 15))
+        XCTAssertTrue(primary.label.contains("Recover saved data"))
+        reveal(primary, in: app)
+        primary.tap()
+        XCTAssertFalse(app.buttons["profile.save"].isEnabled)
+        let reset = app.buttons["data.resetSamples"]
+        seekProfile(reset, in: app, upward: true)
+        XCTAssertFalse(reset.isEnabled)
+        let clear = app.buttons["data.clearHistory"]
+        seekProfile(clear, in: app, upward: true)
+        XCTAssertFalse(clear.isEnabled)
+        XCTAssertFalse(app.buttons["data.clearDraft"].isEnabled)
+        let fresh = app.buttons["recovery.startFresh"]
+        seekProfile(fresh, in: app, upward: false)
+        fresh.tap()
+        app.buttons["Keep unreadable copy and start fresh"].tap()
+        app.tabBars.buttons["Home"].tap()
+        XCTAssertTrue(primary.label.contains("Start today’s check-in"))
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--skip-onboarding"]
+        app.launch()
+        XCTAssertTrue(primary.waitForExistence(timeout: 15))
+        XCTAssertTrue(primary.label.contains("Start today’s check-in"))
     }
 
     func testProfileValidationAndRelaunchKeepTheLastSavedName() {

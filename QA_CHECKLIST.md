@@ -7,6 +7,8 @@ Run the shared `HeartSync` scheme with `xcodebuild test` (the README has the com
 - First launch enters Check-In without a second empty-history sheet.
 - Home leads to a saved reflection, partner consent is required, both perspectives produce a shared summary, and relaunch preserves the pair.
 - Empty/sample Home primary actions remain reachable and within the screen at accessibility text size. Captures are exported for inspection.
+- Cancelling clear-history preserves the shared check-in; a confirmed clear followed by a copied JSON restore brings both perspectives back after relaunch. Restore feedback remains beside the restore controls.
+- Unreadable-state recovery disables profile/preset/sample/clear actions. An explicitly confirmed fresh start persists an empty state; unit tests verify unreadable bytes are retained and blocked actions do not mutate the recovery state.
 - Profile accepts a valid name, explains an oversized name without claiming success, and relaunch retains the last saved name.
 - Unit regressions cover profile rollback, unreadable-state backup rejection, calendar-week bounds, supported ritual symbols, backup validation, migration and both-response persistence.
 
@@ -32,3 +34,7 @@ These were not performed in this Linux environment:
 - App signing, provisioning, privacy/release decisions, TestFlight/App Store distribution.
 
 Do not call these checks passed from CI screenshots alone. The app is not live until a real distribution URL exists.
+
+## Handoff completion gate
+
+A pushed branch, a green run, and a drafted report are not completion. Before ending: confirm tests on the exact head, create the PR, post the daily-log report with its link, and confirm the comment call succeeded. If CI fails, fix the failure and repeat the gate; never publish a passing claim for a failed run.

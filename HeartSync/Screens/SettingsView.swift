@@ -10,6 +10,8 @@ struct SettingsView: View {
     @State private var milestone = ""
     @State private var supportFocus = ""
     @State private var backupImportText = ""
+    @State private var backupCopyMessage = ""
+    @State private var backupRestoreMessage = ""
     @State private var saveMessage = ""
     @State private var showResetConfirmation = false
     @State private var showClearHistoryConfirmation = false
@@ -23,6 +25,7 @@ struct SettingsView: View {
                     Section("Recover local data") {
                         Text(message)
                         Button("Start fresh", role: .destructive) { showRecoveryResetConfirmation = true }
+                            .accessibilityIdentifier("recovery.startFresh")
                     }
                 }
 
@@ -58,7 +61,7 @@ struct SettingsView: View {
                 Section("Demo presets") {
                     ForEach(HeartSyncStore.demoPresets) { preset in
                         Button {
-                            store.applyPreset(preset)
+                            guard store.applyPreset(preset) else { saveMessage = "Preset was not saved. Resolve data recovery first."; return }
                             partnerName = preset.partnerName
                             milestone = preset.milestone
                             supportFocus = preset.supportFocus
@@ -73,6 +76,8 @@ struct SettingsView: View {
                         }
                     }
                 }
+
+                .disabled(store.recoveryMessage != nil)
 
                 Section("Current scenario") {
                     Text(store.currentScenarioSummary)
@@ -94,6 +99,8 @@ struct SettingsView: View {
                         showResetConfirmation = true
                     }
                     .foregroundStyle(.red)
+                    .disabled(store.recoveryMessage != nil)
+                    .accessibilityIdentifier("data.resetSamples")
 
                     Button("Replay onboarding") {
                         shouldShowOnboarding = true
@@ -170,23 +177,26 @@ struct SettingsView: View {
                     .accessibilityValue("\(store.exportStatus.title). \(store.exportStatus.detail). \(store.lastBackupExportLabel)")
 
                     Button {
-                        saveMessage = store.copyBackupExportToClipboard() ? "Backup export copied. Store it somewhere safe; the clipboard is not a permanent backup." : "Backup was not copied. Resolve data recovery or invalid draft values first."
+                        backupCopyMessage = store.copyBackupExportToClipboard() ? "Backup export copied. Store it somewhere safe; the clipboard is not a permanent backup." : "Backup was not copied. Resolve data recovery or invalid draft values first."
                     } label: {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
                     }
-                    if saveMessage.hasPrefix("Backup") {
-                        Text(saveMessage)
+                    .accessibilityIdentifier("backup.copy")
+                    if !backupCopyMessage.isEmpty {
+                        Text(backupCopyMessage)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .accessibilityIdentifier("backup.status")
                     }
 
                     Button {
+                        backupRestoreMessage = ""
                         backupImportText = UIPasteboard.general.string ?? ""
                         saveMessage = backupImportText.isEmpty ? "Clipboard did not contain backup text." : "Backup text pasted from clipboard."
                     } label: {
                         Label("Paste copied backup", systemImage: "doc.on.clipboard")
                     }
+                    .accessibilityIdentifier("backup.paste")
 
                     TextEditor(text: $backupImportText)
                         .focused($profileField, equals: .backup)
@@ -198,17 +208,25 @@ struct SettingsView: View {
                                 .stroke(HeartSyncTheme.cardBorder, lineWidth: 1)
                         )
                         .accessibilityLabel("Backup JSON input")
+                        .accessibilityIdentifier("backup.input")
 
                     Text(store.backupPreviewSummary(for: backupImportText))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
 
                     Button {
+                        backupRestoreMessage = ""
                         showRestoreBackupConfirmation = true
                     } label: {
                         Label("Restore from pasted backup", systemImage: "arrow.clockwise")
                     }
                     .disabled(backupImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("backup.restore")
+                    if !backupRestoreMessage.isEmpty {
+                        Text(backupRestoreMessage)
+                            .font(.footnote)
+                            .accessibilityIdentifier("backup.restoreStatus")
+                    }
                 }
 
                 Section("Local demo data") {
@@ -217,16 +235,19 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
 
                     Button {
-                        store.clearDraft()
-                        saveMessage = "Current check-in draft cleared."
+                        saveMessage = store.clearDraft() ? "Current check-in draft cleared." : "Draft was not cleared. Resolve data recovery first."
                     } label: {
                         Label("Clear current draft", systemImage: "eraser")
                     }
+                    .disabled(store.recoveryMessage != nil)
+                    .accessibilityIdentifier("data.clearDraft")
 
                     Button("Clear all moments history") {
                         showClearHistoryConfirmation = true
                     }
                     .foregroundStyle(.red)
+                    .disabled(store.recoveryMessage != nil)
+                    .accessibilityIdentifier("data.clearHistory")
                 }
 
                 Section("Demo readiness") {
@@ -364,6 +385,7 @@ struct SettingsView: View {
             }
             .confirmationDialog("Start fresh?", isPresented: $showRecoveryResetConfirmation, titleVisibility: .visible) {
                 Button("Keep unreadable copy and start fresh", role: .destructive) { store.startFreshAfterRecovery() }
+                    .accessibilityIdentifier("recovery.confirmFresh")
             } message: {
                 Text("This replaces the active local state with an empty history. The unreadable state is kept on this device for troubleshooting; it is not a usable backup.")
             }
@@ -373,7 +395,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button("Reset sample data", role: .destructive) {
-                    store.resetDemoData()
+                    guard store.resetDemoData() else { saveMessage = "Sample data was not loaded. Resolve data recovery first."; return }
                     partnerName = store.partner.name
                     milestone = store.partner.milestone
                     supportFocus = store.partner.supportFocus
@@ -397,7 +419,7 @@ struct SettingsView: View {
                         supportFocus = store.partner.supportFocus
                         backupImportText = ""
                     }
-                    saveMessage = result.detail
+                    backupRestoreMessage = "\(result.title): \(result.detail)"
                 }
 
                 Button("Cancel", role: .cancel) { }
@@ -410,8 +432,7 @@ struct SettingsView: View {
                 titleVisibility: .visible
             ) {
                 Button("Clear history", role: .destructive) {
-                    store.clearAllHistory()
-                    saveMessage = "All moments history cleared."
+                    saveMessage = store.clearAllHistory() ? "All moments history cleared." : "History was not cleared. Resolve data recovery or invalid draft values first."
                 }
 
                 Button("Cancel", role: .cancel) { }
