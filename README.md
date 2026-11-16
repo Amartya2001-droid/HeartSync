@@ -33,6 +33,12 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## Branding and launch assets (#1)
+
+The review candidate uses a paired-heart icon and **A small pause, together** lockup in welcome/About, with a native warm launch background and clearer shared-device/empty-state copy. The app icon is a full-square opaque 1024×1024 RGB PNG; iOS supplies the mask. The original AI-generated candidate and its asset exports are recorded in [the asset guide](release/ASSET_GUIDE.md).
+
+[Candidate store copy](release/APP_STORE_COPY.json) describes the actual local couples flow. It has not been submitted. The existing bundle identity and configured version/build are retained; no signing, registration or release approval is implied. Support/privacy/distribution URLs remain unset rather than invented. Final branding, store screenshots/privacy answers, Xcode/device/VoiceOver review and signing/distribution await Amartya. Merges belong to Scipio; agent-created PRs stay open for review.
+
 ## QA and demo (#2)
 
 Profile saves now validate and trim input, report persistence failure, and preserve the last saved profile instead of claiming success for unsaved edits. Backup copy refuses unreadable/invalid active state and does not mark it current. Weekly summary statistics use actual calendar days ending today, show unrecorded periods explicitly, and retain fractional averages in text exports. The unsupported ritual symbol `feather.fill` is replaced with `leaf.fill`.

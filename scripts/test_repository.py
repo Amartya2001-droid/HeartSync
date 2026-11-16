@@ -1,5 +1,8 @@
 """Portable documentation and shared-scheme smoke checks (not iOS tests)."""
 import pathlib
+import json
+import plistlib
+import struct
 import re
 import unittest
 import xml.etree.ElementTree as ET
@@ -41,6 +44,28 @@ class RepositoryTests(unittest.TestCase):
         compiled = [re.search(r'fileRef = ([A-F0-9]{24})', objects[item]).group(1) for item in build_ids]
         self.assertEqual(len(compiled), len(set(compiled)), 'Duplicate compiled source')
         self.assertEqual(set(compiled), set(paths), 'App target must compile every app Swift file')
+
+    def test_launch_assets_and_candidate_copy(self):
+        catalog = ROOT / 'HeartSync/Assets.xcassets'
+        icon_set = catalog / 'AppIcon.appiconset'
+        manifest = json.loads((icon_set / 'Contents.json').read_text())
+        for item in manifest['images']:
+            data = (icon_set / item['filename']).read_bytes()
+            self.assertEqual(data[:8], b'\x89PNG\r\n\x1a\n')
+            width, height, depth, color_type = struct.unpack('>IIBB', data[16:26])
+            self.assertEqual((width, height), (1024, 1024))
+            self.assertEqual((depth, color_type), (8, 2), 'App icon must be RGB without an alpha channel')
+        info = plistlib.loads((ROOT / 'HeartSync/Supporting/Info.plist').read_bytes())
+        color_name = info['UILaunchScreen']['UIColorName']
+        self.assertTrue((catalog / (color_name + '.colorset') / 'Contents.json').is_file())
+        project = (ROOT / 'HeartSync.xcodeproj/project.pbxproj').read_text()
+        self.assertEqual(project.count('INFOPLIST_FILE = HeartSync/Supporting/Info.plist;'), 2)
+        copy = json.loads((ROOT / 'release/APP_STORE_COPY.json').read_text())
+        for key, maximum in [('name', 30), ('subtitle', 30), ('promotional_text', 170), ('description', 4000), ('keywords', 100)]:
+            self.assertGreater(len(copy[key]), 0, key)
+            self.assertLessEqual(len(copy[key]), maximum, key)
+        self.assertEqual(copy['status'], 'candidate-not-submitted')
+        self.assertIsNone(copy['distribution_url'])
 
     def test_shared_scheme_includes_app_and_tests(self):
         scheme = ET.parse(ROOT / 'HeartSync.xcodeproj/xcshareddata/xcschemes/HeartSync.xcscheme')

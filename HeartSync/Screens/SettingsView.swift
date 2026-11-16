@@ -372,6 +372,16 @@ struct SettingsView: View {
                     Label("Push notifications", systemImage: "minus.circle")
                     Label("Multi-user collaboration or backend APIs", systemImage: "minus.circle")
                 }
+
+                Section("About HeartSync") {
+                    HeartSyncBrandLockup()
+                    Text(HeartSyncBrand.sharedDeviceNotice)
+                    Text("Version \(appVersion) (\(buildNumber))")
+                        .font(.caption)
+                    Text("No account or partner sync. Reflection prompts are not medical advice.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
