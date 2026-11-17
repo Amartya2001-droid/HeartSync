@@ -1,0 +1,12 @@
+{
+  "status": "candidate-not-submitted",
+  "name": "HeartSync",
+  "subtitle": "A small pause, together",
+  "promotional_text": "Share two perspectives, choose one small intention, and revisit the moments that matter. A daily reflection space for two people on one device.",
+  "description": "Make space to listen to each other. HeartSync helps two people sharing one device record how their day felt, add a reflection and choose an intention.\n\nStart with your own energy and connection check-in. When your partner is ready, pass the device so they can enter their own perspective and consent before saving. A rule-based conversation prompt gives you somewhere to begin listening.\n\nRevisit saved check-ins in Moments, search reflections and intentions, and see your recorded days on Home. Export a JSON backup before uninstalling or clearing data, and restore a reviewed backup when needed. Fictional samples are explicitly labelled.\n\nHeartSync has no account system or remote partner sync. Responses are visible to anyone using the app on the device, and JSON backups include both perspectives. Reflection prompts are not medical advice or a relationship diagnosis.",
+  "keywords": "couples,check-in,reflection,journal,intention,relationship",
+  "suggested_category": "Lifestyle",
+  "support_url": null,
+  "privacy_policy_url": null,
+  "distribution_url": null
+}

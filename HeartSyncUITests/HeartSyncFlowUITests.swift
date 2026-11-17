@@ -152,13 +152,20 @@ final class HeartSyncFlowUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset"]
         app.launch()
+        let brand = app.staticTexts["brand.name"]
+        XCTAssertTrue(brand.waitForExistence(timeout: 15))
+        XCTAssertEqual(brand.label, "HeartSync")
+        let disclosure = app.staticTexts["brand.privacy"]
+        XCTAssertTrue(disclosure.exists)
+        XCTAssertTrue(disclosure.label.contains("same device"))
+        screenshot(app, name: "Welcome brand and shared-device disclosure")
         let start = app.buttons["onboarding.primary"]
         XCTAssertTrue(start.waitForExistence(timeout: 15))
         reveal(start, in: app)
         start.tap()
         XCTAssertTrue(app.navigationBars["Check-In"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["checkIn.save"].exists)
-        XCTAssertFalse(app.staticTexts["Moments history was cleared"].exists)
+        XCTAssertFalse(app.staticTexts["onboarding.recoveryTitle"].exists)
     }
 
     func testCouplesCheckInConsentSummaryAndRelaunch() {

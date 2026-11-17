@@ -24,6 +24,18 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testBundledBrandAssetsAndLaunchMetadataArePresent() throws {
+        XCTAssertNotNil(UIImage(named: "HeartSyncBrandMark"))
+        XCTAssertNotNil(UIColor(named: "HeartSyncLaunchBackground"))
+        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String, "HeartSync")
+        let launch = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: "UILaunchScreen") as? [String: Any])
+        XCTAssertEqual(launch["UIColorName"] as? String, "HeartSyncLaunchBackground")
+        for key in ["CFBundleShortVersionString", "CFBundleVersion"] {
+            let value = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: key) as? String)
+            XCTAssertNotNil(value.range(of: #"^\d+(\.\d+){0,2}$"#, options: .regularExpression), key)
+        }
+    }
+
     func testRecoveryRejectsUnavailableMutationsWithoutReplacingUnreadableData() throws {
         let corrupt = Data("Unreadable QA fixture".utf8)
         defaults.set(corrupt, forKey: "heartsync.state.v1")

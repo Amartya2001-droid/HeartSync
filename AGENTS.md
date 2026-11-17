@@ -1,6 +1,6 @@
 # HeartSync agent rules
 
-1. Work on a branch. Open a pull request for every change. Never push directly to main.
+1. Work on a branch. Open a pull request for every change. Never push directly to main. Never self-merge: merges belong to Scipio under the delegated authority; leave PRs open for review.
 2. Tests must pass before a PR is opened. If the repo has no tests, add a smoke test for what you changed.
 3. Never commit secrets, API keys or credentials. Never invent credentials, licences or metrics.
 4. Keep the README honest: what works, what is live, and the live URL.

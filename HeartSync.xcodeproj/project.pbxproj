@@ -29,6 +29,7 @@
 		8C9367E28284EEFDD937486C /* StoredHeartSyncState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64744E423117108570F9E85C /* StoredHeartSyncState.swift */; };
 		C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32F3F28C5D0449693592238 /* HomeOverview.swift */; };
 		9B9F12C4055D03A8E4B7FB10 /* HeartSyncFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */; };
+		791F1847F05FC4D479A1D5D6 /* HeartSyncBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +75,8 @@
 		C32F3F28C5D0449693592238 /* HomeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeOverview.swift; sourceTree = "<group>"; };
 		DAB8ACA82DB04D9A959782BD /* HeartSyncUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HeartSyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncFlowUITests.swift; sourceTree = "<group>"; };
+		CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncBrand.swift; sourceTree = "<group>"; };
+		B78C606B9DBC5F8A0E0EAADC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +181,7 @@
 		1B84F6CB2A6DAAAC44DC5A0C /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
+				B78C606B9DBC5F8A0E0EAADC /* Info.plist */,
 				AEB300002D00000100AA0001 /* HeartSyncStore.swift */,
 				AEB300022D00000100AA0001 /* HeartSyncTheme.swift */,
 			);
@@ -187,6 +191,7 @@
 		54FE5E34995DE10F87DF7B85 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */,
 				AEB300042D00000100AA0001 /* MetricCard.swift */,
 			);
 			path = Components;
@@ -347,6 +352,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEB300092D00000100AA0001 /* CheckInView.swift in Sources */,
+				791F1847F05FC4D479A1D5D6 /* HeartSyncBrand.swift in Sources */,
 				C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */,
 				8C9367E28284EEFDD937486C /* StoredHeartSyncState.swift in Sources */,
 				9842F7D9F7898491150987D2 /* CoupleCheckInView.swift in Sources */,
@@ -532,7 +538,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = HeartSync;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_FILE = HeartSync/Supporting/Info.plist;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -562,7 +568,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = HeartSync;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_FILE = HeartSync/Supporting/Info.plist;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

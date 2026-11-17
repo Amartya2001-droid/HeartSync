@@ -273,7 +273,7 @@ struct JournalView: View {
 
         switch selectedFilter {
         case .all:
-            return "No moments yet"
+            return "Your story starts here"
         case .strong:
             return "No strong days captured yet"
         case .care:
@@ -288,7 +288,7 @@ struct JournalView: View {
 
         switch selectedFilter {
         case .all:
-            return "Complete a check-in and it will show up here as part of your shared story."
+            return "Save your first check-in and it will appear here. Add your partner’s perspective when you’re both ready."
         case .strong:
             return "Once a higher-connection day is logged, this filter will make those bright spots easy to revisit."
         case .care:

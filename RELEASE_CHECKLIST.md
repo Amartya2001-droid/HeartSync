@@ -1,42 +1,26 @@
-# HeartSync Release Checklist
+# HeartSync release checklist
 
-## In Xcode
+The app is **not live**. This checklist separates a tested source build from release approval.
 
-- Confirm the active developer directory points to full Xcode
-- Build the `HeartSync` scheme
-- Run the `HeartSyncTests` target
-- Run on at least one Simulator
-- Run on one physical device if available
-- Check the onboarding sheet presentation
-- Check tab navigation and safe-area spacing
+## Source/CI review
 
-## Functional verification
+- Review the feature PR and exact-head CI. Scipio owns merges; the agent must not self-merge.
+- Run the shared `HeartSync` scheme, including unit and UI test targets.
+- Inspect exported simulator captures and follow [QA_CHECKLIST.md](QA_CHECKLIST.md).
+- Review the candidate icon, metadata and copy in [release/ASSET_GUIDE.md](release/ASSET_GUIDE.md).
+- Confirm fresh install, paired check-in/relaunch, profile validation, backup restore/cancel and unreadable-state recovery.
 
-- Save a new daily check-in
-- Update an existing same-day check-in
-- Search Moments
-- Sort Moments newest-first and oldest-first
-- Share one individual moment
-- Copy weekly summary
-- Copy presenter talk track
-- Copy latest moment
-- Copy full moments history
-- Copy backup export and confirm `Data safety` updates
-- Paste a copied backup, confirm the preview looks correct, and confirm restore replaces profile, moments, and draft state
-- Reset sample data and confirm the app returns to the default scenario
-- Clear all moments history and confirm the recovery sheet offers a new first check-in or sample-data restore
+## Amartya's Xcode/device/VoiceOver review — pending
 
-## Content verification
+- Inspect the icon on a real Home Screen and the native launch background.
+- Review onboarding, all four tabs, empty/recovery states, keyboard and share/clipboard flows.
+- Check VoiceOver reading order and consent, Dynamic Type, small-phone/iPad and landscape layouts beyond the focused CI assertions.
+- Review local persistence and both-response JSON backups on device; store a backup safely before destructive tests.
 
-- Confirm the selected preset matches the intended demo story
-- Confirm `Demo readiness` shows the expected state
-- Confirm `Backup export is current` flips back to pending after a later edit
-- Confirm the weekly range label looks correct
-- Confirm exported text includes timestamp context
+## Distribution decisions — pending Amartya
 
-## Delivery
-
-- Capture screenshots if needed
-- Share `DEMO_SCRIPT.md`
-- Share `PRESENTER_CHECKLIST.md`
-- Share `FINAL_HANDOFF.md`
+- Confirm bundle registration, developer team, provisioning and final version/build numbers.
+- Approve branding and real App Store screenshot/device classes and copy.
+- Supply/approve real support and privacy-policy destinations and complete privacy/required-reason API review.
+- Configure signing and choose TestFlight/App Store distribution. Do not commit credentials or signing secrets.
+- Record the real distribution URL in the README only after release. Do not mark this checklist complete from a green simulator run alone.
