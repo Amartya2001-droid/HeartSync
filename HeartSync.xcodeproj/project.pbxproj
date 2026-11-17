@@ -30,6 +30,7 @@
 		C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32F3F28C5D0449693592238 /* HomeOverview.swift */; };
 		9B9F12C4055D03A8E4B7FB10 /* HeartSyncFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */; };
 		791F1847F05FC4D479A1D5D6 /* HeartSyncBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */; };
+		5A3821C42F5AF046E04FCA26 /* HeartSyncBackupDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncFlowUITests.swift; sourceTree = "<group>"; };
 		CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncBrand.swift; sourceTree = "<group>"; };
 		B78C606B9DBC5F8A0E0EAADC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncBackupDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +183,7 @@
 		1B84F6CB2A6DAAAC44DC5A0C /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
+				B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */,
 				B78C606B9DBC5F8A0E0EAADC /* Info.plist */,
 				AEB300002D00000100AA0001 /* HeartSyncStore.swift */,
 				AEB300022D00000100AA0001 /* HeartSyncTheme.swift */,
@@ -352,6 +355,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEB300092D00000100AA0001 /* CheckInView.swift in Sources */,
+				5A3821C42F5AF046E04FCA26 /* HeartSyncBackupDocument.swift in Sources */,
 				791F1847F05FC4D479A1D5D6 /* HeartSyncBrand.swift in Sources */,
 				C6A05C574B56A857EE920479 /* HomeOverview.swift in Sources */,
 				8C9367E28284EEFDD937486C /* StoredHeartSyncState.swift in Sources */,

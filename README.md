@@ -33,6 +33,14 @@ These are pass/fail acceptance criteria, not claimed results or invented usage m
 
 Authentication, backend/cloud or partner sync, notifications, HealthKit, third-party integrations, production analytics, medical advice, and App Store launch are outside this MVP. Existing backup export/restore, sharing, prompt suggestions, and launch-review helpers are supporting code, not additions to the core scope. Day 1 adds no product features.
 
+## Backup files
+
+Profile can **Save backup file** through the native file exporter or **Open backup file for review** through the native importer. Files use the existing JSON backup format, including both perspectives. Imported files must be regular UTF-8 files no larger than 5 MB and pass the existing schema/rating/history checks before populating the preview. Nothing is restored until you choose **Restore reviewed backup** and confirm replacement.
+
+File saving marks a backup current only after the exporter reports success and the exported snapshot still matches current data. A cancelled/failed save is not recorded as an export; edits made while the save panel is open keep the older snapshot from being labelled current. The clipboard flow remains available, but a clipboard copy is temporary. Backup files are readable JSON, not encrypted archives; review the destination before sharing.
+
+Unit tests write/read real temporary files, restore both perspectives, reject oversized/empty/binary/folder inputs, and verify stale-export handling. Simulator UI tests check file actions are reachable; actual native picker/provider interactions, permissions and transfers on physical devices remain Amartya's manual review. No signing or new API service is required to build the feature.
+
 ## Branding and launch assets (#1)
 
 The review candidate uses a paired-heart icon and **A small pause, together** lockup in welcome/About, with a native warm launch background and clearer shared-device/empty-state copy. The app icon is a full-square opaque 1024×1024 RGB PNG; iOS supplies the mask. The original AI-generated candidate and its asset exports are recorded in [the asset guide](release/ASSET_GUIDE.md).

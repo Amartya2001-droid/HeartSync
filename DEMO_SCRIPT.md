@@ -6,7 +6,7 @@ HeartSync is a local, shared-device couples check-in app. It has no remote accou
 2. **Your check-in:** set energy/connection and write one reflection/intention. Save using the bottom control, then Continue together.
 3. **Partner's check-in:** pass the device. The partner enters their own response and consents before saving. Show the shared conversation prompt; describe it as a rule-based invitation to listen, not AI or a clinical relationship score.
 4. **Persistence:** return to Home, relaunch, reopen the shared check-in, then find the reflection in Moments. Edit your response and confirm the partner's response remains.
-5. **Profile/data safety:** save the partner profile; export a JSON backup and store it safely. Explain that the clipboard is temporary and uninstalling can delete local data. Restore only after reviewing the destructive warning.
+5. **Profile/data safety:** save the partner profile; choose Save backup file and retain the JSON outside the clipboard. Open the file for validation/preview, then confirm restore only after review. Explain that the clipboard is temporary and uninstalling can delete local data. Restore only after reviewing the destructive warning.
 
 For a fictional demo, explicitly load Reset sample data in Profile. Never replace someone's real data just to recover a presentation. Unreadable saved data should lead to recovery, not silent sample substitution.
 
