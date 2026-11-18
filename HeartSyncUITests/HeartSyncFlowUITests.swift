@@ -146,6 +146,13 @@ final class HeartSyncFlowUITests: XCTestCase {
         app.tabBars.buttons["Profile"].tap()
         XCTAssertTrue(name.waitForExistence(timeout: 10))
         XCTAssertEqual(name.value as? String, "Taylor")
+        let exportFile = app.buttons["backup.exportFile"]
+        seekProfile(exportFile, in: app, upward: true)
+        XCTAssertTrue(exportFile.isEnabled)
+        let importFile = app.buttons["backup.importFile"]
+        seekProfile(importFile, in: app, upward: true)
+        XCTAssertTrue(importFile.isEnabled)
+        screenshot(app, name: "Backup file actions and readable-JSON disclosure")
     }
 
     func testFirstLaunchStartsCheckInWithoutAnEmptyHistoryDetour() {

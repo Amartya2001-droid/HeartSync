@@ -24,13 +24,20 @@ CI artifacts: `ios-test-results` contains the xcresult bundle and exported attac
 6. Copy a JSON backup and store it outside the clipboard before any destructive action. Review it: it contains both people's responses. Clear history only after confirming the warning, then restore the valid backup. Invalid JSON must leave the current data unchanged.
 7. Use Reset sample data only for an explicitly fictional demo. Home must label it. Clear it before entering real check-ins.
 
+## Backup file regression coverage
+
+- The bounded reader rejects folders, empty/binary data and files over 5 MB. Valid text with an invalid schema cannot enter the restore flow.
+- A real temporary-file round trip restores both perspectives with the existing JSON format.
+- Preparing/cancelling a file export does not mark it current; the completion receipt must match current data. A stale snapshot or unreadable active state cannot claim a current backup.
+- Profile's file export/import actions are reachable in the simulator. No automated test is claimed to have operated an external Files/iCloud provider.
+
 ## Amartya's manual checks — pending
 
 These were not performed in this Linux environment:
 
 - VoiceOver reading order, labels, rotor actions and consent controls on all four screens.
 - Full small-phone/iPad and landscape layout, large text beyond the specific automated Home assertions, keyboard dismissal and interaction throughout the app.
-- Physical-device clipboard permission prompts, share sheets, backup transfer/storage and relaunch after force quit.
+- Physical-device clipboard permission prompts, share sheets, backup transfer/storage and relaunch after force quit. For file backups: save to an actual local/provider location, cancel export/import, reopen the saved file for preview, confirm restore, and verify editing during an open save panel is not marked backed up by an older file. Check security-scoped provider permissions and unavailable-provider errors.
 - App signing, provisioning, privacy/release decisions, TestFlight/App Store distribution.
 
 Do not call these checks passed from CI screenshots alone. The app is not live until a real distribution URL exists.

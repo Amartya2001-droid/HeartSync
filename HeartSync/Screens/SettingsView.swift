@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @EnvironmentObject private var store: HeartSyncStore
@@ -9,6 +10,11 @@ struct SettingsView: View {
     @State private var partnerName = ""
     @State private var milestone = ""
     @State private var supportFocus = ""
+    @State private var showBackupExporter = false
+    @State private var showBackupImporter = false
+    @State private var isReadingBackupFile = false
+    @State private var backupDocument: HeartSyncBackupDocument?
+    @State private var backupFileMessage = ""
     @State private var backupImportText = ""
     @State private var backupCopyMessage = ""
     @State private var backupRestoreMessage = ""
@@ -177,6 +183,38 @@ struct SettingsView: View {
                     .accessibilityValue("\(store.exportStatus.title). \(store.exportStatus.detail). \(store.lastBackupExportLabel)")
 
                     Button {
+                        guard let document = store.prepareBackupFile() else {
+                            backupFileMessage = "A backup file could not be prepared. Resolve recovery warnings or invalid draft values, and keep the JSON snapshot within the 5 MB limit."
+                            return
+                        }
+                        backupDocument = document
+                        showBackupExporter = true
+                    } label: {
+                        Label("Save backup file", systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(store.recoveryMessage != nil || isReadingBackupFile)
+                    .accessibilityIdentifier("backup.exportFile")
+
+                    Button {
+                        profileField = nil
+                        showBackupImporter = true
+                    } label: {
+                        Label("Open backup file for review", systemImage: "folder")
+                    }
+                    .disabled(isReadingBackupFile)
+                    .accessibilityIdentifier("backup.importFile")
+
+                    Text("Files contain both responses as readable JSON. Review the destination before saving or sharing. Opening a file only loads a preview; it does not restore data.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    if isReadingBackupFile { ProgressView("Reading backup file…") }
+                    if !backupFileMessage.isEmpty {
+                        Text(backupFileMessage)
+                            .font(.footnote)
+                            .accessibilityIdentifier("backup.fileStatus")
+                    }
+
+                    Button {
                         backupCopyMessage = store.copyBackupExportToClipboard() ? "Backup export copied. Store it somewhere safe; the clipboard is not a permanent backup." : "Backup was not copied. Resolve data recovery or invalid draft values first."
                     } label: {
                         Label("Copy backup export (JSON)", systemImage: "externaldrive")
@@ -209,6 +247,7 @@ struct SettingsView: View {
                         )
                         .accessibilityLabel("Backup JSON input")
                         .accessibilityIdentifier("backup.input")
+                        .disabled(isReadingBackupFile)
 
                     Text(store.backupPreviewSummary(for: backupImportText))
                         .font(.footnote)
@@ -218,9 +257,9 @@ struct SettingsView: View {
                         backupRestoreMessage = ""
                         showRestoreBackupConfirmation = true
                     } label: {
-                        Label("Restore from pasted backup", systemImage: "arrow.clockwise")
+                        Label("Restore reviewed backup", systemImage: "arrow.clockwise")
                     }
-                    .disabled(backupImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(isReadingBackupFile || backupImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityIdentifier("backup.restore")
                     if !backupRestoreMessage.isEmpty {
                         Text(backupRestoreMessage)
@@ -386,6 +425,26 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(HeartSyncTheme.background.ignoresSafeArea())
             .navigationTitle("Profile")
+            .fileExporter(isPresented: $showBackupExporter, document: backupDocument,
+                          contentType: .json, defaultFilename: "HeartSync-backup") { result in
+                switch result {
+                case .success:
+                    if let document = backupDocument, store.completeBackupFileExport(document) {
+                        backupFileMessage = "Backup file saved. Keep it somewhere safe; it includes both responses."
+                    } else {
+                        backupFileMessage = "The snapshot file was saved, but current data changed or needs recovery. Export again before calling the backup current."
+                    }
+                case .failure(let error):
+                    backupFileMessage = fileFailureMessage(error, operation: "Save")
+                }
+                backupDocument = nil
+            }
+            .fileImporter(isPresented: $showBackupImporter, allowedContentTypes: [.json]) { result in
+                switch result {
+                case .success(let url): loadBackupFile(url)
+                case .failure(let error): backupFileMessage = fileFailureMessage(error, operation: "Open")
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -456,6 +515,36 @@ struct SettingsView: View {
                 saveMessage = ""
             }
         }
+    }
+
+    private func loadBackupFile(_ url: URL) {
+        isReadingBackupFile = true
+        backupRestoreMessage = ""
+        backupFileMessage = "Reading the selected file. Saved data has not changed."
+        Task { @MainActor in
+            defer { isReadingBackupFile = false }
+            do {
+                let text = try await Task.detached(priority: .userInitiated) {
+                    let scoped = url.startAccessingSecurityScopedResource()
+                    defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                    return try HeartSyncBackupDocument.readContents(from: url)
+                }.value
+                guard store.canReviewBackupText(text) else { throw BackupFileError.invalidBackup }
+                backupImportText = text
+                backupFileMessage = "File loaded for review. Saved data has not changed. Read the preview, then choose Restore reviewed backup if you want to replace local data."
+            } catch {
+                backupImportText = ""
+                backupFileMessage = "File was not loaded: \(error.localizedDescription) Saved data has not changed."
+            }
+        }
+    }
+
+    private func fileFailureMessage(_ error: Error, operation: String) -> String {
+        let failure = error as NSError
+        if failure.domain == NSCocoaErrorDomain && failure.code == NSUserCancelledError {
+            return "\(operation) cancelled. The existing preview and saved data were not changed."
+        }
+        return "Could not \(operation.lowercased()) the backup file: \(error.localizedDescription) Saved data has not changed."
     }
 
     private var appVersion: String {

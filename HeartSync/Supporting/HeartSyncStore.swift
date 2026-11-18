@@ -554,6 +554,29 @@ final class HeartSyncStore: ObservableObject {
         return text
     }
 
+    func prepareBackupFile() -> HeartSyncBackupDocument? {
+        guard recoveryMessage == nil, currentState.isValid,
+              let source = try? encoder.encode(currentState) else { return nil }
+        let text = backupExportText
+        guard decodedBackupPayload(from: text) != nil else { return nil }
+        return HeartSyncBackupDocument(data: Data(text.utf8), sourceState: source)
+    }
+
+    /// Call only after the native exporter reports success. A stale snapshot is still
+    /// a usable file, but must not be advertised as a backup of newer edits.
+    @discardableResult
+    func completeBackupFileExport(_ document: HeartSyncBackupDocument) -> Bool {
+        guard recoveryMessage == nil, currentState.isValid,
+              let original = document.sourceState,
+              let current = try? encoder.encode(currentState), original == current else { return false }
+        markBackupExported()
+        return true
+    }
+
+    func canReviewBackupText(_ text: String) -> Bool {
+        decodedBackupPayload(from: text) != nil
+    }
+
     var demoReadinessItems: [DemoReadinessItem] {
         [
             DemoReadinessItem(
@@ -931,7 +954,7 @@ final class HeartSyncStore: ObservableObject {
     }
 
     private func decodedBackupPayload(from text: String) -> HeartSyncBackupExport? {
-        guard text.utf8.count <= 5_000_000, let data = text.data(using: .utf8),
+        guard text.utf8.count <= HeartSyncBackupDocument.maximumByteCount, let data = text.data(using: .utf8),
               let payload = try? decoder.decode(HeartSyncBackupExport.self, from: data),
               (payload.schemaVersion ?? 1) == 1,
               HeartSyncValidation.profile(payload.partner), HeartSyncValidation.history(payload.history),

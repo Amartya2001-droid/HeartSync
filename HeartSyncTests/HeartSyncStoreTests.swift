@@ -24,6 +24,60 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testBackupFileRoundTripPreservesBothResponsesWithoutExtraMetadata() throws {
+        let store = HeartSyncStore(defaults: defaults)
+        XCTAssertTrue(store.submitPartnerCheckIn(energy: 2, connection: 4, note: "Fictional file response", intention: "Listen"))
+        let document = try XCTUnwrap(store.prepareBackupFile())
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try document.data.write(to: url, options: .atomic)
+        let text = try HeartSyncBackupDocument.readContents(from: url)
+        XCTAssertTrue(store.canReviewBackupText(text))
+        let payload = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any])
+        XCTAssertNil(payload["sourceState"], "The in-memory receipt must not leak into the backup format")
+        XCTAssertTrue(store.clearAllHistory())
+        XCTAssertTrue(store.restoreFromBackupText(text).isSuccess)
+        XCTAssertEqual(store.todayCheckIn?.partnerResponse?.note, "Fictional file response")
+    }
+
+    func testFileExportOnlyMarksMatchingSavedSnapshotCurrent() throws {
+        defaults.removeObject(forKey: "heartsync.backup.lastExportedAt")
+        let store = HeartSyncStore(defaults: defaults)
+        let earlier = try XCTUnwrap(store.prepareBackupFile())
+        XCTAssertFalse(store.hasCurrentBackupExport, "Preparing a document is not saving it")
+        store.todayNote = "A later edit while the save panel is open"
+        XCTAssertFalse(store.completeBackupFileExport(earlier))
+        XCTAssertFalse(store.hasCurrentBackupExport)
+        let latest = try XCTUnwrap(store.prepareBackupFile())
+        XCTAssertTrue(store.completeBackupFileExport(latest))
+        XCTAssertTrue(store.hasCurrentBackupExport)
+        let imported = HeartSyncBackupDocument(data: latest.data)
+        XCTAssertFalse(store.completeBackupFileExport(imported), "An imported document is not an export receipt")
+        defaults.set(Data("Unreadable fixture".utf8), forKey: "heartsync.state.v1")
+        let recovery = HeartSyncStore(defaults: defaults)
+        XCTAssertNil(recovery.prepareBackupFile())
+        XCTAssertFalse(recovery.completeBackupFileExport(latest))
+    }
+
+    func testBackupFileReaderRejectsOversizedEmptyBinaryAndFolderInput() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let file = folder.appendingPathComponent("input.json")
+        XCTAssertThrowsError(try HeartSyncBackupDocument.readContents(from: folder))
+        for bytes in [Data(), Data([0xff, 0xfe]), Data(repeating: 0x61, count: HeartSyncBackupDocument.maximumByteCount + 1)] {
+            try bytes.write(to: file, options: .atomic)
+            XCTAssertThrowsError(try HeartSyncBackupDocument.readContents(from: file))
+        }
+        let validTextButWrongSchema = Data("{\"example\":true}".utf8)
+        try validTextButWrongSchema.write(to: file, options: .atomic)
+        let store = HeartSyncStore(defaults: defaults)
+        let history = store.history
+        let text = try HeartSyncBackupDocument.readContents(from: file)
+        XCTAssertFalse(store.canReviewBackupText(text))
+        XCTAssertEqual(store.history, history, "Reviewing an invalid file must not restore anything")
+    }
+
     func testBundledBrandAssetsAndLaunchMetadataArePresent() throws {
         XCTAssertNotNil(UIImage(named: "HeartSyncBrandMark"))
         XCTAssertNotNil(UIColor(named: "HeartSyncLaunchBackground"))
