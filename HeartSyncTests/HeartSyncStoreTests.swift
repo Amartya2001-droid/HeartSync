@@ -43,7 +43,7 @@ final class HeartSyncStoreTests: XCTestCase {
         let reread = await store.verifyBackupFile(at: url)
         XCTAssertEqual(reread, .unverifiable, "Do not reuse an earlier preview")
         XCTAssertEqual(store.todayNote, "Changed current state, not the file")
-        XCTAssertNil(store.lastBackupExportAt)
+        XCTAssertNil(defaults.object(forKey: "heartsync.backup.lastExportedAt"))
     }
 
     func testVerificationRecognizesKnownEarlierSuccessfulFileExport() async throws {
