@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var showBackupExporter = false
     @State private var showBackupImporter = false
     @State private var isReadingBackupFile = false
+    @State private var isSelectingForVerification = false
     @State private var backupDocument: HeartSyncBackupDocument?
     @State private var backupFileMessage = ""
     @State private var backupImportText = ""
@@ -197,12 +198,28 @@ struct SettingsView: View {
 
                     Button {
                         profileField = nil
+                        isSelectingForVerification = false
                         showBackupImporter = true
                     } label: {
                         Label("Open backup file for review", systemImage: "folder")
                     }
                     .disabled(isReadingBackupFile)
                     .accessibilityIdentifier("backup.importFile")
+
+                    Button {
+                        profileField = nil
+                        isSelectingForVerification = true
+                        showBackupImporter = true
+                    } label: {
+                        Label("Verify backup file", systemImage: "checkmark.shield")
+                    }
+                    .disabled(isReadingBackupFile || store.recoveryMessage != nil)
+                    .accessibilityIdentifier("backup.verifyFile")
+                    if let message = store.backupVerificationMessage {
+                        Text(message)
+                            .font(.footnote)
+                            .accessibilityIdentifier("backup.verificationStatus")
+                    }
 
                     Text("Files contain both responses as readable JSON. Review the destination before saving or sharing. Opening a file only loads a preview; it does not restore data.")
                         .font(.footnote)
@@ -441,8 +458,20 @@ struct SettingsView: View {
             }
             .fileImporter(isPresented: $showBackupImporter, allowedContentTypes: [.json]) { result in
                 switch result {
-                case .success(let url): loadBackupFile(url)
-                case .failure(let error): backupFileMessage = fileFailureMessage(error, operation: "Open")
+                case .success(let url):
+                    if isSelectingForVerification {
+                        isReadingBackupFile = true
+                        backupFileMessage = "Verifying the selected file. Saved data will not change."
+                        Task { @MainActor in
+                            _ = await store.verifyBackupFile(at: url)
+                            backupFileMessage = "Verification finished. See the comparison result beside Verify backup file."
+                            isReadingBackupFile = false
+                        }
+                    } else {
+                        loadBackupFile(url)
+                    }
+                case .failure(let error):
+                    backupFileMessage = fileFailureMessage(error, operation: isSelectingForVerification ? "Verify" : "Open")
                 }
             }
             .toolbar {

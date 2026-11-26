@@ -31,6 +31,9 @@ CI artifacts: `ios-test-results` contains the xcresult bundle and exported attac
 - Preparing/cancelling a file export does not mark it current; the completion receipt must match current data. A stale snapshot or unreadable active state cannot claim a current backup.
 - Profile's file export/import actions are reachable in the simulator. No automated test is claimed to have operated an external Files/iCloud provider.
 
+- Read-only verification re-reads the selected URL for every request and compares logical state. Unit cases cover match, known earlier export, unknown-origin mismatch, file replacement, invalid/oversized/unreadable input, recovery, profile/partner/sample changes, format/order independence, and result invalidation after local edits. No export marker or persistent data may change.
+- Pending manual verification: save a fictional backup, select Verify backup file, confirm a match; edit local data and select the file again; confirm stale only with this session's successful export evidence, otherwise unknown-age mismatch. Replace/delete the file and reselect it to confirm it is re-read. Cancel the picker and check saved data and restore preview remain unchanged. Never auto-restore.
+
 ## Amartya's manual checks — pending
 
 These were not performed in this Linux environment:

@@ -152,6 +152,9 @@ final class HeartSyncFlowUITests: XCTestCase {
         let importFile = app.buttons["backup.importFile"]
         seekProfile(importFile, in: app, upward: true)
         XCTAssertTrue(importFile.isEnabled)
+        let verifyFile = app.buttons["backup.verifyFile"]
+        seekProfile(verifyFile, in: app, upward: true)
+        XCTAssertTrue(verifyFile.isEnabled)
         screenshot(app, name: "Backup file actions and readable-JSON disclosure")
     }
 

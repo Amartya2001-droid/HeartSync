@@ -39,6 +39,8 @@ Profile can **Save backup file** through the native file exporter or **Open back
 
 File saving marks a backup current only after the exporter reports success and the exported snapshot still matches current data. A cancelled/failed save is not recorded as an export; edits made while the save panel is open keep the older snapshot from being labelled current. The clipboard flow remains available, but a clipboard copy is temporary. Backup files are readable JSON, not encrypted archives; review the destination before sharing.
 
+Profile also offers **Verify backup file**: select a file to re-read it and compare its validated profile, both responses, draft and sample flag with local state. JSON formatting, export labels and history order do not affect comparison. Results distinguish a match, an earlier successful file export from this app session that is now stale, a mismatch of unknown age/origin, or an unverifiable file/state. Prior export evidence is held only in memory; after relaunch an older mismatching file has unknown age. Verification never restores data, changes the restore preview, or marks an export current. A result is invalidated when local state differs; later external file changes are not monitored, so select it again to re-check. Native picker/provider and physical-device/VoiceOver review remain pending.
+
 Unit tests write/read real temporary files, restore both perspectives, reject oversized/empty/binary/folder inputs, and verify stale-export handling. Simulator UI tests check file actions are reachable; actual native picker/provider interactions, permissions and transfers on physical devices remain Amartya's manual review. No signing or new API service is required to build the feature.
 
 ## Branding and launch assets (#1)
