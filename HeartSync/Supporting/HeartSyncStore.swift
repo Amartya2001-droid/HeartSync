@@ -573,6 +573,11 @@ final class HeartSyncStore: ObservableObject {
         return true
     }
 
+    // Regression-first placeholder; implemented in the following commit.
+    func verifyBackupFile(at url: URL) async -> BackupVerificationStatus {
+        .unverifiable
+    }
+
     func canReviewBackupText(_ text: String) -> Bool {
         decodedBackupPayload(from: text) != nil
     }
@@ -994,4 +999,8 @@ final class HeartSyncStore: ObservableObject {
 
         return lhs.connection < rhs.connection
     }
+}
+
+enum BackupVerificationStatus: Equatable {
+    case matches, stale, mismatches, unverifiable
 }

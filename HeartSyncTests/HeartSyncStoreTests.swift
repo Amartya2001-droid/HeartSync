@@ -24,6 +24,77 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testVerificationRereadsFileAndNeverRestoresOrMarksExported() async throws {
+        defaults.removeObject(forKey: "heartsync.backup.lastExportedAt")
+        let store = HeartSyncStore(defaults: defaults)
+        let document = try XCTUnwrap(store.prepareBackupFile())
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try document.data.write(to: url)
+        let before = defaults.dictionaryRepresentation() as NSDictionary
+        let matching = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(matching, .matches)
+        XCTAssertEqual(defaults.dictionaryRepresentation() as NSDictionary, before)
+        XCTAssertFalse(store.hasCurrentBackupExport)
+        store.todayNote = "Changed current state, not the file"
+        let changed = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(changed, .mismatches, "Unknown file age must not be called stale")
+        try Data("invalid replacement".utf8).write(to: url, options: .atomic)
+        let reread = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(reread, .unverifiable, "Do not reuse an earlier preview")
+        XCTAssertEqual(store.todayNote, "Changed current state, not the file")
+        XCTAssertNil(store.lastBackupExportAt)
+    }
+
+    func testVerificationRecognizesKnownEarlierSuccessfulFileExport() async throws {
+        let store = HeartSyncStore(defaults: defaults)
+        let document = try XCTUnwrap(store.prepareBackupFile())
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try document.data.write(to: url)
+        XCTAssertTrue(store.completeBackupFileExport(document))
+        store.todayNote = "Newer draft"
+        let before = defaults.dictionaryRepresentation() as NSDictionary
+        let result = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(result, .stale)
+        XCTAssertEqual(defaults.dictionaryRepresentation() as NSDictionary, before)
+        XCTAssertFalse(store.hasCurrentBackupExport)
+    }
+
+    func testVerificationIgnoresJSONFormattingExportLabelAndHistoryOrder() async throws {
+        let store = HeartSyncStore(defaults: defaults)
+        let document = try XCTUnwrap(store.prepareBackupFile())
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: document.data) as? [String: Any])
+        json["exportedAt"] = "Unknown origin and date"
+        json["history"] = (json["history"] as? [[String: Any]])?.reversed().map { $0 }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try JSONSerialization.data(withJSONObject: json).write(to: url)
+        let result = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(result, .matches)
+    }
+
+    func testVerificationRejectsUnreadableFilesAndRecoveryState() async throws {
+        let store = HeartSyncStore(defaults: defaults)
+        let document = try XCTUnwrap(store.prepareBackupFile())
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let missing = await store.verifyBackupFile(at: url)
+        XCTAssertEqual(missing, .unverifiable)
+        for data in [Data(), Data([0xff]), Data(repeating: 0x61, count: HeartSyncBackupDocument.maximumByteCount + 1), Data("{}".utf8)] {
+            try data.write(to: url, options: .atomic)
+            let invalid = await store.verifyBackupFile(at: url)
+            XCTAssertEqual(invalid, .unverifiable)
+        }
+        try document.data.write(to: url, options: .atomic)
+        let corrupt = Data("Unreadable state".utf8)
+        defaults.set(corrupt, forKey: "heartsync.state.v1")
+        let recovery = HeartSyncStore(defaults: defaults)
+        let result = await recovery.verifyBackupFile(at: url)
+        XCTAssertEqual(result, .unverifiable)
+        XCTAssertEqual(defaults.data(forKey: "heartsync.state.v1"), corrupt)
+    }
+
     func testBackupFileRoundTripPreservesBothResponsesWithoutExtraMetadata() throws {
         let store = HeartSyncStore(defaults: defaults)
         XCTAssertTrue(store.submitPartnerCheckIn(energy: 2, connection: 4, note: "Fictional file response", intention: "Listen"))
