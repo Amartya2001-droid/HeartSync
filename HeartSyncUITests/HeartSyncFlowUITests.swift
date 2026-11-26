@@ -83,7 +83,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         seekProfile(paste, in: app, upward: false)
         paste.tap()
         let input = app.textViews["backup.input"]
-        seekProfile(input, in: app, upward: true)
+        XCTAssertTrue(input.waitForExistence(timeout: 5))
         XCTAssertTrue(NSPredicate(format: "value BEGINSWITH %@", "{").evaluate(with: input), "Paste must populate the JSON editor before restore")
         let restore = app.buttons["backup.restore"]
         seekProfile(restore, in: app, upward: true)
