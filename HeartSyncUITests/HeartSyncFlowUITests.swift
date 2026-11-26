@@ -22,13 +22,21 @@ final class HeartSyncFlowUITests: XCTestCase {
 
     private func seekProfile(_ element: XCUIElement, in app: XCUIApplication, upward: Bool) {
         for _ in 0..<14 {
-            if element.exists && element.isHittable { return }
+            // Hittable can be true for a clipped row under navigation/tab chrome.
+            // Require the whole control to be inside the form before tapping it.
+            let top = app.navigationBars.firstMatch.frame.maxY + 8
+            let bottom = app.tabBars.firstMatch.frame.minY - 8
+            let exists = element.exists
+            let frame = exists ? element.frame : .zero
+            if exists && element.isHittable && frame.height > 0 &&
+                frame.minY >= top && frame.maxY <= bottom { return }
+            let moveUp = exists && frame.height > 0 ? frame.maxY > bottom : upward
             // Drag in the form's margin so a nested JSON editor cannot consume the scroll.
-            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: upward ? 0.75 : 0.30))
-            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: upward ? 0.30 : 0.75))
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.75 : 0.30))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.30 : 0.75))
             start.press(forDuration: 0.05, thenDragTo: end)
         }
-        XCTAssertTrue(element.exists && element.isHittable, "Profile control must be reachable: \(element)")
+        XCTFail("Profile control must be fully visible and reachable: \(element)")
     }
 
     private func assertWithinScreenWidth(_ element: XCUIElement, in app: XCUIApplication) {
@@ -53,6 +61,10 @@ final class HeartSyncFlowUITests: XCTestCase {
         let copy = app.buttons["backup.copy"]
         seekProfile(copy, in: app, upward: true)
         copy.tap()
+        let copied = app.staticTexts["backup.status"]
+        seekProfile(copied, in: app, upward: true)
+        XCTAssertTrue(copied.waitForExistence(timeout: 5))
+        XCTAssertTrue(copied.label.contains("Backup export copied"), "Confirm copy succeeded before clearing fictional history")
         let clear = app.buttons["data.clearHistory"]
         seekProfile(clear, in: app, upward: true)
         clear.tap()
@@ -70,9 +82,13 @@ final class HeartSyncFlowUITests: XCTestCase {
         let paste = app.buttons["backup.paste"]
         seekProfile(paste, in: app, upward: false)
         paste.tap()
+        let input = app.textViews["backup.input"]
+        XCTAssertTrue(input.waitForExistence(timeout: 5))
+        XCTAssertTrue(NSPredicate(format: "value BEGINSWITH %@", "{").evaluate(with: input), "Paste must populate the JSON editor before restore")
         let restore = app.buttons["backup.restore"]
         seekProfile(restore, in: app, upward: true)
-        XCTAssertTrue(restore.isEnabled)
+        let enabled = expectation(for: NSPredicate(format: "enabled == true"), evaluatedWith: restore)
+        wait(for: [enabled], timeout: 5)
         restore.tap()
         app.buttons["Restore backup"].tap()
         let status = app.staticTexts["backup.restoreStatus"]
@@ -152,6 +168,9 @@ final class HeartSyncFlowUITests: XCTestCase {
         let importFile = app.buttons["backup.importFile"]
         seekProfile(importFile, in: app, upward: true)
         XCTAssertTrue(importFile.isEnabled)
+        let verifyFile = app.buttons["backup.verifyFile"]
+        seekProfile(verifyFile, in: app, upward: true)
+        XCTAssertTrue(verifyFile.isEnabled)
         screenshot(app, name: "Backup file actions and readable-JSON disclosure")
     }
 

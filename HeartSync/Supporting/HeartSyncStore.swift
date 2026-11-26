@@ -13,6 +13,8 @@ final class HeartSyncStore: ObservableObject {
 
     @Published private(set) var containsSampleData = false
     @Published private(set) var recoveryMessage: String?
+    @Published private(set) var backupVerification: BackupVerification?
+    private var lastSuccessfulFileSnapshot: Data?
     private var isApplyingState = false
 
     private let defaults: UserDefaults
@@ -569,8 +571,49 @@ final class HeartSyncStore: ObservableObject {
         guard recoveryMessage == nil, currentState.isValid,
               let original = document.sourceState,
               let current = try? encoder.encode(currentState), original == current else { return false }
+        lastSuccessfulFileSnapshot = comparisonSnapshot(currentState)
         markBackupExported()
         return true
+    }
+
+    /// Each request reads the file again. This never restores data or marks an export.
+    func verifyBackupFile(at url: URL) async -> BackupVerificationStatus {
+        backupVerification = nil
+        let text = try? await Task.detached(priority: .userInitiated) {
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            return try HeartSyncBackupDocument.readContents(from: url)
+        }.value
+        guard recoveryMessage == nil, currentState.isValid,
+              let text, let payload = decodedBackupPayload(from: text),
+              let current = comparisonSnapshot(currentState),
+              let selected = comparisonSnapshot(StoredHeartSyncState(
+                partner: payload.partner, history: payload.history,
+                draft: CheckInDraft(energy: payload.draftEnergy, connection: payload.draftConnection,
+                    note: payload.draftNote, intention: payload.draftIntention),
+                containsSampleData: payload.containsSampleData ?? false)) else {
+            backupVerification = BackupVerification(status: .unverifiable, comparedState: nil)
+            return .unverifiable
+        }
+        let status: BackupVerificationStatus = selected == current ? .matches :
+            (selected == lastSuccessfulFileSnapshot ? .stale : .mismatches)
+        backupVerification = BackupVerification(status: status, comparedState: current)
+        return status
+    }
+
+    var backupVerificationMessage: String? {
+        guard let result = backupVerification else { return nil }
+        if let compared = result.comparedState,
+           recoveryMessage != nil || comparisonSnapshot(currentState) != compared {
+            return "Local data changed since verification. Select the file again to re-read and compare. Nothing was restored."
+        }
+        return result.status.message
+    }
+
+    private func comparisonSnapshot(_ state: StoredHeartSyncState) -> Data? {
+        var canonical = state
+        canonical.history.sort { $0.date > $1.date }
+        return try? encoder.encode(canonical)
     }
 
     func canReviewBackupText(_ text: String) -> Bool {
@@ -993,5 +1036,27 @@ final class HeartSyncStore: ObservableObject {
         }
 
         return lhs.connection < rhs.connection
+    }
+}
+
+struct BackupVerification {
+    let status: BackupVerificationStatus
+    let comparedState: Data?
+}
+
+enum BackupVerificationStatus: Equatable {
+    case matches, stale, mismatches, unverifiable
+
+    var message: String {
+        switch self {
+        case .matches:
+            return "Backup matches local data at verification time. File changes later are not monitored; select it again to re-check. Nothing was restored."
+        case .stale:
+            return "Backup is stale: it matches an earlier successful file export from this app session, but local data now differs. Nothing was restored."
+        case .mismatches:
+            return "Backup does not match local data. Its age and origin are unknown; it may be older or from another device. Nothing was restored."
+        case .unverifiable:
+            return "Could not verify: the file is unreadable, invalid, unsupported, over 5 MB, or local data needs recovery/correction. Nothing was restored."
+        }
     }
 }
