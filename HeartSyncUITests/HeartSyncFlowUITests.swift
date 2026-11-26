@@ -26,10 +26,11 @@ final class HeartSyncFlowUITests: XCTestCase {
             // Require the whole control to be inside the form before tapping it.
             let top = app.navigationBars.firstMatch.frame.maxY + 8
             let bottom = app.tabBars.firstMatch.frame.minY - 8
-            let frame = element.frame
-            if element.exists && element.isHittable && frame.height > 0 &&
+            let exists = element.exists
+            let frame = exists ? element.frame : .zero
+            if exists && element.isHittable && frame.height > 0 &&
                 frame.minY >= top && frame.maxY <= bottom { return }
-            let moveUp = element.exists && frame.height > 0 ? frame.maxY > bottom : upward
+            let moveUp = exists && frame.height > 0 ? frame.maxY > bottom : upward
             // Drag in the form's margin so a nested JSON editor cannot consume the scroll.
             let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.75 : 0.30))
             let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.30 : 0.75))
@@ -81,6 +82,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         seekProfile(paste, in: app, upward: false)
         paste.tap()
         let input = app.textViews["backup.input"]
+        seekProfile(input, in: app, upward: true)
         XCTAssertTrue(NSPredicate(format: "value BEGINSWITH %@", "{").evaluate(with: input), "Paste must populate the JSON editor before restore")
         let restore = app.buttons["backup.restore"]
         seekProfile(restore, in: app, upward: true)
