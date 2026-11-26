@@ -62,6 +62,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         seekProfile(copy, in: app, upward: true)
         copy.tap()
         let copied = app.staticTexts["backup.status"]
+        seekProfile(copied, in: app, upward: true)
         XCTAssertTrue(copied.waitForExistence(timeout: 5))
         XCTAssertTrue(copied.label.contains("Backup export copied"), "Confirm copy succeeded before clearing fictional history")
         let clear = app.buttons["data.clearHistory"]
