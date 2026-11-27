@@ -13,11 +13,27 @@ final class HeartSyncFlowUITests: XCTestCase {
     }
 
     private func reveal(_ element: XCUIElement, in app: XCUIApplication) {
-        for _ in 0..<12 {
+        for _ in 0..<16 {
             if element.exists && element.isHittable { return }
-            app.swipeUp()
+            let exists = element.exists
+            let frame = exists ? element.frame : .zero
+            let top = app.navigationBars.firstMatch.frame.maxY
+            let moveUp = !exists || frame.height == 0 || frame.midY > top
+            // Keep drags out of nested fields, sliders and horizontal suggestion rows.
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.75 : 0.30))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: moveUp ? 0.30 : 0.75))
+            start.press(forDuration: 0.05, thenDragTo: end)
         }
-        XCTAssertTrue(element.exists && element.isHittable, "Element should be reachable by scrolling: \(element)")
+        XCTFail("Element should be reachable by scrolling: \(element). Hierarchy: \(app.debugDescription)")
+    }
+
+    private func confirmAlert(_ title: String, action: String, in app: XCUIApplication) {
+        let alert = app.alerts[title]
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        // Newer SwiftUI may expose both the labelled wrapper and its nested button.
+        let button = alert.buttons.matching(identifier: action).firstMatch
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        button.tap()
     }
 
     private func seekProfile(_ element: XCUIElement, in app: XCUIApplication, upward: Bool) {
@@ -68,14 +84,14 @@ final class HeartSyncFlowUITests: XCTestCase {
         let clear = app.buttons["data.clearHistory"]
         seekProfile(clear, in: app, upward: true)
         clear.tap()
-        app.buttons["Cancel"].tap()
+        confirmAlert("Clear all saved moments?", action: "Cancel", in: app)
         app.tabBars.buttons["Home"].tap()
         XCTAssertTrue(app.buttons["home.primaryAction"].label.contains("View your shared check-in"))
 
         app.tabBars.buttons["Profile"].tap()
         seekProfile(clear, in: app, upward: true)
         clear.tap()
-        app.buttons["Clear history"].tap()
+        confirmAlert("Clear all saved moments?", action: "history.confirmClear", in: app)
         let notNow = app.buttons["Not now"]
         XCTAssertTrue(notNow.waitForExistence(timeout: 10))
         notNow.tap()
@@ -90,7 +106,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         let enabled = expectation(for: NSPredicate(format: "enabled == true"), evaluatedWith: restore)
         wait(for: [enabled], timeout: 5)
         restore.tap()
-        app.buttons["Restore backup"].tap()
+        confirmAlert("Restore HeartSync backup?", action: "backup.confirmRestore", in: app)
         let status = app.staticTexts["backup.restoreStatus"]
         seekProfile(status, in: app, upward: true)
         XCTAssertTrue(status.waitForExistence(timeout: 5))
@@ -126,7 +142,7 @@ final class HeartSyncFlowUITests: XCTestCase {
         let fresh = app.buttons["recovery.startFresh"]
         seekProfile(fresh, in: app, upward: false)
         fresh.tap()
-        app.buttons["Keep unreadable copy and start fresh"].tap()
+        confirmAlert("Start fresh?", action: "recovery.confirmFresh", in: app)
         app.tabBars.buttons["Home"].tap()
         XCTAssertTrue(primary.label.contains("Start today’s check-in"))
         app.terminate()
@@ -231,10 +247,15 @@ final class HeartSyncFlowUITests: XCTestCase {
         app.launch()
         let shared = app.buttons["home.primaryAction"]
         XCTAssertTrue(shared.waitForExistence(timeout: 15))
+        XCTAssertTrue(shared.label.contains("View your shared check-in"), "Both saved responses must survive relaunch")
         reveal(shared, in: app)
         shared.tap()
-        XCTAssertTrue(app.staticTexts["couple.summary"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch.exists)
+        let persistedReflection = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch
+        reveal(persistedReflection, in: app)
+        XCTAssertTrue(persistedReflection.exists)
+        let summary = app.staticTexts["couple.summary"]
+        reveal(summary, in: app)
+        XCTAssertTrue(summary.exists && summary.isHittable)
     }
 
     func testEmptyAndSampleHomesAtAccessibilityTextSize() {

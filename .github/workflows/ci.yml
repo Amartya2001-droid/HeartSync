@@ -12,23 +12,23 @@ jobs:
       - run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
   ios:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
-      - name: Select an available iPhone simulator
+      - name: Verify submission toolchain
+        run: python3 scripts/ci_environment.py verify
+      - name: Select an available iOS 26+ iPhone simulator
         run: |
           xcrun simctl list devices available -j > "$RUNNER_TEMP/devices.json"
-          python3 - <<'PY'
-          import json, os
-          with open(os.environ['RUNNER_TEMP'] + '/devices.json') as f:
-              devices = json.load(f)['devices']
-          iphones = [d for runtime, entries in devices.items() if 'iOS' in runtime
-                     for d in entries if d.get('isAvailable') and d['name'].startswith('iPhone')]
-          if not iphones:
-              raise SystemExit('No available iPhone simulator')
-          with open(os.environ['GITHUB_ENV'], 'a') as f:
-              f.write('SIMULATOR_ID=' + iphones[0]['udid'] + '\n')
-          PY
+          python3 scripts/ci_environment.py simulator --devices "$RUNNER_TEMP/devices.json" --github-env "$GITHUB_ENV"
+      - name: Build unsigned Release for iOS devices
+        run: |
+          set -o pipefail
+          xcodebuild build -project HeartSync.xcodeproj -scheme HeartSync -configuration Release \
+            -destination 'generic/platform=iOS' -derivedDataPath .release-deriveddata \
+            CODE_SIGNING_ALLOWED=NO | tee ReleaseBuild.log
       - name: Build and run XCTest
         run: >-
           xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync
@@ -54,4 +54,10 @@ jobs:
         with:
           name: home-screenshots
           path: SimulatorScreenshots/**/*.png
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unsigned-release-build-log
+          path: ReleaseBuild.log
           if-no-files-found: ignore

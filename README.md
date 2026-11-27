@@ -55,6 +55,8 @@ Profile saves now validate and trim input, report persistence failure, and prese
 
 The shared test scheme includes profile-validation/relaunch UI coverage, data-safety regressions and a check that every recommended ritual symbol exists in the simulator. Follow the [QA checklist](QA_CHECKLIST.md) and [current demo script](DEMO_SCRIPT.md). Focused CI layout tests and captures cover their stated cases; broader layouts, VoiceOver, physical devices and signing/distribution remain unverified here and are Amartya's calls.
 
+Clear-history, restore and fresh-start actions use explicit confirmation alerts with a visible Cancel action.
+
 The QA follow-up also keeps restore feedback at the restore action and disables unavailable sample/clear actions while saved data is unreadable. Store methods report blocked mutations without changing recovery data. Simulator tests cover cancelling clear-history, clearing/restoring a paired backup, relaunch, and an explicit fresh start from unreadable data. Fixture switches are DEBUG-only and confined to the UI-test storage suite.
 
 ## Home and the primary flow (#5)
@@ -102,7 +104,7 @@ Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repo
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
-CI runs those checks and builds/tests the iOS app on a macOS simulator, without signing credentials. Before opening a PR, push its branch and wait for the branch CI tests to pass. For local Xcode verification:
+CI runs those checks, selects the explicitly configured stable Xcode 26.3 toolchain, verifies an iPhoneOS 26+ SDK, builds unsigned Release for generic iOS devices, and runs Debug XCTest on an available iOS 26+ iPhone simulator. It fails rather than falling back to an older SDK/runtime. The unsigned Release build log and simulator results are retained as CI artifacts. This does not produce a signed archive or establish App Store upload, device/VoiceOver acceptance, or distribution. Before opening a PR, push its branch and wait for the branch CI tests to pass. For local Xcode verification:
 
 ```sh
 xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync \
