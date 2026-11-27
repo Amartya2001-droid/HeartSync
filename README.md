@@ -102,7 +102,7 @@ Linux cannot build SwiftUI/UIKit or run the iOS XCTest target. Run portable repo
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
-CI runs those checks and builds/tests the iOS app on a macOS simulator, without signing credentials. Before opening a PR, push its branch and wait for the branch CI tests to pass. For local Xcode verification:
+CI runs those checks, selects the explicitly configured stable Xcode 26.3 toolchain, verifies an iPhoneOS 26+ SDK, builds unsigned Release for generic iOS devices, and runs Debug XCTest on an available iOS 26+ iPhone simulator. It fails rather than falling back to an older SDK/runtime. The unsigned Release build log and simulator results are retained as CI artifacts. This does not produce a signed archive or establish App Store upload, device/VoiceOver acceptance, or distribution. Before opening a PR, push its branch and wait for the branch CI tests to pass. For local Xcode verification:
 
 ```sh
 xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync \
