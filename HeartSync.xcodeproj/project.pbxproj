@@ -31,6 +31,7 @@
 		9B9F12C4055D03A8E4B7FB10 /* HeartSyncFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FDC2E42A2A956695AAC97B /* HeartSyncFlowUITests.swift */; };
 		791F1847F05FC4D479A1D5D6 /* HeartSyncBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */; };
 		5A3821C42F5AF046E04FCA26 /* HeartSyncBackupDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */; };
+		D42700000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D42700000000000000000002 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		CB74F7799529927F5D9C388B /* HeartSyncBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncBrand.swift; sourceTree = "<group>"; };
 		B78C606B9DBC5F8A0E0EAADC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartSyncBackupDocument.swift; sourceTree = "<group>"; };
+		D42700000000000000000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +187,7 @@
 			children = (
 				B5E7C7137ACA08750E51165E /* HeartSyncBackupDocument.swift */,
 				B78C606B9DBC5F8A0E0EAADC /* Info.plist */,
+				D42700000000000000000002 /* PrivacyInfo.xcprivacy */,
 				AEB300002D00000100AA0001 /* HeartSyncStore.swift */,
 				AEB300022D00000100AA0001 /* HeartSyncTheme.swift */,
 			);
@@ -330,6 +333,7 @@
 			files = (
 				AEA604942C25B4D900CB3983 /* Preview Assets.xcassets in Resources */,
 				AEA604912C25B4D900CB3983 /* Assets.xcassets in Resources */,
+				D42700000000000000000001 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
