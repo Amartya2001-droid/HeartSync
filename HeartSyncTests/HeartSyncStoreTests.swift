@@ -24,6 +24,18 @@ final class HeartSyncStoreTests: XCTestCase {
         super.tearDown()
     }
 
+    func testAppBundlesItsPrivacyManifestWithAppOwnedDefaultsReason() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"))
+        let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
+        XCTAssertEqual(plist["NSPrivacyTracking"] as? Bool, false)
+        XCTAssertEqual((plist["NSPrivacyTrackingDomains"] as? [String])?.count, 0)
+        XCTAssertEqual((plist["NSPrivacyCollectedDataTypes"] as? [[String: Any]])?.count, 0)
+        let entries = try XCTUnwrap(plist["NSPrivacyAccessedAPITypes"] as? [[String: Any]])
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?["NSPrivacyAccessedAPIType"] as? String, "NSPrivacyAccessedAPICategoryUserDefaults")
+        XCTAssertEqual(entries.first?["NSPrivacyAccessedAPITypeReasons"] as? [String], ["CA92.1"])
+    }
+
     func testVerificationRereadsFileAndNeverRestoresOrMarksExported() async throws {
         defaults.removeObject(forKey: "heartsync.backup.lastExportedAt")
         let store = HeartSyncStore(defaults: defaults)

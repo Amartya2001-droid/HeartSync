@@ -43,6 +43,10 @@ Profile also offers **Verify backup file**: select a file to re-read it and comp
 
 Unit tests write/read real temporary files, restore both perspectives, reject oversized/empty/binary/folder inputs, and verify stale-export handling. Simulator UI tests check file actions are reachable; actual native picker/provider interactions, permissions and transfers on physical devices remain Amartya's manual review. No signing or new API service is required to build the feature.
 
+## Privacy manifest
+
+The app target includes `PrivacyInfo.xcprivacy`, declaring app-owned UserDefaults access (`CA92.1`), no tracking domains and no developer data collection for the current local implementation. See the [API inventory and limits](release/PRIVACY_API_AUDIT.md). CI checks the copied manifest in the unsigned Release product; XCTest reads the simulator app's bundled file. This is technical packaging evidence, not approval of App Store privacy answers or a published privacy policy. User-directed JSON/clipboard/share exports can leave the device. Amartya's final privacy declarations, genuine policy/support destinations and signed-archive validation remain pending.
+
 ## Branding and launch assets (#1)
 
 The review candidate uses a paired-heart icon and **A small pause, together** lockup in welcome/About, with a native warm launch background and clearer shared-device/empty-state copy. The app icon is a full-square opaque 1024×1024 RGB PNG; iOS supplies the mask. The original AI-generated candidate and its asset exports are recorded in [the asset guide](release/ASSET_GUIDE.md).

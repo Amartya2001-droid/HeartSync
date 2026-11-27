@@ -29,6 +29,8 @@ jobs:
           xcodebuild build -project HeartSync.xcodeproj -scheme HeartSync -configuration Release \
             -destination 'generic/platform=iOS' -derivedDataPath .release-deriveddata \
             CODE_SIGNING_ALLOWED=NO | tee ReleaseBuild.log
+      - name: Verify privacy manifest in unsigned Release product
+        run: python3 scripts/check_privacy_manifest.py .release-deriveddata/Build/Products/Release-iphoneos/HeartSync.app
       - name: Build and run XCTest
         run: >-
           xcodebuild test -project HeartSync.xcodeproj -scheme HeartSync
