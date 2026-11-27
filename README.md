@@ -59,6 +59,8 @@ Profile saves now validate and trim input, report persistence failure, and prese
 
 The shared test scheme includes profile-validation/relaunch UI coverage, data-safety regressions and a check that every recommended ritual symbol exists in the simulator. Follow the [QA checklist](QA_CHECKLIST.md) and [current demo script](DEMO_SCRIPT.md). Focused CI layout tests and captures cover their stated cases; broader layouts, VoiceOver, physical devices and signing/distribution remain unverified here and are Amartya's calls.
 
+Clear-history, restore and fresh-start actions use explicit confirmation alerts with a visible Cancel action.
+
 The QA follow-up also keeps restore feedback at the restore action and disables unavailable sample/clear actions while saved data is unreadable. Store methods report blocked mutations without changing recovery data. Simulator tests cover cancelling clear-history, clearing/restoring a paired backup, relaunch, and an explicit fresh start from unreadable data. Fixture switches are DEBUG-only and confined to the UI-test storage suite.
 
 ## Home and the primary flow (#5)
