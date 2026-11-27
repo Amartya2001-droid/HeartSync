@@ -247,10 +247,15 @@ final class HeartSyncFlowUITests: XCTestCase {
         app.launch()
         let shared = app.buttons["home.primaryAction"]
         XCTAssertTrue(shared.waitForExistence(timeout: 15))
+        XCTAssertTrue(shared.label.contains("View your shared check-in"), "Both saved responses must survive relaunch")
         reveal(shared, in: app)
         shared.tap()
-        XCTAssertTrue(app.staticTexts["couple.summary"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch.exists)
+        let persistedReflection = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "We made time to listen.")).firstMatch
+        reveal(persistedReflection, in: app)
+        XCTAssertTrue(persistedReflection.exists)
+        let summary = app.staticTexts["couple.summary"]
+        reveal(summary, in: app)
+        XCTAssertTrue(summary.exists && summary.isHittable)
     }
 
     func testEmptyAndSampleHomesAtAccessibilityTextSize() {
