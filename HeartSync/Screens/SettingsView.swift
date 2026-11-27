@@ -481,7 +481,7 @@ struct SettingsView: View {
                         .accessibilityIdentifier("profile.keyboardDone")
                 }
             }
-            .confirmationDialog("Start fresh?", isPresented: $showRecoveryResetConfirmation, titleVisibility: .visible) {
+            .alert("Start fresh?", isPresented: $showRecoveryResetConfirmation) {
                 Button("Keep unreadable copy and start fresh", role: .destructive) { store.startFreshAfterRecovery() }
                     .accessibilityIdentifier("recovery.confirmFresh")
             } message: {
@@ -504,10 +504,9 @@ struct SettingsView: View {
             } message: {
                 Text("This replaces the current profile and check-in history with the default demo scenario.")
             }
-            .confirmationDialog(
+            .alert(
                 "Restore HeartSync backup?",
-                isPresented: $showRestoreBackupConfirmation,
-                titleVisibility: .visible
+                isPresented: $showRestoreBackupConfirmation
             ) {
                 Button("Restore backup", role: .destructive) {
                     let result = store.restoreFromBackupText(backupImportText)
@@ -519,19 +518,20 @@ struct SettingsView: View {
                     }
                     backupRestoreMessage = "\(result.title): \(result.detail)"
                 }
+                .accessibilityIdentifier("backup.confirmRestore")
 
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("This replaces the current local profile, moments, and draft state with the pasted backup.")
             }
-            .confirmationDialog(
+            .alert(
                 "Clear all saved moments?",
-                isPresented: $showClearHistoryConfirmation,
-                titleVisibility: .visible
+                isPresented: $showClearHistoryConfirmation
             ) {
                 Button("Clear history", role: .destructive) {
                     saveMessage = store.clearAllHistory() ? "All moments history cleared." : "History was not cleared. Resolve data recovery or invalid draft values first."
                 }
+                .accessibilityIdentifier("history.confirmClear")
 
                 Button("Cancel", role: .cancel) { }
             } message: {
